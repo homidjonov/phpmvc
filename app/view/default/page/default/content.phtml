@@ -1,0 +1,11 @@
+<?php
+/**
+ * @var $this Module
+ */
+$page = $this->getParam('page');
+?>
+<h2 class="post_title"><?=$page->getData('title')?></h2>
+<div class="post_data">
+    <?=$page->getData('content')?>
+</div>
+

@@ -1,0 +1,5 @@
+<?php foreach (array('last_posts', 'categories', 'tags') as $widget): ?>
+<div class="widget widget_<?=$widget?>">
+    <?php $this->getPart('post/widget/' . $widget) ?>
+</div>
+<?php endforeach; ?>

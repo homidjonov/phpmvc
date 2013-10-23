@@ -1,0 +1,129 @@
+Build a dynamic news blog from scrach.
+
+1. Development tools:
+	- Notepad++ (coding)
+	- Total Commandor (file management)
+	- Mothilla Firefox (viewing)
+	- Firebug (extension for firefox which is help us to find bugs easly)
+	- ColorZilla (extension for firefox which is help us to find colors)
+	- Navicat (database management tool)
+	- Some server stack (Denwer or wamp)
+		- Apache (it is http server)
+			(you should study to configure apache using .htaccess) -google
+		- PHP (it is php script interpretator)
+			(you should study to configure PHP using php.ini) -google
+		- mySql (it is database)
+			(you should study to configure mySql using my.cnf) -google
+
+2. Draw web site structure, devide the page to logical blocks:
+	- head (b1)
+		-linking external css, js, jquery, meta tags, startup scripts
+	- header (b1)
+		- top menu (b2)
+			- about us
+			- sitemap	
+			- login
+		- main menu (b2)
+			- home
+			- some page
+			- contact us
+		- header image (b2)
+	- left or right sidebar (b1)
+		- categories (b)
+		- last added news (b)
+		- last comments (b)
+		- poll (b)
+		- cloud of tags (b)
+	- content (home) (b1)
+		- some jquery image slider
+		- news list (b2)
+			- agenda image
+			- title
+			- meta
+			- brief content
+		- pagination (b2)
+	- footer (b1)
+		- copyright
+		- contact us
+		- sitemap
+		- archive
+3. Make html template:
+	- Write blocks using html box modeling, write also css.
+	- First parent blocks(b1), then child blocks(b2)
+	- After all blocks are ready, correct the design, fix some css rules. 
+	- Add some javascript funtionality (form validation, jquery effects)
+4. Prepare local host
+	- Add local domain, configure it
+	- Test phpinfo();
+5. Prepare database tables:
+	- In our blog content is pulled from database, we have following tables to store content:
+		- posts (for news, post)
+			- post_id	(integer, pk)
+			- title		(varchar, nn)		
+			- meta_tags	(varchar, dn)		
+			- image		(varchar, dn)
+			- content	(text, nn)
+			- author	(varchar, nn)
+			- created	(timestamp, nn)
+			- url		(varchar, unique)
+			- status 	(enum [draft, published])
+		- categories
+			- category_id
+			- name
+			- url
+		- post_categories
+			- post_id
+			- category_id
+		- comments
+			- comment_id
+			- post_id
+			- user_id
+			- user_name
+			- email
+			- created
+			- user_ip
+			- status
+		- pages
+			- page_id
+			- title
+			- conent
+			- meta_tags
+			- meta_description
+			- url
+			- status (draft, published)
+		- users
+			- user_id
+			- login
+			- password
+			- first_name
+			- last_name
+			- email
+			- status (active, non active)
+6. URL mapping:
+	- www.mynewsblog.com 					(main url, home page)
+	- www.mynewsblog.com/posts.php			(post list)
+	- www.mynewsblog.com/post.php?id=1		(view some post)
+	- www.mynewsblog.com/page.php?id=1		(view some page)
+	- www.mynewsblog.com/category.php?id=1	(category posts list)
+	
+	After finished all work we can change url mapping to human and seo friendly view:
+	- www.mynewsblog.com/posts
+	- www.mynewsblog.com/some-post-title
+	- www.mynewsblog.com/some-page-title
+
+7. Make website folders:
+	- www
+		- images
+		- css
+		- js
+		- blocks (private using .htaccess)
+			- head.php
+			- header.php
+			- sidebar.php
+		- index.php
+		- page.php
+		- post.php
+		
+8. Devide html mokup into logical blocks. 
+9. Develop each functionality using php.
+10. Thats all plan, see codes.
