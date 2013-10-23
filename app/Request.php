@@ -21,7 +21,7 @@ class Request
 
     /**
      * Url parser
-     * Bilganimdek yozdim, balki kamchiligi bordir hozicha ishlayabdi, agar
+     * Bilganimdek yozdim, balki kamchiligi bordir hozicha ishlayabdi, lekin
      * optimallashtirish kerak bo'ladi qachonlardir. Regular expression ma'qulroqdir?
      */
     public function __construct()
@@ -32,6 +32,10 @@ class Request
         $this->_host     = strtolower((($this->_isSecure) ? 'https://' : 'http://') . trim($_SERVER['HTTP_HOST'], '/') . '/');
         $this->_baseUrl  = strtolower($this->_host . trim(trim($_SERVER['SCRIPT_NAME'], 'index.php'), '/') . '/');
 
+        /**
+         * agar module qismi bo'lmasa default routeni olamiz
+         * agar action qismi bo'lmasa default actionni olamiz
+         */
         $this->_moduleRoute  = App::getDefaultRoute();
         $this->_moduleAction = 'default';
 

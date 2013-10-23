@@ -105,13 +105,16 @@ class App
     }
 
     /**
-     * Route obyektidan qaysi modul routi ni olamiz va shu routga javob beruvchi Modul mavjud
+     * Route obyektidan kerakli modul routi ni olamiz va shu routga javob beruvchi Modul mavjud
      * bo'lsa boshqaruvni unga uzatamiz.
      */
     public function run()
     {
         $route  = $this->getRequest()->getModule();
         $module = $this->getModuleManager()->getModule($route);
+        /**
+         * TODO route urovenida keshlash logikasini qilish kerak
+         */
         try {
             $module->dispatch();
         } catch (Exception $e) {
