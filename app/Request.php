@@ -19,6 +19,11 @@ class Request
     protected $_getParams;
     protected static $_instance;
 
+    /**
+     * Url parser
+     * Bilganimdek yozdim, balki kamchiligi bordir hozicha ishlayabdi, agar
+     * optimallashtirish kerak bo'ladi qachonlardir. Regular expression ma'qulroqdir?
+     */
     public function __construct()
     {
         $this->_request  = strtolower($_SERVER['REQUEST_URI']);

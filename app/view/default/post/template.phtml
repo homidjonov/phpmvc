@@ -8,8 +8,7 @@
  */
 
 /**
- * template deyarli barcha sahifalar uchun bir xil sklet, shuning uchun uni tema papkasiga qo'shilgan,
- * agar u modul papkasiga ham qo'shsak o'sha yuklanadi. Masalan post ga qarang
+ * Bu umuman boshqacha sxema deb olamiz, bu faqat post moduli uchun ishlaydi
  */
 ?>
 
@@ -19,7 +18,6 @@
 <?php $this->getPart('head');?>
 <body class="<?=App::getRequest()->getFullActionName()?> <?=$this->getBodyClassName()?>">
 <div id="wrapper">
-    <?php $this->getPart('header');?>
     <div id="page" class="noborder">
         <div id="content">
             <?php $this->getPart('content');?>
@@ -28,13 +26,7 @@
             <?php $this->getPart('sidebar');?>
         </div>
     </div>
-    <div class="clear"></div>
-    <div id="footer">
-        <p class="copyright">
-            Copyright &copy; 2013. Global Media Solutions LLC.
 
-        <p>
-    </div>
 </div>
 </body>
 </html>

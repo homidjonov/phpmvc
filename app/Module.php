@@ -4,7 +4,6 @@
  * User: Shavkat
  * Date: 10/22/13
  * Time: 8:58 PM
- *
  * modules/ direktoriyasidagi har bir modul uchun ota klass hisoblanadi.
  * Ixtiyoriy modul yuklanganda ota klass ro'yhatidan o'tadi.
  */
@@ -105,6 +104,24 @@ class Module
         return self::$_parts;
     }
 
+    /**
+     * @param $part
+     * @return mixed
+     *
+     * Tema va shablonlarni birlashtirish, juda ham qiziq, asosiy maqsad
+     * view papkada har bir modul va action uchun templatelarni boshqarsak bo'ladi
+     * design/module/action ko'rinishida joylashtirlgan
+     * har bir part (qism html) quyidagi ko'rinishda qidiriladi va yuklanad
+     * 1. currentDesign/module/action/part
+     * 2. currentDesign/module/part
+     * 3. currentDesign/part
+     * 4. defaultDesign/module/action/part
+     * 5. defaultDesign/module/part
+     * 6. defaultDesign/part
+     *
+     * Kerakli part kamida shu papkalardan birida bo'lishi kerak, birinchi qaysi papkadan
+     * topilsa o'sha yuklanadi. (Theme fallback like Magento, but not complicated like it)
+     */
     public function getPart($part)
     {
         //$part   = str_replace('/', DS, $part);
@@ -136,6 +153,8 @@ class Module
             'module' => $module,
             'action' => $action,
         );
+
+        App::log($log);
     }
 
     protected $_bodyClassName;
@@ -145,6 +164,11 @@ class Module
         return $this->_bodyClassName;
     }
 
+    /**
+     * @param $name
+     * @return Module
+     * Page renderdan oldin bodyga klass berib ketsak yaxshiroq
+     */
     public function setBodyClassName($name)
     {
         $this->_bodyClassName = $name;
