@@ -4,6 +4,9 @@
  * User: Shavkat
  * Date: 10/22/13
  * Time: 8:58 PM
+ *
+ * modules/ direktoriyasidagi har bir modul uchun ota klass hisoblanadi.
+ * Ixtiyoriy modul yuklanganda ota klass ro'yhatidan o'tadi.
  */
 class Module
 {

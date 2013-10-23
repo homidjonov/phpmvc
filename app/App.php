@@ -11,6 +11,11 @@ class App
     protected static $_requestManager;
     protected static $_dbManager;
     protected static $_modelManager;
+
+    /**
+     * avtoyuklanuvchi fayllar
+     * @var array
+     */
     protected $_autoloads = array(
         'config' => 'config.php',
         'db'     => 'Db.php',
@@ -33,6 +38,10 @@ class App
         $this->loadModules();
     }
 
+    /**
+     * app/Modules direktoriyasi skan qilinadi va u yerdagi har bir php fayl Modul hisoblanadi
+     * har bir Modul bitta routga javob beradi, batafsil app/modules/Page.php qarang
+     */
     public function loadModules()
     {
         $found   = array();
@@ -61,6 +70,7 @@ class App
     }
 
     /**
+     * Modullarnui boshqaruvchi class
      * @return Module
      */
     public function getModuleManager()
@@ -94,6 +104,10 @@ class App
         return APP_DEVELOPER_MODE;
     }
 
+    /**
+     * Route obyektidan qaysi modul routi ni olamiz va shu routga javob beruvchi Modul mavjud
+     * bo'lsa boshqaruvni unga uzatamiz.
+     */
     public function run()
     {
         $route  = $this->getRequest()->getModule();
