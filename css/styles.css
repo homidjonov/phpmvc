@@ -83,12 +83,15 @@ a {
 }
 
 #main_menu {
-    position: absolute;
-    height: 40px;
-    bottom: 0px;
-    width: 100%;
+    border-image: none;
+    border-style: none none solid;
+    border-width: medium medium 2px;
+    bottom: 0;
     font-size: 20px;
-    border: none;
+    height: 40px;
+    margin-top: 60px;
+    position: relative;
+    width: 100%;
     border-bottom: 2px solid #F65E12;
 }
 
@@ -304,14 +307,15 @@ a {
     display: block;
 }
 
-.part_border .info:hover{
+.part_border .info:hover {
     height: auto;
 }
-.part_border .info{
+
+.part_border .info {
     display: none;
     position: absolute;
-    top:0;
-    right:0;
+    top: 0;
+    right: 0;
     background: #000000;
     color: white;
     z-index: 1000;
@@ -322,12 +326,15 @@ a {
     width: 100%;
     text-align: center;
 }
-.part_border:hover >.info{
+
+.part_border:hover > .info {
     display: block;
 }
+
 .part_border {
     border: 1px solid red;
     border: 1px dashed #FF0000;
     display: block;
     position: relative;
+    z-index: +5;
 }
