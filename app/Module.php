@@ -16,6 +16,28 @@ class Module
     protected $_params;
     protected $_observers;
 
+    /**
+     * Page title, keywords, description
+     */
+    protected $_keywords;
+    protected $_title;
+    protected $_description;
+
+    protected function getTitle()
+    {
+        return $this->_title;
+    }
+
+    protected function getKeywords()
+    {
+        return $this->_keywords;
+    }
+
+    protected function getDescription()
+    {
+        return $this->_description;
+    }
+
     protected static $_instance;
 
 
@@ -139,6 +161,10 @@ class Module
     protected static $_parts = array();
     protected static $_partsContent = array();
 
+    /**
+     * @return array
+     * part ni barcha modullar view papkasidan yuklash
+     */
     public static function getParts()
     {
         return self::$_parts;
@@ -159,6 +185,7 @@ class Module
      * 6. defaultDesign/part
      * Kerakli part kamida shu papkalardan birida bo'lishi kerak, birinchi qaysi papkadan
      * topilsa o'sha yuklanadi. (Theme fallback like Magento, but not complicated like it)
+     * TODO part urovenda keshlash
      */
     public function getPart($part)
     {

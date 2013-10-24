@@ -29,6 +29,9 @@ class Page extends Module
             $page->loadPageByUrl($url);
             if ($page->getId()) {
                 $this->_bodyClassName = $url;
+                $this->_title         = $page->getData('meta)title');
+                $this->_keywords      = $page->getData('meta_keywords');
+                $this->_description   = $page->getData('meta_description');
                 $this->render(array('page' => $page));
                 return;
             }
@@ -61,7 +64,7 @@ class Page extends Module
         $part = $params['part'];
         $file = explode('\view\\', $params['file']);
         $file = $file[1];
-        if (!in_array($part, array('head', 'template')))
+        if (!in_array($part, array('head', 'template', 'meta')))
             echo "<span class='part_border'><div class='info'>$part ($file)</div>";
     }
 
@@ -69,7 +72,7 @@ class Page extends Module
     {
         if (!App::canDebugParts()) return;
         $part = $params['part'];
-        if (!in_array($part, array('head', 'template')))
+        if (!in_array($part, array('head', 'template', 'meta')))
             echo "</span>";
     }
 
