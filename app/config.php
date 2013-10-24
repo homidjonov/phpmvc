@@ -31,4 +31,4 @@ define('APP_DEFAULT_DESIGN', 'default');
 define('APP_DB_HOST', 'localhost');
 define('APP_DB_USERNAME', 'root');
 define('APP_DB_PASSWORD', '');
-define('APP_DB_DATABASE', 'blog1');
+define('APP_DB_DATABASE', 'blog');

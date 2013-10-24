@@ -149,7 +149,7 @@ class App
             if ($module) {
                 $module->run();
                 App::runObserver('module_after_run', array('module' => &$module));
-                self::log(self::getModuleManager()->getParts());
+                //self::log(self::getModuleManager()->getParts());
             }
         } catch (Exception $e) {
             if (self::getIsDeveloperMode()) {
