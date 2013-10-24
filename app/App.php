@@ -11,6 +11,7 @@ class App
     protected static $_requestManager;
     protected static $_dbManager;
     protected static $_modelManager;
+    protected static $_sessionManager;
 
     /**
      * avtoyuklanuvchi fayllar
@@ -22,6 +23,7 @@ class App
         'request' => 'Request.php',
         'module'  => 'Module.php',
         'model'   => 'Model.php',
+        'session' => 'Session.php',
     );
 
     public function __construct()
@@ -35,7 +37,14 @@ class App
             ini_set('display_errors', 'on');
             ini_set('error_reporting', E_ALL);
         }
-        $this->loadModules();
+
+        try {
+            $this->loadModules();
+        } catch (Exception $e) {
+            if (self::getIsDeveloperMode()) {
+                echo "<pre>" . $e->getTraceAsString();
+            }
+        }
     }
 
     /**
@@ -44,6 +53,12 @@ class App
      */
     public function loadModules()
     {
+
+        self::$_sessionManager = Session::getInstance();
+        self::$_moduleManager  = Module::getInstance();
+        self::$_requestManager = Request::getInstance();
+        self::$_dbManager      = Db::getInstance();
+
         $found   = array();
         $modules = scandir(APP_MODULES_DIR);
         foreach ($modules as $moduleFile) {
@@ -63,10 +78,8 @@ class App
                 $routes[$module->getRoute()] = $class;
             }
         }
-        self::$_moduleManager  = Module::getInstance();
-        self::$_requestManager = Request::getInstance();
-        self::$_dbManager      = Db::getInstance();
-        self::$_modelManager   = Model::getInstance();
+
+        self::$_modelManager = Model::getInstance();
     }
 
     /**
@@ -87,6 +100,14 @@ class App
     }
 
     /**
+     * @return Session
+     */
+    public static function getSession()
+    {
+        return self::$_sessionManager;
+    }
+
+    /**
      * @return Db
      */
     public static function getDb()
@@ -103,9 +124,15 @@ class App
     {
         return APP_DEVELOPER_MODE;
     }
+
     static public function canDebugParts()
     {
         return APP_DEBUG_PARTS;
+    }
+
+    static public function canTranslateInterface()
+    {
+        return APP_TRANSLATE_INTERFACE;
     }
 
     /**

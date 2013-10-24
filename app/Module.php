@@ -23,8 +23,13 @@ class Module
     {
         if ($this instanceof Module) self::$_modules[$this->getRoute()] = $this;
         if ($this->_observers) App::addObserver($this->getName(), $this->_observers);
+        $this->_init();
     }
 
+    protected function _init()
+    {
+
+    }
 
     public function getName()
     {
@@ -194,6 +199,20 @@ class Module
         return false;
     }
 
+    public function getPartAll($part)
+    {
+        $designDir = scandir(APP_VIEW_DIR . APP_DEFAULT_DESIGN);
+        foreach ($designDir as $moduleDir) {
+            $modulePath = APP_VIEW_DIR . APP_DEFAULT_DESIGN . DS . $moduleDir;
+            if (is_dir($modulePath) && $moduleDir != '..' && $moduleDir != '.') {
+                $file = $modulePath . DS . $part . '.phtml';
+                if (file_exists($file)) {
+                    include $file;
+                }
+            }
+        }
+    }
+
     protected $_bodyClassName;
 
     public function getBodyClassName()
@@ -210,5 +229,28 @@ class Module
     {
         $this->_bodyClassName = $name;
         return $this;
+    }
+
+    /**
+     * @param $word
+     * @return mixed
+     * Translator
+     * TODO translate functionality
+     */
+    public function __($word)
+    {
+        $word = $this->getTranslator()->translate($word);
+        if (App::canTranslateInterface()) {
+            $word = "<span class='translation'>$word</span>";
+        }
+        return $word;
+    }
+
+    /**
+     * @return Translator
+     */
+    protected function getTranslator()
+    {
+        return self::$_modules['translator'];
     }
 }

@@ -9,13 +9,6 @@ class Db
 {
 
     protected static $_instance;
-    protected $_db;
-
-    public function __construct()
-    {
-        $this->_db = mysql_connect(APP_DB_HOST, APP_DB_USERNAME, APP_DB_PASSWORD) or die("Can't connect to db");
-        mysql_select_db(APP_DB_DATABASE, $this->_db);
-    }
 
     public static function getInstance()
     {
@@ -24,6 +17,16 @@ class Db
         }
         return self::$_instance;
     }
+
+
+    protected $_db;
+
+    public function __construct()
+    {
+        $this->_db = mysql_connect(APP_DB_HOST, APP_DB_USERNAME, APP_DB_PASSWORD) or die("Can't connect to db");
+        mysql_select_db(APP_DB_DATABASE, $this->_db);
+    }
+
 
     public function query($query)
     {

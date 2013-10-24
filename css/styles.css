@@ -178,8 +178,8 @@ a {
 #content {
     width: 69%;
     float: left;
-    padding-top: 10px;
     position: relative;
+    margin-bottom: 15px;
 }
 
 #sidebar {
@@ -309,6 +309,7 @@ a {
 
 .part_border .info:hover {
     height: auto;
+    width: 100%;
 }
 
 .part_border .info {
@@ -318,13 +319,14 @@ a {
     right: 0;
     background: #000000;
     color: white;
-    z-index: 1000;
+    z-index: +10;
     padding: 4px 0;
     font-size: 12px;
     height: 16px;
     line-height: 16px;
-    width: 100%;
+    width: 50px;
     text-align: center;
+    overflow: hidden;
 }
 
 .part_border:hover > .info {
@@ -337,4 +339,16 @@ a {
     display: block;
     position: relative;
     z-index: +5;
+}
+
+.translation:hover {
+    padding-right: 15px;
+    background: url("images/trans.gif") no-repeat scroll right center rgba(0, 0, 0, 0);
+}
+
+.translation {
+    border: 1px dashed #a1a1a1;
+    padding: 3px;
+    cursor: pointer;
+    padding-right: 15px
 }

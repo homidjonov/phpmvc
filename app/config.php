@@ -9,6 +9,7 @@
 define('DS', DIRECTORY_SEPARATOR);
 define('APP_DEVELOPER_MODE', true);
 define('APP_DEBUG_PARTS', true);
+define('APP_TRANSLATE_INTERFACE', true);
 define('APP_MODULES_DIR', __DIR__ . DS . 'modules' . DS);
 define('APP_CONFIG_DIR', __DIR__ . DS . 'config' . DS);
 define('APP_VIEW_DIR', __DIR__ . DS . 'view' . DS);
