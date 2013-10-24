@@ -304,6 +304,9 @@ a {
     display: block;
 }
 
+.part_border .info:hover{
+    height: auto;
+}
 .part_border .info{
     display: none;
     position: absolute;
@@ -312,8 +315,12 @@ a {
     background: #000000;
     color: white;
     z-index: 1000;
-    padding: 4px;
-    font-size: 10px;
+    padding: 4px 0;
+    font-size: 12px;
+    height: 16px;
+    line-height: 16px;
+    width: 100%;
+    text-align: center;
 }
 .part_border:hover >.info{
     display: block;
