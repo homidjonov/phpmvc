@@ -14,6 +14,8 @@ class Model
     protected $_id;
     protected $_data;
 
+    protected $_translateable;
+
     public static function getInstance()
     {
         if (self::$_instance == null) {

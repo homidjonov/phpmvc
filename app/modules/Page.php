@@ -29,7 +29,7 @@ class Page extends Module
             $page->loadPageByUrl($url);
             if ($page->getId()) {
                 $this->_bodyClassName = $url;
-                $this->_title         = $page->getData('meta)title');
+                $this->_title         = $page->getData('meta_title');
                 $this->_keywords      = $page->getData('meta_keywords');
                 $this->_description   = $page->getData('meta_description');
                 $this->render(array('page' => $page));
@@ -83,9 +83,7 @@ class PageModel extends Model
     protected $_table = 'pages';
     protected $_version = 1;
 
-    protected $_columns = array(
-        'page_id', 'title', 'url', 'created', 'content',
-    );
+    protected $_translateable = true;
 
     public function loadPageByUrl($url)
     {

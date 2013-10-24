@@ -24,7 +24,9 @@ class Db
     public function __construct()
     {
         $this->_db = mysql_connect(APP_DB_HOST, APP_DB_USERNAME, APP_DB_PASSWORD) or die("Can't connect to db");
-        mysql_select_db(APP_DB_DATABASE, $this->_db);
+        if(!mysql_select_db(APP_DB_DATABASE, $this->_db)){
+            throw new ErrorException(mysql_error($this->_db));
+        };
     }
 
 

@@ -18,7 +18,7 @@ class Session
     public static function getInstance()
     {
         if (self::$_instance == null) {
-            self::$_instance = new Db();
+            self::$_instance = new Session();
         }
         return self::$_instance;
     }

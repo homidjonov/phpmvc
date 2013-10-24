@@ -38,13 +38,6 @@ class App
             ini_set('error_reporting', E_ALL);
         }
 
-        try {
-            $this->loadModules();
-        } catch (Exception $e) {
-            if (self::getIsDeveloperMode()) {
-                echo "<pre>" . $e->getTraceAsString();
-            }
-        }
     }
 
     /**
@@ -141,42 +134,48 @@ class App
      */
     public function run()
     {
-        /**
-         * @var $module Module
-         */
-        $route = $this->getRequest()->getModule();
-        /**
-         * TODO route urovenida keshlash logikasini qilish kerak
-         */
         try {
+            $this->loadModules();
+            /**
+             * @var $module Module
+             */
+            $route = $this->getRequest()->getModule();
+            /**
+             * TODO route urovenida keshlash logikasini qilish kerak
+             */
+
             $module = $this->getModuleManager()->getModuleForRoute($route);
             App::runObserver('module_before_run', array('module' => &$module));
             if ($module) {
                 $module->run();
                 App::runObserver('module_after_run', array('module' => &$module));
+                self::log(self::getModuleManager()->getParts());
             }
         } catch (Exception $e) {
             if (self::getIsDeveloperMode()) {
-                echo "<pre>" . $e->getTraceAsString();
+                echo "<pre>" . $e->getMessage();
+            } else {
+                echo "Something is wrong!  :)"; //Default error page
             }
+            self::log($e);
         }
-        self::log(self::getModuleManager()->getParts());
     }
 
-    public static function log($object)
+    public static function log($object, $force = false, $logFile = false)
     {
-        if (self::getRequest()->getParam('log') == 1) {
+        if (App::getIsDeveloperMode() || $force) {
             $file = 'system.log';
             if ($object instanceof Exception) {
-                $string = $object->getTraceAsString();
-                $file   = 'exception.log';
+                $string = $object->getMessage() . " in " . $object->getFile() . " on line " . $object->getLine() . "\n";
+                $string .= print_r($object->getTraceAsString(), true) . "\n";
+                $string .= "URL: \t" . $_SERVER['REQUEST_URI'] . "\n";
+                $file = 'exception.log';
             } elseif (is_array($object)) {
                 $string = print_r($object, true);
             } else {
                 $string = $object;
             }
-            file_put_contents(APP_LOG_DIR . $file, date('d-m-Y h:s:i') . "\n", FILE_APPEND);
-            file_put_contents(APP_LOG_DIR . $file, $string, FILE_APPEND);
+            file_put_contents(APP_LOG_DIR . (($logFile) ? $logFile : $file), date('d-m-Y h:s:i') . "\n" . $string, FILE_APPEND);
         }
     }
 
