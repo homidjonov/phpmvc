@@ -14,6 +14,7 @@ class Module
     protected $_defaultAction;
     protected $_name;
     protected $_params;
+    protected $_observers;
 
     protected static $_instance;
 
@@ -21,7 +22,9 @@ class Module
     public function __construct()
     {
         if ($this instanceof Module) self::$_modules[$this->getRoute()] = $this;
+        if ($this->_observers) App::addObserver($this->getName(), $this->_observers);
     }
+
 
     public function getName()
     {
@@ -39,13 +42,27 @@ class Module
         return self::$_instance;
     }
 
-    public function getModule($name)
+
+    public function getModuleForRoute($name)
     {
         if (isset(self::$_modules[$name])) {
             return self::$_modules[$name];
         }
         Request::getInstance()->setModule('page');
         return self::$_modules['page'];
+    }
+
+    /**
+     * @param $name
+     * @return Module
+     */
+
+    public function getModule($name)
+    {
+        if (isset(self::$_modules[$name])) {
+            return self::$_modules[$name];
+        }
+        throw new Exception("Module [$name] not found");
     }
 
     public function canRoute()
@@ -63,27 +80,44 @@ class Module
         echo "404";
     }
 
-    public function dispatch()
+    protected function _preDispatch()
     {
+
+    }
+
+    protected function _postDispatch()
+    {
+
+    }
+
+    public function run()
+    {
+        $this->_preDispatch();
         $action = App::getRequest()->getAction();
         if ($action) {
             $action .= 'Action';
             if (method_exists($this, $action)) {
-                return $this->$action();
+                $this->$action();
+            } else {
+                $action = 'defaultAction';
+                if (method_exists($this, $action)) {
+                    Request::getInstance()->setAction('default');
+                    $this->$action();
+                }
             }
-            $action = 'defaultAction';
-            if (method_exists($this, $action)) {
-                Request::getInstance()->setAction('default');
-                return $this->$action();
-            }
+        } else {
+            $this->_defaultNoRouteAction();
         }
-        $this->_defaultNoRouteAction();
+
+        $this->_postDispatch();
     }
 
     protected function render($params = false)
     {
         $this->_params = $params;
         $this->getPart('template');
+
+
     }
 
     public function getParams()
@@ -98,6 +132,7 @@ class Module
     }
 
     protected static $_parts = array();
+    protected static $_partsContent = array();
 
     public static function getParts()
     {
@@ -107,7 +142,6 @@ class Module
     /**
      * @param $part
      * @return mixed
-     *
      * Tema va shablonlarni birlashtirish, juda ham qiziq, asosiy maqsad
      * view papkada har bir modul va action uchun templatelarni boshqarsak bo'ladi
      * design/module/action ko'rinishida joylashtirlgan
@@ -118,13 +152,12 @@ class Module
      * 4. defaultDesign/module/action/part
      * 5. defaultDesign/module/part
      * 6. defaultDesign/part
-     *
      * Kerakli part kamida shu papkalardan birida bo'lishi kerak, birinchi qaysi papkadan
      * topilsa o'sha yuklanadi. (Theme fallback like Magento, but not complicated like it)
      */
     public function getPart($part)
     {
-        //$part   = str_replace('/', DS, $part);
+        $part   = str_replace('/', DS, $part);
         $module = $this->getName();
         $action = App::getRequest()->getAction();
 
@@ -145,16 +178,20 @@ class Module
             $file = APP_VIEW_DIR . $file . '.phtml';
             if (file_exists($file)) {
                 self::$_parts[] = $file;
-                return include $file;
+                App::runObserver('part_before_include', array('part' => $part, 'file' => &$file));
+                if ($file) include $file;
+                App::runObserver('part_after_include', array('part' => $part, 'file' => &$file));
+                return true;
             }
         }
         $log = array(
-            'message'=> "Template file [$part] not found",
-            'module' => $module,
-            'action' => $action,
+            'message' => "Template file [$part] not found",
+            'module'  => $module,
+            'action'  => $action,
         );
 
         App::log($log);
+        return false;
     }
 
     protected $_bodyClassName;

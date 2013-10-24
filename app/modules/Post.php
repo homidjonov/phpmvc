@@ -18,6 +18,7 @@ class Post extends Module
     protected function defaultAction()
     {
         if ($url = App::getRequest()->getDefaultRoute()) {
+            echo $url; die;
             //$page = new PageModel();
             //$page->loadPageByUrl($url);
             /*if ($page->getId()) {

@@ -96,6 +96,9 @@ class Request
         return $this->_request;
     }
 
+    /**
+     * @return mixed
+     */
     public function getModule()
     {
         return $this->_moduleRoute;

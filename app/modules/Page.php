@@ -9,11 +9,18 @@ class Page extends Module
 {
     protected $_route = 'page';
     protected $_defaultAction = 'view';
+    protected $_observers = array(
+        'module_before_run',
+        'module_after_run',
+        'part_before_include',
+        'part_after_include',
+    );
 
     public function viewAction()
     {
         //echo App::getRequest()->getParam('k');
     }
+
 
     protected function defaultAction()
     {
@@ -22,7 +29,7 @@ class Page extends Module
             $page->loadPageByUrl($url);
             if ($page->getId()) {
                 $this->_bodyClassName = $url;
-                $this->render(array('page'=> $page));
+                $this->render(array('page' => $page));
                 return;
             }
         } else {
@@ -31,6 +38,39 @@ class Page extends Module
             return;
         }
         $this->_defaultNoRouteAction();
+    }
+
+    /**
+     * observers
+     */
+
+    public function module_before_run($params)
+    {
+        $module = $params['module'];
+        //echo $module->getName() . " module is running and setted to null<br>";
+    }
+
+    public function module_after_run($params)
+    {
+        echo "I am module_after_run observer!";
+    }
+
+    public function part_before_include($params)
+    {
+        if (!App::canDebugParts()) return;
+        $part = $params['part'];
+        $file = explode('\view\\', $params['file']);
+        $file = $file[1];
+        if (!in_array($part, array('head', 'template')))
+            echo "<span class='part_border'><div class='info'>$part ($file)</div>";
+    }
+
+    public function part_after_include($params)
+    {
+        if (!App::canDebugParts()) return;
+        $part = $params['part'];
+        if (!in_array($part, array('head', 'template')))
+            echo "</span>";
     }
 
 }

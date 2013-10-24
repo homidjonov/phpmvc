@@ -11,10 +11,8 @@
  * Yukovchi fayl, barcha zapros shu yerga kelib tushadi (.htaccess).
  * Asosiy bootstrap fayl bu app/App.php, u modullarni yuklaydi va
  * kerakli modulga boshqaruvni uzatadi.
- *
  * har bir url www.website.com/module/action/param1/value1/param2/value2
  * sifatida qaraladi.
- *
  * ushbu MVC PHP OOP asosida yaratilishi kerak, deyarli barcha modul va
  * yordamchi klasslar singleton patterni asosida yuklanadi.
  */

@@ -17,11 +17,11 @@ class App
      * @var array
      */
     protected $_autoloads = array(
-        'config' => 'config.php',
-        'db'     => 'Db.php',
-        'request'=> 'Request.php',
-        'module' => 'Module.php',
-        'model'  => 'Model.php',
+        'config'  => 'config.php',
+        'db'      => 'Db.php',
+        'request' => 'Request.php',
+        'module'  => 'Module.php',
+        'model'   => 'Model.php',
     );
 
     public function __construct()
@@ -57,7 +57,7 @@ class App
          * @var $module Module
          */
         $routes = array();
-        foreach ($found as $id=> $class) {
+        foreach ($found as $id => $class) {
             $module = new $class();
             if ($module->canRoute()) {
                 $routes[$module->getRoute()] = $class;
@@ -103,6 +103,10 @@ class App
     {
         return APP_DEVELOPER_MODE;
     }
+    static public function canDebugParts()
+    {
+        return APP_DEBUG_PARTS;
+    }
 
     /**
      * Route obyektidan kerakli modul routi ni olamiz va shu routga javob beruvchi Modul mavjud
@@ -110,15 +114,22 @@ class App
      */
     public function run()
     {
-        $route  = $this->getRequest()->getModule();
-        $module = $this->getModuleManager()->getModule($route);
+        /**
+         * @var $module Module
+         */
+        $route = $this->getRequest()->getModule();
         /**
          * TODO route urovenida keshlash logikasini qilish kerak
          */
         try {
-            $module->dispatch();
+            $module = $this->getModuleManager()->getModuleForRoute($route);
+            App::runObserver('module_before_run', array('module' => &$module));
+            if ($module) {
+                $module->run();
+                App::runObserver('module_after_run', array('module' => &$module));
+            }
         } catch (Exception $e) {
-            if (APP_DEVELOPER_MODE) {
+            if (self::getIsDeveloperMode()) {
                 echo "<pre>" . $e->getTraceAsString();
             }
         }
@@ -128,7 +139,6 @@ class App
     public static function log($object)
     {
         if (self::getRequest()->getParam('log') == 1) {
-
             $file = 'system.log';
             if ($object instanceof Exception) {
                 $string = $object->getTraceAsString();
@@ -140,6 +150,28 @@ class App
             }
             file_put_contents(APP_LOG_DIR . $file, date('d-m-Y h:s:i') . "\n", FILE_APPEND);
             file_put_contents(APP_LOG_DIR . $file, $string, FILE_APPEND);
+        }
+    }
+
+    static protected $_observers = array();
+
+    static public function runObserver($observerName, $params)
+    {
+        if (isset(self::$_observers[$observerName])) {
+            foreach (self::$_observers[$observerName] as $module) {
+                $instance = self::getModuleManager()->getModule($module);
+                if (method_exists($instance, $observerName)) {
+                    $instance->$observerName($params);
+                }
+            }
+        }
+    }
+
+    static public function addObserver($module, $observers)
+    {
+        foreach ($observers as $observerName) {
+            if (!isset(self::$_observers[$observerName])) self::$_observers[$observerName] = array();
+            self::$_observers[$observerName][] = $module;
         }
     }
 }
