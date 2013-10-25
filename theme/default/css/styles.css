@@ -337,10 +337,11 @@ a {
     background: #010101;
     opacity: 0.9;
 }
+
 .part_border {
     border: 1px solid red;
     border: 1px dotted #FF0000;
-    display: block;
+    display: none;
     position: absolute;
     z-index: +1;
     background-color: transparent;
@@ -364,4 +365,22 @@ a {
     font-weight: bold;
     color: brown;
 
+}
+
+#part_debug_button:hover {
+    background-color: #010101;
+}
+
+#part_debug_button {
+    background-color: #FF0000;
+    color: #FFFFFF;
+    cursor: pointer;
+    font-size: 14px;
+    height: 40px;
+    left: 0;
+    line-height: 40px;
+    position: fixed;
+    text-align: center;
+    top: 45%;
+    width: 60px;
 }

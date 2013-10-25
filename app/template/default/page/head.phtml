@@ -33,30 +33,7 @@
 
     <script type="text/javascript">
         //here you can write some startup scripts
-        $(document).on('resize',function () {
-            return fixPositions();
-        }).ready(function () {
-                return fixPositions();
-            })
-        function fixPositions() {
-            $('.part_border').each(function () {
-                var next = $(this).next();
-                var info = this;
-                $(this)
-                    .width(next.width())
-                    .height(next.height())
-                    .css('top', next.position().top)
-                    .css('left', next.position().left)
-                    .css('margin-top', next.css('margin-top'))
-                    .css('margin-left', next.css('margin-left'));
-                $(this).click(function () {
-                    $(this).css('z-index', '-1');
-                })
-                $(this).next().click(function () {
-                    $(this).prev().css('z-index', '+1');
-                })
-            })
-        }
+
     </script>
     <?php $this->getPartAll('head_part') ?>
 </head>

@@ -18,6 +18,7 @@
 <!-- we are using xhtml standard, see http://www.w3schools.com/html/html_xhtml.asp-->
 <?php $this->getPart('head'); ?>
 <body class="<?= App::getRequest()->getFullActionName() ?> <?= $this->getBodyClassName() ?>">
+<?php $this->getPartAll('body_after_start'); ?>
 <div id="wrapper">
     <?php $this->getPart('header'); ?>
     <div id="page" class="noborder">
@@ -32,5 +33,6 @@
         <p>
     </div>
 </div>
+<?php $this->getPartAll('body_before_end');?>
 </body>
 </html>

@@ -44,7 +44,7 @@ class Module
     public function __construct()
     {
 
-        if ($this instanceof Module && $this->getName() != 'module') self::$_modules[$this->getRoute()] = $this;
+        if ($this instanceof Module && $this->getName() != 'module') self::$_modules[$this->getName()] = $this;
         if ($this->_observers) App::addObserver($this->getName(), $this->_observers);
         $this->_init();
     }
@@ -73,7 +73,7 @@ class Module
 
     public function getModuleForRoute($name)
     {
-        if (isset(self::$_modules[$name])) {
+        if (isset(self::$_modules[$name]) && self::$_modules[$name]->canRoute()) {
             return self::$_modules[$name];
         }
         Request::getInstance()->setModule('page');
@@ -232,8 +232,9 @@ class Module
         $this->getPart(str_replace('/', '/widget/', $widget, $count), $widget);
     }
 
-    public function getPartAll($part)
+    public function getPartAll($part, $alias = false)
     {
+        if (!$alias) $alias = $part;
         $modules    = array_keys(self::$_modules);
         $designDirs = array();
         foreach ($modules as $module) {
@@ -241,8 +242,11 @@ class Module
             $designDirs[] = App::getBaseTemplateDir() . $module . DS . $part . '.phtml';
         }
         for ($i = 0; $i < count($designDirs); $i++) {
-            if (file_exists($designDirs[$i])) {
-                include $designDirs[$i];
+            $file = $designDirs[$i];
+            if (file_exists($file)) {
+                App::runObserver('part_before_include', array('part' => $part, 'alias' => $alias, 'file' => &$file));
+                if ($file) include $file;
+                App::runObserver('part_after_include', array('part' => $part, 'alias' => $alias, 'file' => &$file));
                 if ($i % 2 == 0) $i++;
             }
         }

@@ -1,0 +1,10 @@
+
+
+DATE: 	25-10-2013 06:20:36
+URL: 	/
+MESS: 	Module [debug] not found in Z:\home\mynewsblog.com\www\app\Module.php on line 93
+#0 Z:\home\mynewsblog.com\www\app\App.php(191): Module->getModule('debug')
+#1 Z:\home\mynewsblog.com\www\app\App.php(151): App::runObserver('module_before_r...', Array)
+#2 Z:\home\mynewsblog.com\www\index.php(24): App->run()
+#3 {main}
+

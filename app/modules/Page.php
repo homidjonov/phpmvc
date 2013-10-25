@@ -9,13 +9,6 @@ class Page extends Module
 {
     protected $_route = 'page';
     protected $_defaultAction = 'view';
-    protected $_observers = array(
-        'module_before_run',
-        'module_after_run',
-        'part_before_include',
-        'part_after_include',
-    );
-
     public function viewAction()
     {
         //echo App::getRequest()->getParam('k');
@@ -42,46 +35,6 @@ class Page extends Module
         }
         $this->_defaultNoRouteAction();
     }
-
-    /**
-     * observers
-     */
-
-    public function module_before_run($params)
-    {
-        $module = $params['module'];
-        //echo $module->getName() . " module is running and setted to null<br>";
-    }
-
-    public function module_after_run($params)
-    {
-        echo "I am module_after_run observer!";
-    }
-
-    public function part_before_include($params)
-    {
-        if (!App::canDebugParts()) return;
-        $part  = $params['part'];
-        $alias = $params['alias'];
-        $file  = explode("\\template\\", $params['file']);
-        $file  = $file[1];
-        if (!in_array($part, array('head', 'template', 'meta')))
-            echo "<span class='part_border'><div class='info'>$alias ($file)</div></span>";
-        else
-            echo "\n<!--DEBUG PART [$alias] in ($file) -->\n";
-    }
-
-    public function part_after_include($params)
-    {
-        if (!App::canDebugParts()) return;
-        $part  = $params['part'];
-        $alias = $params['alias'];
-        if (!in_array($part, array('head', 'template', 'meta')))
-            echo "\n<!--END PART [$alias]-->\n";
-        else
-            echo "\n<!--END PART [$alias]-->\n";
-    }
-
 }
 
 class PageModel extends Model
