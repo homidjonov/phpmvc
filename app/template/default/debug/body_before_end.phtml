@@ -30,12 +30,7 @@
                     .css('left', next.position().left)
                     .css('margin-top', next.css('margin-top'))
                     .css('margin-left', next.css('margin-left'));
-                $(this).click(function () {
-                    $(this).css('z-index', '-1');
-                })
-                $(this).next().click(function () {
-                    $(this).prev().css('z-index', '+1');
-                })
+
             })
         }
     </script>
