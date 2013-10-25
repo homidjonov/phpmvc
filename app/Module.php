@@ -176,7 +176,7 @@ class Module
      * Tema va shablonlarni birlashtirish, juda ham qiziq, asosiy maqsad
      * view papkada har bir modul va action uchun templatelarni boshqarsak bo'ladi
      * design/module/action ko'rinishida joylashtirlgan
-     * har bir part (qism html) quyidagi ko'rinishda qidiriladi va yuklanad
+     * har bir part (qism html) quyidagi ko'rinishda qidiriladi va yuklanadi
      * 1. currentDesign/module/action/part
      * 2. currentDesign/module/part
      * 3. currentDesign/part
@@ -187,8 +187,9 @@ class Module
      * topilsa o'sha yuklanadi. (Theme fallback like Magento, but not complicated like it)
      * TODO part urovenda keshlash
      */
-    public function getPart($part)
+    public function getPart($part, $alias = false)
     {
+        if (!$alias) $alias = $part;
         $part   = str_replace('/', DS, $part);
         $module = $this->getName();
         $action = App::getRequest()->getAction();
@@ -210,9 +211,9 @@ class Module
             $file = APP_VIEW_DIR . $file . '.phtml';
             if (file_exists($file)) {
                 self::$_parts[] = $file;
-                App::runObserver('part_before_include', array('part' => $part, 'file' => &$file));
+                App::runObserver('part_before_include', array('part' => $part, 'alias' => $alias, 'file' => &$file));
                 if ($file) include $file;
-                App::runObserver('part_after_include', array('part' => $part, 'file' => &$file));
+                App::runObserver('part_after_include', array('part' => $part, 'alias' => $alias, 'file' => &$file));
                 return true;
             }
         }
@@ -224,6 +225,12 @@ class Module
 
         App::log($log);
         return false;
+    }
+
+    public function getWidget($widget)
+    {
+        $count = 1;
+        $this->getPart(str_replace('/', '/widget/', $widget, $count), $widget);
     }
 
     public function getPartAll($part)

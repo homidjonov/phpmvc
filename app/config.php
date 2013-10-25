@@ -24,7 +24,7 @@ define('APP_LOG_DIR', __DIR__ . DS . 'log' . DS);
 
 //defaults
 define('APP_DEFAULT_ROUTE', 'page');
-define('APP_DEFAULT_DESIGN', 'default');
+define('APP_DEFAULT_DESIGN', 'myblog');
 
 
 //db login parollari

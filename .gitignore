@@ -1,1 +1,3 @@
 /.idea
+/app/log/exception.log
+/app/log/system.log
