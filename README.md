@@ -1,4 +1,4 @@
 phpmvc
 ======
 
-Expriemental MVC CMS written in PHP (alpha)
+Experimental MVC CMS written in PHP (alpha)
