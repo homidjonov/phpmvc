@@ -164,18 +164,18 @@ class App
     public static function log($object, $force = false, $logFile = false)
     {
         if (App::getIsDeveloperMode() || $force) {
-            $file = 'system.log';
+            $file   = 'system.log';
+            $string = "\nDATE: \t" . date('d-m-Y h:s:i') . "\nURL: \t" . $_SERVER['REQUEST_URI'] . "\n";
             if ($object instanceof Exception) {
-                $string = $object->getMessage() . " in " . $object->getFile() . " on line " . $object->getLine() . "\n";
+                $string .= "MESS: \t" . $object->getMessage() . " in " . $object->getFile() . " on line " . $object->getLine() . "\n";
                 $string .= print_r($object->getTraceAsString(), true) . "\n";
-                $string .= "URL: \t" . $_SERVER['REQUEST_URI'] . "\n";
                 $file = 'exception.log';
             } elseif (is_array($object)) {
-                $string = print_r($object, true);
+                $string .= print_r($object, true);
             } else {
-                $string = $object;
+                $string .= $object;
             }
-            file_put_contents(APP_LOG_DIR . (($logFile) ? $logFile : $file), date('d-m-Y h:s:i') . "\n" . "$string\n", FILE_APPEND);
+            file_put_contents(APP_LOG_DIR . (($logFile) ? $logFile : $file), "\n$string\n", FILE_APPEND);
         }
     }
 

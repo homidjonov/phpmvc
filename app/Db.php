@@ -24,8 +24,12 @@ class Db
     public function __construct()
     {
         $this->_db = mysql_connect(APP_DB_HOST, APP_DB_USERNAME, APP_DB_PASSWORD) or die("Can't connect to db");
-        if(!mysql_select_db(APP_DB_DATABASE, $this->_db)){
-            throw new ErrorException(mysql_error($this->_db));
+        if (!mysql_select_db(APP_DB_DATABASE, $this->_db)) {
+            $err = mysql_errno($this->_db);
+            if ($err == 1049) {
+                //TODO default blog install script;
+            }
+            throw new Exception(mysql_error($this->_db));
         };
     }
 
@@ -33,7 +37,7 @@ class Db
     public function query($query)
     {
         if ($result = mysql_query($query, $this->_db)) return $result;
-        throw new ErrorException(mysql_error($this->_db));
+        throw new Exception(mysql_error($this->_db));
     }
 
 }
