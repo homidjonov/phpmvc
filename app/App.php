@@ -175,7 +175,7 @@ class App
             } else {
                 $string = $object;
             }
-            file_put_contents(APP_LOG_DIR . (($logFile) ? $logFile : $file), date('d-m-Y h:s:i') . "\n" . $string, FILE_APPEND);
+            file_put_contents(APP_LOG_DIR . (($logFile) ? $logFile : $file), date('d-m-Y h:s:i') . "\n" . "$string\n", FILE_APPEND);
         }
     }
 
@@ -199,5 +199,46 @@ class App
             if (!isset(self::$_observers[$observerName])) self::$_observers[$observerName] = array();
             self::$_observers[$observerName][] = $module;
         }
+    }
+
+    static public function getCurrentTheme()
+    {
+        return APP_DEFAULT_THEME;
+    }
+
+    static public function getBaseTheme()
+    {
+        return 'default';
+    }
+
+    static public function getTemplateDir()
+    {
+        return APP_VIEW_DIR;
+    }
+
+
+    static public function getThemeDir()
+    {
+        return APP_THEME_DIR;
+    }
+
+    static public function getCurrentTemplateDir()
+    {
+        return self::getTemplateDir() . self::getCurrentTheme() . DS;
+    }
+
+    static public function getBaseTemplateDir()
+    {
+        return self::getTemplateDir() . self::getBaseTheme() . DS;
+    }
+
+    static public function getCurrentThemeDir()
+    {
+        return self::getThemeDir() . self::getCurrentTheme() . DS;
+    }
+
+    static public function getBaseThemeDir()
+    {
+        return self::getThemeDir() . self::getBaseTheme() . DS;
     }
 }

@@ -1,0 +1,38 @@
+<?php
+/**
+ * Created by JetBrains PhpStorm.
+ * User: Shavkat
+ * Date: 10/23/13
+ * Time: 12:10 PM
+ */
+
+/**
+ * @var $this Module
+ */
+?>
+<head>
+    <?php $this->getPart('meta') ?>
+
+    <!-- web site icons -->
+    <link rel="icon" href="<?= $this->getThemeFileLink('images/favicon.ico') ?>" type="image/x-icon"/>
+    <link rel="shortcut icon" href="<?= $this->getThemeFileLink('images/favicon.ico') ?>" type="image/x-icon"/>
+
+
+    <!--
+        here is conditional comments, this works when we open the website using Internet Explorer below version 7,
+        see http://en.wikipedia.org/wiki/Conditional_comment
+    -->
+
+    <!--[if lt IE 7]>
+    <link rel="stylesheet" type="text/css" href="<?= $this->getThemeFileLink('css/styles_ie7.css')?>" media="all"/>
+    <script type="text/javascript" src="<?= $this->getThemeFileLink('js/js_ie7.js')?>"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="<?= $this->getThemeFileLink('css/styles.css') ?>" media="all"/>
+    <script type="text/javascript" src="<?= $this->getThemeFileLink('js/jquery-1.8.2.min.js') ?>"></script>
+
+    <script type="text/javascript">
+        //here you can write some startup scripts
+    </script>
+    <?php $this->getPartAll('head_part') ?>
+</head>

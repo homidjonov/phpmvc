@@ -19,12 +19,13 @@ define('APP_TRANSLATE_INTERFACE', true);
 //folders and paths
 define('APP_MODULES_DIR', __DIR__ . DS . 'modules' . DS);
 define('APP_CONFIG_DIR', __DIR__ . DS . 'config' . DS);
-define('APP_VIEW_DIR', __DIR__ . DS . 'view' . DS);
+define('APP_VIEW_DIR', __DIR__ . DS . 'template' . DS);
 define('APP_LOG_DIR', __DIR__ . DS . 'log' . DS);
+define('APP_THEME_DIR', APP_WWW_FOLDER . DS . 'theme' . DS);
 
 //defaults
 define('APP_DEFAULT_ROUTE', 'page');
-define('APP_DEFAULT_DESIGN', 'myblog');
+define('APP_DEFAULT_THEME', 'myblog');
 
 
 //db login parollari

@@ -63,18 +63,23 @@ class Page extends Module
         if (!App::canDebugParts()) return;
         $part  = $params['part'];
         $alias = $params['alias'];
-        $file  = explode('\view\\', $params['file']);
+        $file  = explode("\\template\\", $params['file']);
         $file  = $file[1];
         if (!in_array($part, array('head', 'template', 'meta')))
-            echo "<span class='part_border'><div class='info'>$alias ($file)</div>";
+            echo "\n<!--DEBUG PART [$alias] in ($file) -->\n<span class='part_border'><div class='info'>$alias ($file)</div>";
+        else
+            echo "\n<!--DEBUG PART [$alias] in ($file) -->\n";
     }
 
     public function part_after_include($params)
     {
         if (!App::canDebugParts()) return;
-        $part = $params['part'];
+        $part  = $params['part'];
+        $alias = $params['alias'];
         if (!in_array($part, array('head', 'template', 'meta')))
-            echo "</span>";
+            echo "</span>\n<!--END PART [$alias]-->\n";
+        else
+            echo "\n<!--END PART [$alias]-->\n";
     }
 
 }

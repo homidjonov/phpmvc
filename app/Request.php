@@ -30,8 +30,8 @@ class Request
         $this->_isSecure = $_SERVER['SERVER_PORT'] == 443;
         $this->_query    = strtolower($_SERVER['QUERY_STRING']);
         $this->_host     = strtolower((($this->_isSecure) ? 'https://' : 'http://') . trim($_SERVER['HTTP_HOST'], '/') . '/');
-        $this->_baseUrl  = strtolower($this->_host . trim(trim($_SERVER['SCRIPT_NAME'], 'index.php'), '/') . '/');
-
+        $folder          = trim($_SERVER['SCRIPT_NAME'], '/index.php');
+        $this->_baseUrl  = strtolower($this->_host . (($folder) ? "$folder/" : ""));
         /**
          * agar module qismi bo'lmasa default routeni olamiz
          * agar action qismi bo'lmasa default actionni olamiz
@@ -56,7 +56,7 @@ class Request
                 }
             }
         }
-        foreach ($_GET as $key=> $value) {
+        foreach ($_GET as $key => $value) {
             $params[$key] = mysql_real_escape_string($value);
         }
         $this->_getParams = $params;

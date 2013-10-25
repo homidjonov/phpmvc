@@ -43,7 +43,8 @@ class Module
 
     public function __construct()
     {
-        if ($this instanceof Module) self::$_modules[$this->getRoute()] = $this;
+
+        if ($this instanceof Module && $this->getName() != 'module') self::$_modules[$this->getRoute()] = $this;
         if ($this->_observers) App::addObserver($this->getName(), $this->_observers);
         $this->_init();
     }
@@ -195,20 +196,18 @@ class Module
         $action = App::getRequest()->getAction();
 
         $files = array(
-            APP_DEFAULT_DESIGN . DS . $module . DS . $action . DS . $part,
-            APP_DEFAULT_DESIGN . DS . $module . DS . $part,
-            APP_DEFAULT_DESIGN . DS . 'page' . DS . 'default' . DS . $part,
-            APP_DEFAULT_DESIGN . DS . 'page' . DS . $part,
-            APP_DEFAULT_DESIGN . DS . $part,
-            'default' . DS . $module . DS . $action . DS . $part,
-            'default' . DS . $module . DS . $part,
-            'default' . DS . 'page' . DS . 'default' . DS . $part,
-            'default' . DS . 'page' . DS . $part,
-            'default' . DS . $part,
+            App::getCurrentTemplateDir() . $module . DS . $action . DS . $part,
+            App::getCurrentTemplateDir() . $module . DS . $part,
+            App::getCurrentTemplateDir() . 'page' . DS . $part,
+            App::getCurrentTemplateDir() . $part,
+            App::getBaseTemplateDir() . $module . DS . $action . DS . $part,
+            App::getBaseTemplateDir() . $module . DS . $part,
+            App::getBaseTemplateDir() . 'page' . DS . $part,
+            App::getBaseTemplateDir() . $part,
         );
         $files = array_unique($files);
         foreach ($files as $file) {
-            $file = APP_VIEW_DIR . $file . '.phtml';
+            $file = $file . '.phtml';
             if (file_exists($file)) {
                 self::$_parts[] = $file;
                 App::runObserver('part_before_include', array('part' => $part, 'alias' => $alias, 'file' => &$file));
@@ -235,16 +234,38 @@ class Module
 
     public function getPartAll($part)
     {
-        $designDir = scandir(APP_VIEW_DIR . APP_DEFAULT_DESIGN);
-        foreach ($designDir as $moduleDir) {
-            $modulePath = APP_VIEW_DIR . APP_DEFAULT_DESIGN . DS . $moduleDir;
-            if (is_dir($modulePath) && $moduleDir != '..' && $moduleDir != '.') {
-                $file = $modulePath . DS . $part . '.phtml';
-                if (file_exists($file)) {
-                    include $file;
-                }
+        $modules    = array_keys(self::$_modules);
+        $designDirs = array();
+        foreach ($modules as $module) {
+            $designDirs[] = App::getCurrentTemplateDir() . $module . DS . $part . '.phtml';
+            $designDirs[] = App::getBaseTemplateDir() . $module . DS . $part . '.phtml';
+        }
+        for ($i = 0; $i < count($designDirs); $i++) {
+            if (file_exists($designDirs[$i])) {
+                include $designDirs[$i];
+                if ($i % 2 == 0) $i++;
             }
         }
+
+    }
+
+    public function getThemeFileLink($fileLink)
+    {
+        $file     = trim(str_replace('/', DS, $fileLink), DS);
+        $fileLink = trim(str_replace(DS, '/', $fileLink), '/');
+        $files    = array(
+            App::getCurrentThemeDir() . $file => $this->getLink('theme/' . App::getCurrentTheme() . '/' . $fileLink),
+            App::getBaseThemeDir() . $file    => $this->getLink('theme/' . App::getBaseTheme() . '/' . $fileLink),
+        );
+        foreach ($files as $file => $link) {
+            if (file_exists($file)) return $link;
+        }
+        return $link;
+    }
+
+    protected function getLink($part)
+    {
+        return App::getRequest()->getBaseUrl() . $part;
     }
 
     protected $_bodyClassName;
