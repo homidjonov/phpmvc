@@ -33,9 +33,12 @@ class App
             require_once $file;
         }
 
-        if (APP_DEVELOPER_MODE) {
+        if (self::getIsDeveloperMode()) {
             ini_set('display_errors', 'on');
             ini_set('error_reporting', E_ALL);
+        } else {
+            ini_set('display_errors', 'off');
+            ini_set('error_reporting', E_ERROR);
         }
 
     }
