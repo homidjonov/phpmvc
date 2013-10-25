@@ -2,7 +2,16 @@
 /**
  * @var $this Module
  */
-$this->getPart('post/list');
+?>
+
+<h1>Developer mode <span class="code">APP_DEVELOPER_MODE</span> is <span class="code"><?= (App::getIsDeveloperMode()) ? 'ON' : 'OFF' ?></span>
+</h1>
+<p>Exceptions will be logged if some error occurs in this mode. Also you can use <span class="code">App::log()</span> function, see <span class="code">/app/log</span> folder.</p>
+<h1>Debug Parts mode <span class="code">APP_DEBUG_PARTS</span> is <span class="code"><?= (App::canDebugParts()) ? 'ON' : 'OFF' ?></span></h1>
+<p>In this mode you can see dotted border of each part and you can easily find where is template files.</p>
+<h1>Interface translation mode <span class="code">APP_TRANSLATE_INTERFACE</span>
+    is <span class="code"><?= (App::canTranslateInterface()) ? 'ON' : 'OFF' ?></span></h1>
+<p>Interface translation module started, you can see gray dotted words, click them.</p>
 
 
 
