@@ -66,7 +66,7 @@ class Page extends Module
         $file  = explode("\\template\\", $params['file']);
         $file  = $file[1];
         if (!in_array($part, array('head', 'template', 'meta')))
-            echo "\n<!--DEBUG PART [$alias] in ($file) -->\n<span class='part_border'><div class='info'>$alias ($file)</div>";
+            echo "<span class='part_border'><div class='info'>$alias ($file)</div></span>";
         else
             echo "\n<!--DEBUG PART [$alias] in ($file) -->\n";
     }
@@ -77,7 +77,7 @@ class Page extends Module
         $part  = $params['part'];
         $alias = $params['alias'];
         if (!in_array($part, array('head', 'template', 'meta')))
-            echo "</span>\n<!--END PART [$alias]-->\n";
+            echo "\n<!--END PART [$alias]-->\n";
         else
             echo "\n<!--END PART [$alias]-->\n";
     }

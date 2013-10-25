@@ -319,12 +319,11 @@ a {
     right: 0;
     background: #000000;
     color: white;
-    z-index: +10;
+    z-index: 1000;
     padding: 4px 0;
     font-size: 12px;
-    height: 16px;
     line-height: 16px;
-    width: 50px;
+    width: 100%;
     text-align: center;
     overflow: hidden;
 }
@@ -333,12 +332,19 @@ a {
     display: block;
 }
 
+.part_border:hover {
+    border: 1px solid #000000;
+    background: #010101;
+    opacity: 0.9;
+}
 .part_border {
     border: 1px solid red;
-    border: 1px dashed #FF0000;
+    border: 1px dotted #FF0000;
     display: block;
-    position: relative;
-    z-index: +5;
+    position: absolute;
+    z-index: +1;
+    background-color: transparent;
+    cursor: pointer;
 }
 
 .translation:hover {

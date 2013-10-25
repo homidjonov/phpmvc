@@ -1,5 +1,5 @@
-<?php foreach (array('last_posts', 'categories', 'tags') as $widget): ?>
-<div class="widget widget_<?=$widget?>">
-    <?php $this->getWidget('post/' . $widget) ?>
+<div id="sidebar" class="right">
+    <?php foreach (array('last_posts', 'categories', 'tags') as $widget): ?>
+        <?php $this->getWidget('post/' . $widget) ?>
+    <?php endforeach; ?>
 </div>
-<?php endforeach; ?>

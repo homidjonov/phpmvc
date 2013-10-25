@@ -16,22 +16,19 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <!-- we are using xhtml standard, see http://www.w3schools.com/html/html_xhtml.asp-->
-<?php $this->getPart('head');?>
-<body class="<?=App::getRequest()->getFullActionName()?> <?=$this->getBodyClassName()?>">
+<?php $this->getPart('head'); ?>
+<body class="<?= App::getRequest()->getFullActionName() ?> <?= $this->getBodyClassName() ?>">
 <div id="wrapper">
-    <?php $this->getPart('header');?>
+    <?php $this->getPart('header'); ?>
     <div id="page" class="noborder">
-        <div id="content">
-            <?php $this->getPart('content');?>
-        </div>
-        <div id="sidebar" class="right">
-            <?php $this->getPart('sidebar');?>
-        </div>
+        <?php $this->getPart('content'); ?>
+        <?php $this->getPart('sidebar'); ?>
     </div>
     <div class="clear"></div>
     <div id="footer">
         <p class="copyright">
             Copyright &copy; 2013. Global Media Solutions LLC.
+
         <p>
     </div>
 </div>
