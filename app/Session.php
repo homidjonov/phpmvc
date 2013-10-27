@@ -10,7 +10,9 @@ class Session
 {
     protected $_space = 'user';
     protected $_user = false;
+    protected $_userId = false;
     protected $_savePath;
+    protected $_isLoggedIn;
 
     public function __construct()
     {
@@ -18,12 +20,26 @@ class Session
         //$this->setUser('blabla');
     }
 
+    public function isLoggedIn()
+    {
+        return $this->_isLoggedIn;
+    }
+
+    public function setIsLoggedIn(Model $model)
+    {
+        $this->_isLoggedIn  = true;
+        $_SESSION['userId'] = $model->getId();
+    }
+
+
     protected function _init()
     {
         if (!isset($_SESSION)) {
             session_module_name('files');
             if (is_writable($this->getSessionSavePath())) {
                 session_save_path($this->getSessionSavePath());
+            } else {
+                mkdir($this->getSessionSavePath());
             }
             session_name($this->_space);
             session_start();
@@ -31,7 +47,10 @@ class Session
                 App::getRequest()->setCookie($this->getSessionName(), $this->getSessionId());
             }
         }
-        if (isset($_SESSION['user'])) $this->_user = $_SESSION['user'];
+        if (isset($_SESSION['userId'])) {
+            $this->_userId     = $_SESSION['userId'];
+            $this->_isLoggedIn = true;
+        }
     }
 
     public function getSessionId()
@@ -49,7 +68,7 @@ class Session
         return APP_SESSION_DIR;
     }
 
-    private  static $_instance;
+    private static $_instance;
 
     public static function getInstance()
     {
@@ -76,6 +95,17 @@ class Session
         session_regenerate_id(true);
 
         return $this;
+    }
+
+    protected $_messages = array(
+        'notice'  => array(),
+        'warning' => array(),
+        'error'   => array(),
+    );
+
+    public function addError($message)
+    {
+        $this->_messages['error'][] = $message;
     }
 
 } 

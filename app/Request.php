@@ -20,6 +20,8 @@ class Request
     protected $_queryParams;
     protected $_defaultRoute;
     protected $_getParams;
+    protected $_beforeAuthUrl;
+    protected $_beforeAuthAction;
     protected static $_instance;
 
     /**
@@ -108,7 +110,7 @@ class Request
         return $this->_isSecure;
     }
 
-    public function getUrl()
+    public function getRequestUrl()
     {
         return $this->_request;
     }
@@ -129,6 +131,28 @@ class Request
     public function setModule($module)
     {
         $this->_moduleRoute = $module;
+        return $this;
+    }
+
+    public function getBeforeAuthUrl()
+    {
+        return $this->_beforeAuthUrl;
+    }
+
+    public function getBeforeAuthAction()
+    {
+        return $this->_beforeAuthAction;
+    }
+
+    public function setBeforeAuthUrl($url)
+    {
+        $this->_beforeAuthUrl = $url;
+        return $this;
+    }
+
+    public function setBeforeAuthAction($action)
+    {
+        $this->_beforeAuthAction = $action;
         return $this;
     }
 
@@ -198,5 +222,22 @@ class Request
         }
 
         setcookie($name, $value, $expire, $path, $domain, $secure, $httponly);
+    }
+
+    public function getIsPost()
+    {
+        return count($_POST) > 0;
+    }
+
+    public function getPost($key)
+    {
+        if (isset($_POST[$key])) return $_POST[$key];
+        return false;
+    }
+
+    public function redirect($url)
+    {
+        header('Location: ' . $url);
+        die;
     }
 }

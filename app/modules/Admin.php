@@ -23,9 +23,10 @@ class Admin extends Module
     protected function _preDispatch()
     {
 
-        $user                = $this->getSession()->getUser();
-        if (empty($user)) {
-            //$this->getRequest()->setAction('login');
+        $user = $this->getSession()->getUser();
+        if (!$this->getSession()->isLoggedIn()) {
+            $this->getRequest()->setBeforeAuthUrl($this->getRequest()->getRequestUrl());
+            $this->getRequest()->setAction('login');
         }
     }
 
@@ -53,14 +54,68 @@ class Admin extends Module
 
     public function loginAction()
     {
+        if ($this->getSession()->isLoggedIn()) {
+            $this->getRequest()->redirect($this->getAdminUrl('index'));
+        }
+        $form = new Form();
+        $form->setElementWrapper('p');
+
+        $form->addElement('text', 'login', array(
+            'name'  => 'login',
+            'label' => $this->__('Login'),
+            'class' => 'some_class valid-required',
+
+        ));
+        $form->addElement('password', 'password', array(
+            'label'        => $this->__('Password'),
+            'autocomplite' => 'off',
+            'class'        => 'some_class valid-required',
+        ));
+        $form->addElement('submit', 'submit', array(
+            'value' => $this->__('Login'),
+            'class' => 'some_class valid-required',
+        ));
+
+        if ($this->getRequest()->getIsPost()) {
+            $form->init();
+            $login    = $this->getRequest()->getPost('login');
+            $password = $this->getRequest()->getPost('password');
+            try {
+                if ($this->getSession()->authentificate($login, $password)) {
+                    $this->getRequest()->redirect($this->getRequest()->getBeforeAuthUrl());
+                }
+            } catch (Exception $e) {
+                $form->addValidationError($e->getMessage());
+            }
+        }
+        $this->setPart('login_form', $form->render());
+
         $this->render();
     }
 
-    /**
-     * observers
-     */
+    public function indexAction()
+    {
+        $this->render();
+    }
+}
 
+class AdminModel extends Model
+{
+    protected $_username;
+    protected $_password;
 
+    public function loadByUsername($login)
+    {
+        $this->_username = "shavkat";
+        $this->_password = "123";
+        $this->_id       = "1";
+        return $this;
+    }
+
+    public function validatePassword($password)
+    {
+        return $this->_password == $password;
+    }
 }
 
 class AdminSession extends Session
@@ -75,6 +130,20 @@ class AdminSession extends Session
         }
         return self::$_instance;
     }
+
+    public function authentificate($login, $password)
+    {
+        $admin = new AdminModel();
+        $admin->loadByUsername($login);
+        if ($admin->getId()) {
+            if ($admin->validatePassword($password)) {
+                $this->renew()->setIsLoggedIn($admin);
+                return true;
+            }
+        }
+        throw new Exception('Invalid Username or Password');
+    }
+
 
 }
 

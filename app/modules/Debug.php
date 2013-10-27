@@ -14,6 +14,8 @@ class Debug extends Module
         'module_after_run',
         'part_before_include',
         'part_after_include',
+        'part_before_output',
+        'part_after_output',
     );
 
 
@@ -51,7 +53,26 @@ class Debug extends Module
         $part  = $params['part'];
         $alias = $params['alias'];
         echo "\n<!--END PART [$alias]-->\n";
+    }
 
+    public function part_before_output($params)
+    {
+        if (!App::canDebugParts()) return;
+        $part  = $params['part'];
+        $alias = $params['alias'];
+        $file  = $this->getRequest()->getFullActionName();
+        if (!in_array($part, array('head', 'template', 'meta', 'head_part', 'body_before_end')))
+            echo "<span class='part_border'><div class='info'>$alias ($file)</div></span>";
+        else
+            echo "\n<!--DEBUG PART [$alias] in ($file) -->\n";
+    }
+
+    public function part_after_output($params)
+    {
+        if (!App::canDebugParts()) return;
+        $part  = $params['part'];
+        $alias = $params['alias'];
+        echo "\n<!--END PART [$alias]-->\n";
     }
 
 }

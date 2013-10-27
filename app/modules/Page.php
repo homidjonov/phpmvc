@@ -9,10 +9,10 @@ class Page extends Module
 {
     protected $_route = 'page';
     protected $_objectData;
-    protected $_observers = array(
-        'meta_load_description',
-        'meta_load_keywords',
-        'meta_load_title',
+
+    protected $_adminMenu = array(
+        'index' => 'Page Management',
+        'new'   => 'Add NewPage'
     );
 
     public function viewAction()
@@ -43,6 +43,12 @@ class Page extends Module
     }
 
     public function adminNew()
+    {
+        $this->_title = $this->__('Create New Page');
+        $this->render();
+    }
+
+    public function adminIndex()
     {
         $this->_title = $this->__('Create New Page');
         $this->render();

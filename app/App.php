@@ -24,6 +24,7 @@ class App
         'module'  => 'Module.php',
         'model'   => 'Model.php',
         'session' => 'Session.php',
+        'form'    => 'Form.php',
     );
 
     public function __construct()

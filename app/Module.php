@@ -19,6 +19,8 @@ class Module
 
     private static $_routes = array();
 
+    protected $_adminMenu = array();
+    protected static $_adminMenuItems = array();
     /**
      * Page title, keywords, description
      */
@@ -26,9 +28,36 @@ class Module
     protected $_title;
     protected $_description;
 
+
+    public function __construct()
+    {
+        if ($this->getName() != 'module') {
+            self::$_modules[$this->getName()] = $this;
+            if ($this->canRoute()) {
+                self::$_routes[$this->_route] = $this->getName();
+            }
+        }
+        if (!empty($this->_observers)) App::addObserver($this->getName(), $this->_observers);
+        if (App::isAdmin() && !empty($this->_adminMenu)) {
+            foreach ($this->_adminMenu as $menuItem => $title) {
+                if (!isset(self::$_adminMenuItems[$menuItem])) {
+                    self::$_adminMenuItems[$menuItem]             = array();
+                    self::$_adminMenuItems[$menuItem]['children'] = array();
+                }
+
+            }
+        }
+        $this->_init();
+    }
+
+    protected function _init()
+    {
+
+    }
+
     protected function getTitle()
     {
-        $data = $this->_title;
+        $data = strip_tags($this->_title);
         return $this->getMetaData($data, 'title');
     }
 
@@ -56,23 +85,6 @@ class Module
 
     protected static $_instance;
 
-
-    public function __construct()
-    {
-        if ($this->getName() != 'module') {
-            self::$_modules[$this->getName()] = $this;
-            if ($this->canRoute()) {
-                self::$_routes[$this->_route] = $this->getName();
-            }
-        }
-        if (!empty($this->_observers)) App::addObserver($this->getName(), $this->_observers);
-        $this->_init();
-    }
-
-    protected function _init()
-    {
-
-    }
 
     public function getName()
     {
@@ -226,6 +238,13 @@ class Module
         $module = $this->getName();
         $action = App::getRequest()->getAction();
 
+        if (isset(self::$_partsContent[$part])) {
+            $data = self::$_partsContent[$part];
+            App::runObserver('part_before_output', array('part' => $part, 'alias' => $alias, 'data' => &$data));
+            echo $data;
+            App::runObserver('part_after_output', array('part' => $part, 'alias' => $alias, 'data' => &$data));
+            return;
+        }
         $files = array(
             $this->getCurrentTemplateDir() . $module . DS . $action . DS . $part,
             $this->getCurrentTemplateDir() . $module . DS . $part,
@@ -237,7 +256,7 @@ class Module
             App::getBaseTemplateDir() . $part,
         );
         $files = array_unique($files);
-        App::log($files);
+        //App::log($files);
         foreach ($files as $file) {
             $file = $file . '.phtml';
             if (file_exists($file)) {
@@ -256,6 +275,13 @@ class Module
 
         App::log($log);
         return false;
+    }
+
+    protected static $_partContents = array();
+
+    public function setPart($part, $content, $isFile = false)
+    {
+        self::$_partsContent[$part] = $content;
     }
 
     public function getWidget($widget)
@@ -368,5 +394,12 @@ class Module
     protected function getTranslator()
     {
         return self::$_modules['translator'];
+    }
+
+    protected function forward($action)
+    {
+        $this->getRequest()->setAction($action);
+        $action .= 'Action';
+        $this->$action();
     }
 }
