@@ -1,0 +1,21 @@
+
+
+DATE: 	25-10-2013 06:20:36
+URL: 	/
+MESS: 	Module [debug] not found in Z:\home\mynewsblog.com\www\app\Module.php on line 93
+#0 Z:\home\mynewsblog.com\www\app\App.php(191): Module->getModule('debug')
+#1 Z:\home\mynewsblog.com\www\app\App.php(151): App::runObserver('module_before_r...', Array)
+#2 Z:\home\mynewsblog.com\www\index.php(24): App->run()
+#3 {main}
+
+
+
+DATE: 	27-10-2013 05:17:49
+URL: 	/adminbox/pag1e_edit
+MESS: 	Module [pag1e] not found in Z:\home\mynewsblog.com\www\app\Module.php on line 126
+#0 Z:\home\mynewsblog.com\www\app\modules\Admin.php(36): Module->getModule('pag1e')
+#1 Z:\home\mynewsblog.com\www\app\Module.php(165): Admin->defaultAction()
+#2 Z:\home\mynewsblog.com\www\app\App.php(153): Module->run()
+#3 Z:\home\mynewsblog.com\www\index.php(24): App->run()
+#4 {main}
+

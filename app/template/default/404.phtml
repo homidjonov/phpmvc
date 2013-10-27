@@ -1,0 +1,39 @@
+<?php
+/**
+ * Created by JetBrains PhpStorm.
+ * User: Shavkat
+ * Date: 10/23/13
+ * Time: 12:08 PM
+ * @var $this Module
+ */
+
+/**
+ * template deyarli barcha sahifalar uchun bir xil sklet, shuning uchun uni tema papkasiga qo'shilgan,
+ * agar u modul papkasiga ham qo'shsak o'sha yuklanadi. Masalan post ga qarang
+ */
+?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!-- we are using xhtml standard, see http://www.w3schools.com/html/html_xhtml.asp-->
+<?php $this->getPart('head'); ?>
+<body class="<?= App::getRequest()->getFullActionName() ?> <?= $this->getBodyClassName() ?>">
+<?php $this->getPartAll('body_after_start'); ?>
+<div id="wrapper">
+    <?php $this->getPart('header'); ?>
+    <div id="page" class="noborder">
+        <div id="content">
+            <h1><?= $this->__('Custom 404 message') ?></h1>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div id="footer">
+        <p class="copyright">
+            Copyright &copy; 2013. Global Media Solutions LLC.
+
+        <p>
+    </div>
+</div>
+<?php $this->getPartAll('body_before_end'); ?>
+</body>
+</html>

@@ -25,5 +25,12 @@
     <p>Interface translation module started, you can see gray dotted uppercase <?= $this->__('WORDS') ?>, click
         them.</p>
 
+    <h1>Custom menu links:</h1>
+    <ul>
+        <li><a href="<?= $this->getUrl('about-us') ?>">Page Module Custom page view</a></li>
+        <li><a href="<?= $this->getAdminUrl('login') ?>">Admin Login</a></li>
+        <li><a href="<?= $this->getAdminUrl('page_new') ?>">Admin Add New Page</a></li>
+    </ul>
+
 </div>
 

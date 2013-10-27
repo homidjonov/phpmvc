@@ -15,6 +15,9 @@ class Module
     protected $_name;
     protected $_params;
     protected $_observers;
+    protected static $_currentTheme;
+
+    private static $_routes = array();
 
     /**
      * Page title, keywords, description
@@ -25,17 +28,30 @@ class Module
 
     protected function getTitle()
     {
-        return $this->_title;
+        $data = $this->_title;
+        return $this->getMetaData($data, 'title');
     }
 
     protected function getKeywords()
     {
-        return $this->_keywords;
+        $data = $this->_keywords;
+        return $this->getMetaData($data, 'keywords');
     }
 
     protected function getDescription()
     {
-        return $this->_description;
+        $data = $this->_description;
+        return $this->getMetaData($data, 'description');
+    }
+
+    protected function getMetaData($data, $type = false)
+    {
+        $params = array('data' => &$data, 'type' => $type);
+        if ($type) {
+            //Is it necessary to add event observer to only meta tags? I don't now really.
+            //App::runObserver('load_meta_' . $type, $params);
+        }
+        return $params['data'];
     }
 
     protected static $_instance;
@@ -43,9 +59,13 @@ class Module
 
     public function __construct()
     {
-
-        if ($this instanceof Module && $this->getName() != 'module') self::$_modules[$this->getName()] = $this;
-        if ($this->_observers) App::addObserver($this->getName(), $this->_observers);
+        if ($this->getName() != 'module') {
+            self::$_modules[$this->getName()] = $this;
+            if ($this->canRoute()) {
+                self::$_routes[$this->_route] = $this->getName();
+            }
+        }
+        if (!empty($this->_observers)) App::addObserver($this->getName(), $this->_observers);
         $this->_init();
     }
 
@@ -65,7 +85,8 @@ class Module
     public static function getInstance()
     {
         if (self::$_instance == null) {
-            self::$_instance = new Module();
+            self::$_instance     = new Module();
+            self::$_currentTheme = App::getCurrentTheme();
         }
         return self::$_instance;
     }
@@ -73,11 +94,21 @@ class Module
 
     public function getModuleForRoute($name)
     {
-        if (isset(self::$_modules[$name]) && self::$_modules[$name]->canRoute()) {
-            return self::$_modules[$name];
+        if (isset(self::$_routes[$name])) {
+            return self::$_modules[self::$_routes[$name]];
         }
         Request::getInstance()->setModule('page');
         return self::$_modules['page'];
+    }
+
+    protected function getSession()
+    {
+        return Session::getInstance();
+    }
+
+    protected function getRequest()
+    {
+        return App::getRequest();
     }
 
     /**
@@ -103,10 +134,6 @@ class Module
         return $this->_route;
     }
 
-    protected function _defaultNoRouteAction()
-    {
-        echo "404";
-    }
 
     protected function _preDispatch()
     {
@@ -129,23 +156,27 @@ class Module
             } else {
                 $action = 'defaultAction';
                 if (method_exists($this, $action)) {
-                    Request::getInstance()->setAction('default');
                     $this->$action();
+                } else {
+                    $this->_defaultNoRouteAction();
                 }
             }
-        } else {
-            $this->_defaultNoRouteAction();
         }
 
         $this->_postDispatch();
     }
 
+    protected function _defaultNoRouteAction()
+    {
+        $this->getPart('404');
+    }
+
+
     protected function render($params = false)
     {
+
         $this->_params = $params;
         $this->getPart('template');
-
-
     }
 
     public function getParams()
@@ -196,16 +227,17 @@ class Module
         $action = App::getRequest()->getAction();
 
         $files = array(
-            App::getCurrentTemplateDir() . $module . DS . $action . DS . $part,
-            App::getCurrentTemplateDir() . $module . DS . $part,
-            App::getCurrentTemplateDir() . 'page' . DS . $part,
-            App::getCurrentTemplateDir() . $part,
+            $this->getCurrentTemplateDir() . $module . DS . $action . DS . $part,
+            $this->getCurrentTemplateDir() . $module . DS . $part,
+            $this->getCurrentTemplateDir() . 'page' . DS . $part,
+            $this->getCurrentTemplateDir() . $part,
             App::getBaseTemplateDir() . $module . DS . $action . DS . $part,
             App::getBaseTemplateDir() . $module . DS . $part,
             App::getBaseTemplateDir() . 'page' . DS . $part,
             App::getBaseTemplateDir() . $part,
         );
         $files = array_unique($files);
+        App::log($files);
         foreach ($files as $file) {
             $file = $file . '.phtml';
             if (file_exists($file)) {
@@ -258,8 +290,8 @@ class Module
         $file     = trim(str_replace('/', DS, $fileLink), DS);
         $fileLink = trim(str_replace(DS, '/', $fileLink), '/');
         $files    = array(
-            App::getCurrentThemeDir() . $file => $this->getLink('theme/' . App::getCurrentTheme() . '/' . $fileLink),
-            App::getBaseThemeDir() . $file    => $this->getLink('theme/' . App::getBaseTheme() . '/' . $fileLink),
+            $this->getCurrentThemeDir() . $file => $this->getLink('theme/' . $this->getCurrentTheme() . '/' . $fileLink),
+            App::getBaseThemeDir() . $file      => $this->getLink('theme/' . App::getBaseTheme() . '/' . $fileLink),
         );
         foreach ($files as $file => $link) {
             if (file_exists($file)) return $link;
@@ -267,9 +299,34 @@ class Module
         return $link;
     }
 
+    protected function getCurrentTheme()
+    {
+        return self::$_currentTheme;
+    }
+
+    protected function getCurrentThemeDir()
+    {
+        return App::getThemeDir() . $this->getCurrentTheme() . DS;
+    }
+
+    protected function getCurrentTemplateDir()
+    {
+        return App::getTemplateDir() . $this->getCurrentTheme() . DS;
+    }
+
     protected function getLink($part)
     {
         return App::getRequest()->getBaseUrl() . $part;
+    }
+
+    public function getUrl($link)
+    {
+        return $this->getRequest()->getBaseUrl() . $link . '/';
+    }
+
+    public function getAdminUrl($link)
+    {
+        return $this->getUrl(APP_ADMIN_ROUTE . "/" . $link);
     }
 
     protected $_bodyClassName;

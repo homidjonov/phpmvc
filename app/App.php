@@ -50,10 +50,10 @@ class App
     public function loadModules()
     {
 
-        self::$_sessionManager = Session::getInstance();
-        self::$_moduleManager  = Module::getInstance();
         self::$_requestManager = Request::getInstance();
         self::$_dbManager      = Db::getInstance();
+        //self::$_sessionManager = Session::getInstance(); user and admin session separated
+        self::$_moduleManager = Module::getInstance();
 
         $found   = array();
         $modules = scandir(APP_MODULES_DIR);
@@ -178,7 +178,7 @@ class App
             } else {
                 $string .= $object;
             }
-            file_put_contents(APP_LOG_DIR . (($logFile) ? $logFile : $file), "\n$string\n", FILE_APPEND);
+            file_put_contents(APP_LOG_DIR . (($logFile) ? $logFile : $file), "$string", FILE_APPEND);
         }
     }
 
@@ -204,9 +204,14 @@ class App
         }
     }
 
+    static public function isAdmin()
+    {
+        return self::getRequest()->isAdmin();
+    }
+
     static public function getCurrentTheme()
     {
-        return APP_DEFAULT_THEME;
+        return (self::isAdmin()) ? 'admin' : APP_DEFAULT_THEME;
     }
 
     static public function getBaseTheme()

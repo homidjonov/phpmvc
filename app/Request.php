@@ -9,10 +9,13 @@ class Request
 {
     protected $_request;
     protected $_host;
+    protected $_domain;
     protected $_baseUrl;
     protected $_isSecure;
     protected $_moduleRoute;
     protected $_moduleAction;
+    protected $_moduleOrigAction;
+    protected $_moduleSubAction;
     protected $_query;
     protected $_queryParams;
     protected $_defaultRoute;
@@ -27,6 +30,7 @@ class Request
     public function __construct()
     {
         $this->_request  = strtolower($_SERVER['REQUEST_URI']);
+        $this->_domain   = $_SERVER['HTTP_HOST'];
         $this->_isSecure = $_SERVER['SERVER_PORT'] == 443;
         $this->_query    = strtolower($_SERVER['QUERY_STRING']);
         $this->_host     = strtolower((($this->_isSecure) ? 'https://' : 'http://') . trim($_SERVER['HTTP_HOST'], '/') . '/');
@@ -39,7 +43,7 @@ class Request
         $this->_moduleRoute  = App::getDefaultRoute();
         $this->_moduleAction = 'default';
 
-        $params = array();
+
         if (isset($_SERVER['REDIRECT_URL']) && $_SERVER['REDIRECT_URL']) {
             $this->_defaultRoute = strtolower(trim($_SERVER['REDIRECT_URL'], rtrim($_SERVER['SCRIPT_NAME'], 'index.php')));
             $parts               = explode('/', $this->_defaultRoute);
@@ -47,14 +51,22 @@ class Request
             $c = count($parts);
 
             if ($c > 1) {
-                if ($parts[1]) $this->_moduleAction = $parts[1];
+                $this->_moduleAction     = $parts[1];
+                $this->_moduleOrigAction = $parts[1];
                 if ($c > 2) {
-                    for ($i = 2; $i < $c; $i += 2) {
-                        if (isset($parts[$i]) && isset($parts[$i + 1]) && $parts[$i] && $parts[$i + 1] !== '')
-                            $params[$parts[$i]] = $parts[$i + 1];
-                    }
+                    $this->parseParams($parts, 3, $c);;
                 }
             }
+        }
+
+    }
+
+    protected function parseParams($parts, $start, $count)
+    {
+        $params = array();
+        for ($i = $start; $i < $count; $i += 2) {
+            if (isset($parts[$i]) && isset($parts[$i + 1]) && $parts[$i] && $parts[$i + 1] !== '')
+                $params[$parts[$i]] = $parts[$i + 1];
         }
         foreach ($_GET as $key => $value) {
             $params[$key] = mysql_real_escape_string($value);
@@ -81,6 +93,11 @@ class Request
         return $this->_baseUrl;
     }
 
+    public function isAdmin()
+    {
+        return $this->_moduleRoute == APP_ADMIN_ROUTE;
+    }
+
     public function getHost()
     {
         return $this->_host;
@@ -94,6 +111,11 @@ class Request
     public function getUrl()
     {
         return $this->_request;
+    }
+
+    public function getDomain()
+    {
+        return $this->_domain;
     }
 
     /**
@@ -112,8 +134,14 @@ class Request
 
     public function setAction($action)
     {
-        $this->_moduleAction = $action;
+        $this->_moduleOrigAction = $this->_moduleAction;
+        $this->_moduleAction     = $action;
         return $this;
+    }
+
+    public function getOrigAction()
+    {
+        return $this->_moduleOrigAction;
     }
 
     public function getAction()
@@ -129,5 +157,46 @@ class Request
     public function getFullActionName()
     {
         return $this->_moduleRoute . '_' . $this->_moduleAction;
+    }
+
+    public function getCookie($key = false, $default = null)
+    {
+        if ($key) {
+            return (isset($_COOKIE[$key])) ? $_COOKIE[$key] : $default;
+        }
+        return $_COOKIE;
+    }
+
+    public function setCookie($name, $value, $period = null, $path = null, $domain = null, $secure = null, $httponly = null)
+    {
+        unset($_COOKIE[$name]);
+        if (is_null($period)) {
+            $period = 3600 * 24 * 7; //default week
+        }
+
+        if ($period == 0) {
+            $expire = 0;
+        } else {
+            $expire = time() + $period;
+        }
+
+        if (is_null($path)) {
+            $path = '/';
+            if (self::isAdmin()) {
+                $path = '/admin';
+            }
+        }
+
+        if (is_null($domain)) {
+            $domain = $this->getDomain();
+        }
+        if (is_null($secure)) {
+            $secure = $this->isSecure();
+        }
+        if (is_null($httponly)) {
+            $httponly = true;
+        }
+
+        setcookie($name, $value, $expire, $path, $domain, $secure, $httponly);
     }
 }

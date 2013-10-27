@@ -8,7 +8,13 @@
 class Page extends Module
 {
     protected $_route = 'page';
-    protected $_defaultAction = 'view';
+    protected $_objectData;
+    protected $_observers = array(
+        'meta_load_description',
+        'meta_load_keywords',
+        'meta_load_title',
+    );
+
     public function viewAction()
     {
         //echo App::getRequest()->getParam('k');
@@ -34,6 +40,12 @@ class Page extends Module
             return;
         }
         $this->_defaultNoRouteAction();
+    }
+
+    public function adminNew()
+    {
+        $this->_title = $this->__('Create New Page');
+        $this->render();
     }
 }
 
