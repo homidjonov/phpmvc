@@ -16,6 +16,8 @@ class Cache extends Module
     public function page_before_cache($params)
     {
         $params['can_cache'] &= APP_CACHE_ENABLED;
+        $params['can_cache'] &= !$this->getRequest()->hasPost();
+        $params['can_cache'] &= $this->getRequest()->getAction() != '404';
     }
 
     public function module_before_run($params)
@@ -63,7 +65,7 @@ class Cache extends Module
 
     protected function getFileNameForRequest()
     {
-        $fileName = md5($this->getRequest()->getRequestUrl()) . '.cache';
+        $fileName = md5(trim($this->getRequest()->getRequestUrl(), '/?')) . '.cache';
         return APP_CACHE_PAGE_DIR . $fileName;
     }
 

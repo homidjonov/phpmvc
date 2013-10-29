@@ -236,7 +236,7 @@ class Request
         setcookie($name, $value, $expire, $path, $domain, $secure, $httponly);
     }
 
-    public function getIsPost()
+    public function hasPost()
     {
         return count($_POST) > 0;
     }
