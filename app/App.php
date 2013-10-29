@@ -61,19 +61,10 @@ class App
             if (is_file(APP_MODULES_DIR . $moduleFile)) {
                 require_once APP_MODULES_DIR . $moduleFile;
                 $class         = substr($moduleFile, 0, strpos($moduleFile, '.php'));
-                $found[$class] = $class;
+                $found[$class] = new $class();
             }
         }
-        /**
-         * @var $module Module
-         */
-        $routes = array();
-        foreach ($found as $id => $class) {
-            $module = new $class();
-            if ($module->canRoute()) {
-                $routes[$module->getRoute()] = $class;
-            }
-        }
+
         self::$_moduleManager = Module::getInstance();
         self::$_modelManager  = Model::getInstance();
     }
@@ -137,22 +128,20 @@ class App
      */
     public function run()
     {
+        /**
+         * @var $module Module
+         */
         try {
             $this->loadModules();
-            /**
-             * @var $module Module
-             */
             $route = $this->getRequest()->getModule();
             /**
              * TODO route urovenida keshlash logikasini qilish kerak
              */
-
             $module = $this->getModuleManager()->getModuleForRoute($route);
             App::runObserver('module_before_run', array('module' => &$module));
             if ($module) {
                 $module->run();
                 App::runObserver('module_after_run', array('module' => &$module));
-                //self::log(self::getModuleManager()->getParts());
             }
         } catch (Exception $e) {
             if (self::getIsDeveloperMode()) {
@@ -198,10 +187,12 @@ class App
 
     static public function addObserver($module, $observers)
     {
+        if (empty($observers)) return false;
         foreach ($observers as $observerName) {
             if (!isset(self::$_observers[$observerName])) self::$_observers[$observerName] = array();
             self::$_observers[$observerName][] = $module;
         }
+        return true;
     }
 
     static public function isAdmin()

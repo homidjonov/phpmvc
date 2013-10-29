@@ -57,6 +57,36 @@ class Admin extends Module
         if ($this->getSession()->isLoggedIn()) {
             $this->getRequest()->redirect($this->getAdminUrl('index'));
         }
+
+        $form = $this->getLoginForm();
+
+        if ($this->getRequest()->getIsPost()) {
+            $form->init();
+            $email    = $this->getRequest()->getPost('email');
+            $password = $this->getRequest()->getPost('password');
+            try {
+                if ($this->getSession()->authentificate($email, $password)) {
+                    $this->getRequest()->redirect($this->getRequest()->getBeforeAuthUrl());
+                }
+            } catch (Exception $e) {
+                $form->addValidationError($e->getMessage());
+            }
+        }
+        $this->setPart('login_form', $form);
+
+        $this->render();
+    }
+
+    public function indexAction()
+    {
+        $this->render();
+    }
+
+    /**
+     * @return Form
+     */
+    protected function getLoginForm()
+    {
         $form = new Form();
         $form->setElementWrapper('p');
 
@@ -88,27 +118,7 @@ class Admin extends Module
             'class' => 'some_class valid-required',
         ));
 
-
-        if ($this->getRequest()->getIsPost()) {
-            $form->init();
-            $email    = $this->getRequest()->getPost('email');
-            $password = $this->getRequest()->getPost('password');
-            try {
-                if ($this->getSession()->authentificate($email, $password)) {
-                    $this->getRequest()->redirect($this->getRequest()->getBeforeAuthUrl());
-                }
-            } catch (Exception $e) {
-                $form->addValidationError($e->getMessage());
-            }
-        }
-        $this->setPart('login_form', $form->render());
-
-        $this->render();
-    }
-
-    public function indexAction()
-    {
-        $this->render();
+        return $form;
     }
 }
 

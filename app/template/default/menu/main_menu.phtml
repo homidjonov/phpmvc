@@ -1,0 +1,17 @@
+<!-- TODO dynamic poll menu -->
+<?php
+$menu = $this->getMenuData('main_menu');
+?>
+
+<div id="main_menu">
+    <ul class="main_menu">
+        <?php foreach ($menu as $id => $item): ?>
+            <?php $url = $this->getUrl($item['link']) ?>
+            <?php $request = $this->getUrl(App::getRequest()->getRequestUrl()) ?>
+            <li class="<?= ($id == 0) ? 'first' : '' ?> <?= ($id + 1) == count($menu) ? 'last' : '' ?>">
+                <a href="<?= $url ?>"
+                   class="<?= ($url == $request) ? 'selected' : '' ?>"><?= $item['caption'] ?></a>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+</div>

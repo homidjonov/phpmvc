@@ -19,3 +19,37 @@ MESS: 	Module [pag1e] not found in Z:\home\mynewsblog.com\www\app\Module.php on 
 #3 Z:\home\mynewsblog.com\www\index.php(24): App->run()
 #4 {main}
 
+
+DATE: 	29-10-2013 11:37:50
+URL: 	/
+MESS: 	Table 'menu_group' already exists in Z:\home\mynewsblog.com\www\app\Db.php on line 40
+#0 Z:\home\mynewsblog.com\www\app\modules\Menu.php(47): Db->query('CREATE TABLE `m...')
+#1 Z:\home\mynewsblog.com\www\app\Model.php(37): MenuModel->installVersion1()
+#2 Z:\home\mynewsblog.com\www\app\modules\Menu.php(15): Model->__construct()
+#3 Z:\home\mynewsblog.com\www\app\lib\Module.php(50): Menu->_init()
+#4 Z:\home\mynewsblog.com\www\app\App.php(64): Module->__construct()
+#5 Z:\home\mynewsblog.com\www\app\App.php(135): App->loadModules()
+#6 Z:\home\mynewsblog.com\www\index.php(24): App->run()
+#7 {main}
+
+DATE: 	30-10-2013 01:36:13
+URL: 	/
+MESS: 	Unknown column 'order' in 'order clause' in Z:\home\mynewsblog.com\www\app\Db.php on line 40
+#0 Z:\home\mynewsblog.com\www\app\Model.php(87): Db->query('SELECT * FROM m...')
+#1 Z:\home\mynewsblog.com\www\app\modules\Menu.php(49): Model->query('SELECT * FROM m...')
+#2 Z:\home\mynewsblog.com\www\app\modules\Menu.php(34): MenuModel->getMenuData('main_menu')
+#3 [internal function]: Menu->getMenuData('main_menu')
+#4 Z:\home\mynewsblog.com\www\app\lib\Module.php(428): call_user_func_array(Array, Array)
+#5 Z:\home\mynewsblog.com\www\app\template\default\menu\main_menu.phtml(3): Module->__call('getMenuData', Array)
+#6 Z:\home\mynewsblog.com\www\app\template\default\menu\main_menu.phtml(3): Page->getMenuData('main_menu')
+#7 Z:\home\mynewsblog.com\www\app\lib\Module.php(272): include('Z:\home\mynewsb...')
+#8 Z:\home\mynewsblog.com\www\app\template\myblog\page\header.phtml(15): Module->getPart('menu/main_menu')
+#9 Z:\home\mynewsblog.com\www\app\lib\Module.php(272): include('Z:\home\mynewsb...')
+#10 Z:\home\mynewsblog.com\www\app\template\default\template.phtml(23): Module->getPart('header')
+#11 Z:\home\mynewsblog.com\www\app\lib\Module.php(272): include('Z:\home\mynewsb...')
+#12 Z:\home\mynewsblog.com\www\app\lib\Module.php(198): Module->getPart('template')
+#13 Z:\home\mynewsblog.com\www\app\modules\Page.php(39): Module->render()
+#14 Z:\home\mynewsblog.com\www\app\lib\Module.php(174): Page->defaultAction()
+#15 Z:\home\mynewsblog.com\www\app\App.php(143): Module->run()
+#16 Z:\home\mynewsblog.com\www\index.php(24): App->run()
+#17 {main}

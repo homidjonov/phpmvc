@@ -9,18 +9,20 @@
  */
 class Module
 {
-    protected static $_modules;
     protected $_route;
-    protected $_defaultAction;
     protected $_name;
     protected $_params;
     protected $_observers;
+    protected $_adminMenu;
+    protected $_predefinedFunctions = array();
+
+    protected static $_modules;
     protected static $_currentTheme;
+    protected static $_predefinedFunctionsArray;
 
     private static $_routes = array();
-
-    protected $_adminMenu = array();
     protected static $_adminMenuItems = array();
+
     /**
      * Page title, keywords, description
      */
@@ -31,21 +33,28 @@ class Module
 
     public function __construct()
     {
+        if (!$this->_name) {
+            $this->_name = strtolower(get_class($this));
+        }
         if ($this->getName() != 'module') {
             self::$_modules[$this->getName()] = $this;
             if ($this->canRoute()) {
                 self::$_routes[$this->_route] = $this->getName();
             }
         }
-        if (!empty($this->_observers)) App::addObserver($this->getName(), $this->_observers);
-        if (App::isAdmin() && !empty($this->_adminMenu)) {
+
+        App::addObserver($this->getName(), $this->_observers);
+
+        if (App::isAdmin() && $this->_adminMenu) {
             foreach ($this->_adminMenu as $menuItem => $title) {
                 if (!isset(self::$_adminMenuItems[$menuItem])) {
                     self::$_adminMenuItems[$menuItem]             = array();
                     self::$_adminMenuItems[$menuItem]['children'] = array();
                 }
-
             }
+        }
+        foreach ($this->_predefinedFunctions as $function) {
+            self::$_predefinedFunctionsArray[$function] = $this->getName();
         }
         $this->_init();
     }
@@ -88,9 +97,7 @@ class Module
 
     public function getName()
     {
-        if (!$this->_name) {
-            $this->_name = strtolower(get_class($this));
-        }
+
         return $this->_name;
     }
 
@@ -281,6 +288,7 @@ class Module
 
     public function setPart($part, $content, $isFile = false)
     {
+        if (is_object($content)) $content = $content->render();
         self::$_partsContent[$part] = $content;
     }
 
@@ -308,7 +316,6 @@ class Module
                 if ($i % 2 == 0) $i++;
             }
         }
-
     }
 
     public function getThemeFileLink($fileLink)
@@ -323,6 +330,11 @@ class Module
             if (file_exists($file)) return $link;
         }
         return $link;
+    }
+
+    protected function _get()
+    {
+
     }
 
     protected function getCurrentTheme()
@@ -347,7 +359,7 @@ class Module
 
     public function getUrl($link)
     {
-        return $this->getRequest()->getBaseUrl() . $link . '/';
+        return $this->getRequest()->getBaseUrl() . trim($link, '/');
     }
 
     public function getAdminUrl($link)
@@ -402,4 +414,36 @@ class Module
         $action .= 'Action';
         $this->$action();
     }
+
+    /**
+     * @param $method
+     * @param $args
+     * @return mixed
+     * Predefined callable functions
+     */
+    public function __call($method, $args)
+    {
+        if (isset(self::$_predefinedFunctionsArray[$method])) {
+            $module = self::$_modules[self::$_predefinedFunctionsArray[$method]];
+            if (method_exists($module, $method)) return call_user_func_array(array($module, $method), $args);
+        }
+    }
+
+    /**
+     * @param bool $modelName
+     * @return Model
+     * @throws Exception
+     */
+    protected function getModel($modelName = false)
+    {
+        if ($modelName && class_exists($modelName)) {
+            return new $modelName();
+        }
+        $modelName = ucfirst($this->getName()) . 'Model';
+        if ($modelName && class_exists($modelName)) {
+            return new $modelName();
+        }
+        throw new Exception("Model class not found.");
+    }
+
 }
