@@ -22,7 +22,6 @@ class Admin extends Module
 
     protected function _preDispatch()
     {
-
         $user = $this->getSession()->getUser();
         if (!$this->getSession()->isLoggedIn()) {
             $this->getRequest()->setBeforeAuthUrl($this->getRequest()->getRequestUrl());
@@ -38,7 +37,7 @@ class Admin extends Module
             try {
                 $module = $this->getModule($action[0]);
             } catch (Exception $e) {
-                return $this->_defaultNoRouteAction();
+                //module not found
             }
             if ($module) {
                 $invoke = 'admin' . ucfirst($action[1]);
@@ -48,8 +47,9 @@ class Admin extends Module
                     return;
                 }
             }
+            $this->_defaultNoRouteAction();
         }
-        $this->_defaultNoRouteAction();
+        $this->forward('index');
     }
 
     public function loginAction()
@@ -60,28 +60,41 @@ class Admin extends Module
         $form = new Form();
         $form->setElementWrapper('p');
 
-        $form->addElement('text', 'login', array(
-            'name'  => 'login',
-            'label' => $this->__('Login'),
+        $form->addElement('text', 'email', array(
+            'name'  => 'email',
+            'label' => $this->__('Email'),
             'class' => 'some_class valid-required',
-
         ));
+
         $form->addElement('password', 'password', array(
             'label'        => $this->__('Password'),
             'autocomplite' => 'off',
             'class'        => 'some_class valid-required',
         ));
+
+        $form->addElement('select', 'role', array(
+            'label'   => $this->__('Test SelectBox'),
+            'value'   => 'admin',
+            'options' => array(
+                ''          => 'Select',
+                'admin'     => 'Admin',
+                'user'      => 'User',
+                'moderator' => 'Moderator',
+            )
+        ));
+
         $form->addElement('submit', 'submit', array(
-            'value' => $this->__('Login'),
+            'value' => 'Login',
             'class' => 'some_class valid-required',
         ));
 
+
         if ($this->getRequest()->getIsPost()) {
             $form->init();
-            $login    = $this->getRequest()->getPost('login');
+            $email    = $this->getRequest()->getPost('email');
             $password = $this->getRequest()->getPost('password');
             try {
-                if ($this->getSession()->authentificate($login, $password)) {
+                if ($this->getSession()->authentificate($email, $password)) {
                     $this->getRequest()->redirect($this->getRequest()->getBeforeAuthUrl());
                 }
             } catch (Exception $e) {
@@ -99,22 +112,51 @@ class Admin extends Module
     }
 }
 
-class AdminModel extends Model
+class UserModel extends Model
 {
     protected $_username;
     protected $_password;
+    protected $_table = 'users';
 
-    public function loadByUsername($login)
+    public function loadByEmail($email)
     {
-        $this->_username = "shavkat";
-        $this->_password = "123";
-        $this->_id       = "1";
+        $query = "SELECT * FROM {$this->_table} WHERE `email`='$email'";
+        if ($result = mysql_fetch_assoc($this->query($query))) {
+            $this->_username = $result['username'];
+            $this->_password = $result['password'];
+            $this->_id       = (int)$result['id'];
+        }
         return $this;
     }
 
     public function validatePassword($password)
     {
+        if ($this->_password) {
+            $salt = substr($this->_password, 0, 10);
+            return $this->_password == $this->encryptPassword($password, $salt);
+        }
         return $this->_password == $password;
+    }
+
+    protected function encryptPassword($password, $salt = false)
+    {
+        if (!$salt) $salt = substr(md5(time()), 0, 10);
+        return $salt . hash('sha256', $password . $salt);
+    }
+
+    protected function installVersion1()
+    {
+        $query = "CREATE TABLE `{$this->_table}` (
+        `id`  int(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
+        `username`  varchar(20) DEFAULT NULL ,
+        `email`  varchar(50) NOT NULL ,
+        `password`  varchar(255) NOT NULL ,
+        `role`  enum('user','admin') DEFAULT 'user' ,
+        `status`  int(1) NULL DEFAULT 1 ,
+        PRIMARY KEY (`id`),
+        UNIQUE INDEX `email` (`email`) USING BTREE
+        )ENGINE=MyISAM";
+        $this->getConnection()->query($query);
     }
 }
 
@@ -131,15 +173,13 @@ class AdminSession extends Session
         return self::$_instance;
     }
 
-    public function authentificate($login, $password)
+    public function authentificate($email, $password)
     {
-        $admin = new AdminModel();
-        $admin->loadByUsername($login);
-        if ($admin->getId()) {
-            if ($admin->validatePassword($password)) {
-                $this->renew()->setIsLoggedIn($admin);
-                return true;
-            }
+        $admin = new UserModel();
+        $admin->loadByEmail($email);
+        if ($admin->validatePassword($password)) {
+            $this->renew()->setIsLoggedIn($admin);
+            return true;
         }
         throw new Exception('Invalid Username or Password');
     }

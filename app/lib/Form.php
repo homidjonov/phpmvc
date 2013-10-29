@@ -151,9 +151,9 @@ class Form
 
     protected function renderParams($params)
     {
-        $html = "";
-        unset($params['label']);
-        unset($params['options']);
+        $html   = "";
+        $unSets = array('label', 'options');
+        foreach ($unSets as $key) unset($params[$key]);
         foreach ($params as $param => $value) {
             $value = addcslashes($value, '\',"');
             $html .= " $param='$value'";
@@ -168,14 +168,20 @@ class Form
         return $html;
     }
 
-
-    protected $_values;
-
-    public function getValue($elementName)
+    protected function renderSelect($id, $params)
     {
-
+        $options = '';
+        if (isset($params['options'])) {
+            foreach ($params['options'] as $value => $label) {
+                $selected = (isset($params['value']) && $params['value'] == $value) ? "selected='selected'" : '';
+                $options .= "<option value='{$value}' $selected>{$label}</option>";
+            }
+        }
+        unset($params['value']);
+        $params = $this->renderParams($params);
+        $html   = "<select $params>$options</select>";
+        return $html;
     }
-
 
     public function init()
     {

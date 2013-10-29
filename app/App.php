@@ -18,7 +18,6 @@ class App
      * @var array
      */
     protected $_autoloads = array(
-        'config'  => 'config.php',
         'db'      => 'Db.php',
         'request' => 'Request.php',
         'module'  => 'Module.php',
@@ -29,9 +28,9 @@ class App
 
     public function __construct()
     {
-
+        require_once 'config.php';
         foreach ($this->_autoloads as $file) {
-            require_once $file;
+            require_once "lib" . DS . $file;
         }
 
         if (self::getIsDeveloperMode()) {
@@ -53,8 +52,8 @@ class App
 
         self::$_requestManager = Request::getInstance();
         self::$_dbManager      = Db::getInstance();
-        //self::$_sessionManager = Session::getInstance(); user and admin session separated
-        self::$_moduleManager = Module::getInstance();
+        self::$_sessionManager = Session::getInstance(); //user and admin session separated
+
 
         $found   = array();
         $modules = scandir(APP_MODULES_DIR);
@@ -75,8 +74,8 @@ class App
                 $routes[$module->getRoute()] = $class;
             }
         }
-
-        self::$_modelManager = Model::getInstance();
+        self::$_moduleManager = Module::getInstance();
+        self::$_modelManager  = Model::getInstance();
     }
 
     /**
