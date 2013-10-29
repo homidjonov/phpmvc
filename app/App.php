@@ -28,6 +28,8 @@ class App
 
     public function __construct()
     {
+        set_error_handler(create_function('$severity, $message, $file, $line', 'throw new ErrorException($message." on line ".$line, $severity, $severity, $file, $line);'));
+
         require_once 'config.php';
         foreach ($this->_autoloads as $file) {
             require_once "lib" . DS . $file;
@@ -41,6 +43,7 @@ class App
             ini_set('error_reporting', E_ERROR);
         }
 
+
     }
 
     /**
@@ -52,7 +55,7 @@ class App
 
         self::$_requestManager = Request::getInstance();
         self::$_dbManager      = Db::getInstance();
-        self::$_sessionManager = Session::getInstance(); //user and admin session separated
+       // self::$_sessionManager = Session::getInstance(); //user and admin session separated
 
 
         $found   = array();
@@ -73,7 +76,7 @@ class App
      * Modullarnui boshqaruvchi class
      * @return Module
      */
-    public function getModuleManager()
+    public static function getModuleManager()
     {
         return self::$_moduleManager;
     }

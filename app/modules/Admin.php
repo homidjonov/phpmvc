@@ -11,9 +11,13 @@ class Admin extends Module
     protected $_observers = array(
         'module_before_run',
         'module_after_run',
-        'part_before_include',
-        'part_after_include',
+        'page_before_cache',
     );
+
+    public function page_before_cache($params)
+    {
+        $params['can_cache'] &= !$this->getRequest()->isAdmin();
+    }
 
     protected function getSession()
     {
@@ -187,6 +191,7 @@ class AdminSession extends Session
     {
         $admin = new UserModel();
         $admin->loadByEmail($email);
+
         if ($admin->validatePassword($password)) {
             $this->renew()->setIsLoggedIn($admin);
             return true;

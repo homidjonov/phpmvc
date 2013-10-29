@@ -187,15 +187,22 @@ class Module
 
     protected function _defaultNoRouteAction()
     {
-        $this->getPart('404');
+        $this->getRequest()->setAction('404');
+        $this->render();
     }
 
 
     protected function render($params = false)
     {
-
         $this->_params = $params;
+        App::runObserver('module_before_render', array('module' => $this, 'params' => &$params));
+        ob_start();
         $this->getPart('template');
+        $content = ob_get_contents();
+        ob_end_clean();
+        App::runObserver('module_after_render', array('module' => $this, 'content' => &$content));
+        echo $content;
+
     }
 
     public function getParams()

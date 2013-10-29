@@ -31,7 +31,7 @@ class Debug extends Module
 
     public function module_after_run($params)
     {
-        echo "I am module_after_run observer!";
+
     }
 
     public function part_before_include($params)

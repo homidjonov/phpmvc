@@ -1,55 +1,78 @@
 
+DATE: 	30-10-2013 02:01:48
+URL: 	/about-us
+MESS: 	file_put_contents(Z:\home\mynewsblog.com\www\temp\cache\page\a1fd661e6ffa20d055181a2088401380.cache) [<a href='function.file-put-contents'>function.file-put-contents</a>]: failed to open stream: No such file or directory on line 44 in Z:\home\mynewsblog.com\www\app\modules\Cache.php on line 44
+#0 [internal function]: __lambda_func(2, 'file_put_conten...', 'Z:\home\mynewsb...', 44, Array)
+#1 Z:\home\mynewsblog.com\www\app\modules\Cache.php(44): file_put_contents('Z:\home\mynewsb...', '?<!--DEBUG PART...')
+#2 Z:\home\mynewsblog.com\www\app\App.php(185): Cache->module_after_render(Array)
+#3 Z:\home\mynewsblog.com\www\app\lib\Module.php(203): App::runObserver('module_after_re...', Array)
+#4 Z:\home\mynewsblog.com\www\app\modules\Page.php(34): Module->render(Array)
+#5 Z:\home\mynewsblog.com\www\app\lib\Module.php(174): Page->defaultAction()
+#6 Z:\home\mynewsblog.com\www\app\App.php(146): Module->run()
+#7 Z:\home\mynewsblog.com\www\index.php(24): App->run()
+#8 {main}
 
-DATE: 	25-10-2013 06:20:36
+DATE: 	30-10-2013 02:46:49
+URL: 	/about-us
+MESS: 	file_put_contents(Z:\home\mynewsblog.com\www\temp\cache\page\a1fd661e6ffa20d055181a2088401380.cache) [<a href='function.file-put-contents'>function.file-put-contents</a>]: failed to open stream: No such file or directory on line 44 in Z:\home\mynewsblog.com\www\app\modules\Cache.php on line 44
+#0 [internal function]: __lambda_func(2, 'file_put_conten...', 'Z:\home\mynewsb...', 44, Array)
+#1 Z:\home\mynewsblog.com\www\app\modules\Cache.php(44): file_put_contents('Z:\home\mynewsb...', '?<!--DEBUG PART...')
+#2 Z:\home\mynewsblog.com\www\app\App.php(185): Cache->module_after_render(Array)
+#3 Z:\home\mynewsblog.com\www\app\lib\Module.php(203): App::runObserver('module_after_re...', Array)
+#4 Z:\home\mynewsblog.com\www\app\modules\Page.php(34): Module->render(Array)
+#5 Z:\home\mynewsblog.com\www\app\lib\Module.php(174): Page->defaultAction()
+#6 Z:\home\mynewsblog.com\www\app\App.php(146): Module->run()
+#7 Z:\home\mynewsblog.com\www\index.php(24): App->run()
+#8 {main}
+
+DATE: 	30-10-2013 02:58:51
+URL: 	/about-us
+MESS: 	mkdir() [<a href='function.mkdir'>function.mkdir</a>]: File exists on line 50 in Z:\home\mynewsblog.com\www\app\modules\Cache.php on line 50
+#0 [internal function]: __lambda_func(2, 'mkdir() [<a hre...', 'Z:\home\mynewsb...', 50, Array)
+#1 Z:\home\mynewsblog.com\www\app\modules\Cache.php(50): mkdir('Z:\home\mynewsb...')
+#2 Z:\home\mynewsblog.com\www\app\App.php(185): Cache->module_after_render(Array)
+#3 Z:\home\mynewsblog.com\www\app\lib\Module.php(203): App::runObserver('module_after_re...', Array)
+#4 Z:\home\mynewsblog.com\www\app\modules\Page.php(34): Module->render(Array)
+#5 Z:\home\mynewsblog.com\www\app\lib\Module.php(174): Page->defaultAction()
+#6 Z:\home\mynewsblog.com\www\app\App.php(146): Module->run()
+#7 Z:\home\mynewsblog.com\www\index.php(24): App->run()
+#8 {main}
+
+DATE: 	30-10-2013 02:19:52
+URL: 	/about-us
+MESS: 	file_put_contents(Z:\home\mynewsblog.com\www\temp\cache\page\a1fd661e6ffa20d055181a2088401380.cache) [<a href='function.file-put-contents'>function.file-put-contents</a>]: failed to open stream: No such file or directory on line 44 in Z:\home\mynewsblog.com\www\app\modules\Cache.php on line 44
+#0 [internal function]: __lambda_func(2, 'file_put_conten...', 'Z:\home\mynewsb...', 44, Array)
+#1 Z:\home\mynewsblog.com\www\app\modules\Cache.php(44): file_put_contents('Z:\home\mynewsb...', '?<!--DEBUG PART...')
+#2 Z:\home\mynewsblog.com\www\app\App.php(185): Cache->module_after_render(Array)
+#3 Z:\home\mynewsblog.com\www\app\lib\Module.php(203): App::runObserver('module_after_re...', Array)
+#4 Z:\home\mynewsblog.com\www\app\modules\Page.php(34): Module->render(Array)
+#5 Z:\home\mynewsblog.com\www\app\lib\Module.php(174): Page->defaultAction()
+#6 Z:\home\mynewsblog.com\www\app\App.php(146): Module->run()
+#7 Z:\home\mynewsblog.com\www\index.php(24): App->run()
+#8 {main}
+
+DATE: 	30-10-2013 02:05:56
 URL: 	/
-MESS: 	Module [debug] not found in Z:\home\mynewsblog.com\www\app\Module.php on line 93
-#0 Z:\home\mynewsblog.com\www\app\App.php(191): Module->getModule('debug')
-#1 Z:\home\mynewsblog.com\www\app\App.php(151): App::runObserver('module_before_r...', Array)
-#2 Z:\home\mynewsblog.com\www\index.php(24): App->run()
-#3 {main}
+MESS: 	file_put_contents(Z:\home\mynewsblog.com\www\temp\cache\page\6666cd76f96956469e7be39d750cc7d9.cache) [<a href='function.file-put-contents'>function.file-put-contents</a>]: failed to open stream: No such file or directory on line 44 in Z:\home\mynewsblog.com\www\app\modules\Cache.php on line 44
+#0 [internal function]: __lambda_func(2, 'file_put_conten...', 'Z:\home\mynewsb...', 44, Array)
+#1 Z:\home\mynewsblog.com\www\app\modules\Cache.php(44): file_put_contents('Z:\home\mynewsb...', '?<!--DEBUG PART...')
+#2 Z:\home\mynewsblog.com\www\app\App.php(185): Cache->module_after_render(Array)
+#3 Z:\home\mynewsblog.com\www\app\lib\Module.php(203): App::runObserver('module_after_re...', Array)
+#4 Z:\home\mynewsblog.com\www\app\modules\Page.php(39): Module->render()
+#5 Z:\home\mynewsblog.com\www\app\lib\Module.php(174): Page->defaultAction()
+#6 Z:\home\mynewsblog.com\www\app\App.php(146): Module->run()
+#7 Z:\home\mynewsblog.com\www\index.php(24): App->run()
+#8 {main}
 
-
-
-DATE: 	27-10-2013 05:17:49
-URL: 	/adminbox/pag1e_edit
-MESS: 	Module [pag1e] not found in Z:\home\mynewsblog.com\www\app\Module.php on line 126
-#0 Z:\home\mynewsblog.com\www\app\modules\Admin.php(36): Module->getModule('pag1e')
-#1 Z:\home\mynewsblog.com\www\app\Module.php(165): Admin->defaultAction()
-#2 Z:\home\mynewsblog.com\www\app\App.php(153): Module->run()
-#3 Z:\home\mynewsblog.com\www\index.php(24): App->run()
-#4 {main}
-
-
-DATE: 	29-10-2013 11:37:50
+DATE: 	30-10-2013 02:15:57
 URL: 	/
-MESS: 	Table 'menu_group' already exists in Z:\home\mynewsblog.com\www\app\Db.php on line 40
-#0 Z:\home\mynewsblog.com\www\app\modules\Menu.php(47): Db->query('CREATE TABLE `m...')
-#1 Z:\home\mynewsblog.com\www\app\Model.php(37): MenuModel->installVersion1()
-#2 Z:\home\mynewsblog.com\www\app\modules\Menu.php(15): Model->__construct()
-#3 Z:\home\mynewsblog.com\www\app\lib\Module.php(50): Menu->_init()
-#4 Z:\home\mynewsblog.com\www\app\App.php(64): Module->__construct()
-#5 Z:\home\mynewsblog.com\www\app\App.php(135): App->loadModules()
-#6 Z:\home\mynewsblog.com\www\index.php(24): App->run()
-#7 {main}
-
-DATE: 	30-10-2013 01:36:13
-URL: 	/
-MESS: 	Unknown column 'order' in 'order clause' in Z:\home\mynewsblog.com\www\app\Db.php on line 40
-#0 Z:\home\mynewsblog.com\www\app\Model.php(87): Db->query('SELECT * FROM m...')
-#1 Z:\home\mynewsblog.com\www\app\modules\Menu.php(49): Model->query('SELECT * FROM m...')
-#2 Z:\home\mynewsblog.com\www\app\modules\Menu.php(34): MenuModel->getMenuData('main_menu')
-#3 [internal function]: Menu->getMenuData('main_menu')
-#4 Z:\home\mynewsblog.com\www\app\lib\Module.php(428): call_user_func_array(Array, Array)
-#5 Z:\home\mynewsblog.com\www\app\template\default\menu\main_menu.phtml(3): Module->__call('getMenuData', Array)
-#6 Z:\home\mynewsblog.com\www\app\template\default\menu\main_menu.phtml(3): Page->getMenuData('main_menu')
-#7 Z:\home\mynewsblog.com\www\app\lib\Module.php(272): include('Z:\home\mynewsb...')
-#8 Z:\home\mynewsblog.com\www\app\template\myblog\page\header.phtml(15): Module->getPart('menu/main_menu')
-#9 Z:\home\mynewsblog.com\www\app\lib\Module.php(272): include('Z:\home\mynewsb...')
-#10 Z:\home\mynewsblog.com\www\app\template\default\template.phtml(23): Module->getPart('header')
-#11 Z:\home\mynewsblog.com\www\app\lib\Module.php(272): include('Z:\home\mynewsb...')
-#12 Z:\home\mynewsblog.com\www\app\lib\Module.php(198): Module->getPart('template')
-#13 Z:\home\mynewsblog.com\www\app\modules\Page.php(39): Module->render()
-#14 Z:\home\mynewsblog.com\www\app\lib\Module.php(174): Page->defaultAction()
-#15 Z:\home\mynewsblog.com\www\app\App.php(143): Module->run()
-#16 Z:\home\mynewsblog.com\www\index.php(24): App->run()
-#17 {main}
+MESS: 	file_put_contents(Z:\home\mynewsblog.com\www\temp\cache\page\6666cd76f96956469e7be39d750cc7d9.cache) [<a href='function.file-put-contents'>function.file-put-contents</a>]: failed to open stream: No such file or directory on line 44 in Z:\home\mynewsblog.com\www\app\modules\Cache.php on line 44
+#0 [internal function]: __lambda_func(2, 'file_put_conten...', 'Z:\home\mynewsb...', 44, Array)
+#1 Z:\home\mynewsblog.com\www\app\modules\Cache.php(44): file_put_contents('Z:\home\mynewsb...', '?<!--DEBUG PART...')
+#2 Z:\home\mynewsblog.com\www\app\App.php(185): Cache->module_after_render(Array)
+#3 Z:\home\mynewsblog.com\www\app\lib\Module.php(203): App::runObserver('module_after_re...', Array)
+#4 Z:\home\mynewsblog.com\www\app\modules\Page.php(39): Module->render()
+#5 Z:\home\mynewsblog.com\www\app\lib\Module.php(174): Page->defaultAction()
+#6 Z:\home\mynewsblog.com\www\app\App.php(146): Module->run()
+#7 Z:\home\mynewsblog.com\www\index.php(24): App->run()
+#8 {main}

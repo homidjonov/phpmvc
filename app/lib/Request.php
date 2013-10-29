@@ -31,6 +31,8 @@ class Request
      */
     public function __construct()
     {
+        $this->sanitizeInput();
+
         $this->_request  = strtolower($_SERVER['REQUEST_URI']);
         $this->_domain   = $_SERVER['HTTP_HOST'];
         $this->_isSecure = $_SERVER['SERVER_PORT'] == 443;
@@ -61,6 +63,16 @@ class Request
             }
         }
 
+    }
+
+    protected function sanitizeInput()
+    {
+        foreach ($_POST as $key => $value) {
+            $_POST[$key] = mysql_real_escape_string($value);
+        }
+        foreach ($_GET as $key => $value) {
+            $_GET[$key] = mysql_real_escape_string($value);
+        }
     }
 
     protected function parseParams($parts, $start, $count)
