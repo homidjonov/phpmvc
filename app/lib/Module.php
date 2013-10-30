@@ -446,7 +446,7 @@ class Module
         if ($modelName && class_exists($modelName)) {
             return new $modelName();
         }
-        throw new Exception("Model class not found.");
+        throw new Exception("Model class [$modelName] not found.");
     }
 
 }

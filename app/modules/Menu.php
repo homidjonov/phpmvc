@@ -62,7 +62,7 @@ class MenuModel extends Model
         PRIMARY KEY (`id`),
         INDEX `languages` (`lang_id`) USING BTREE
         )ENGINE=MyISAM;";
-        $this->getConnection()->query($query);
+        return $this->getConnection()->query($query);
     }
 
     protected function installVersion2()
@@ -79,6 +79,6 @@ class MenuModel extends Model
         PRIMARY KEY (`id`),
         INDEX `menu_group` (`group_id`) USING BTREE
         ) ENGINE=MyISAM";
-        $this->getConnection()->query($query);
+        return $this->getConnection()->query($query);
     }
 }

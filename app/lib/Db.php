@@ -37,7 +37,7 @@ class Db
     public function query($query)
     {
         if ($result = mysql_query($query, $this->_db)) return $result;
-        throw new Exception(mysql_error($this->_db));
+        throw new Exception(mysql_error($this->_db)." \nQUERY: ".$query);
     }
 
 }

@@ -79,7 +79,7 @@ class PageModel extends Model
            PRIMARY KEY (`id`),
            INDEX `languages` (`lang_id`) USING BTREE
            )ENGINE=MyISAM";
-           $this->getConnection()->query($query);
+           return $this->getConnection()->query($query);
        }
 
     protected function installVersion2()
@@ -102,7 +102,7 @@ class PageModel extends Model
         INDEX `category_id` (`category_id`) USING BTREE,
         UNIQUE INDEX `url` (`url`) USING BTREE
         )ENGINE=MyISAM;";
-        $this->getConnection()->query($query);
+        return $this->getConnection()->query($query);
     }
 
     public function getCreatedDate()

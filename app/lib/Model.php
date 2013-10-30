@@ -34,19 +34,17 @@ class Model
                 for ($i = $installedVersion; $i <= $currentVersion; $i++) {
                     $method = "installVersion$i";
                     if (method_exists($this, $method)) {
-                        try{
-                            $result = $this->$method();
-                        }catch (Exception $e){
-                            echo $e->getMessage();
+                        $result = false;
+                        if ($result = $this->$method()) {
+                            if ($installedVersion == 0) {
+                                $query = "INSERT INTO `models`(`version`,`name`) VALUES ($i,'$name')";
+                            } else {
+                                $query = "UPDATE `models` SET `version`=$i WHERE `name`='$name'";
+                            }
+                            $this->getConnection()->query($query);
                         }
                     }
                 }
-                if ($installedVersion == 0) {
-                    $query = "INSERT INTO `models`(`version`,`name`) VALUES ($currentVersion,'$name')";
-                } else {
-                    $query = "UPDATE `models` SET `version`=$currentVersion WHERE `name`='$name'";
-                }
-                $this->getConnection()->query($query);
             }
         }
     }

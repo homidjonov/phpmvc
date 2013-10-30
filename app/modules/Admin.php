@@ -171,7 +171,7 @@ class UserModel extends Model
         PRIMARY KEY (`id`),
         UNIQUE INDEX `email` (`email`) USING BTREE
         )ENGINE=MyISAM";
-        $this->getConnection()->query($query);
+        return $this->getConnection()->query($query);
     }
 }
 

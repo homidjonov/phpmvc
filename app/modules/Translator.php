@@ -42,7 +42,7 @@ class TranslatorModel extends Model
         `name`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
         PRIMARY KEY (`id`)
         )ENGINE=MyISAM";
-        $this->getConnection()->query($query);
+        return $this->getConnection()->query($query);
     }
 
     protected function installVersion2()
@@ -56,6 +56,6 @@ class TranslatorModel extends Model
         INDEX `lang_id` (`lang_id`) USING BTREE,
         INDEX `word` (`word`) USING BTREE
         )ENGINE=MyISAM";
-        $this->getConnection()->query($query);
+        return $this->getConnection()->query($query);
     }
 }
