@@ -36,7 +36,7 @@ class TranslatorModel extends Model
 
     protected function installVersion1()
     {
-        $query = "CREATE TABLE `languages` (
+        $query = "CREATE TABLE IF NOT EXISTS `languages` (
         `id`  int(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
         `lang`  varchar(3) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
         `name`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
@@ -47,7 +47,7 @@ class TranslatorModel extends Model
 
     protected function installVersion2()
     {
-        $query = "CREATE TABLE `{$this->_table}` (
+        $query = "CREATE TABLE IF NOT EXISTS `{$this->_table}` (
         `id`  int(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
         `word`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
         `lang_id`  int(11) UNSIGNED NOT NULL ,

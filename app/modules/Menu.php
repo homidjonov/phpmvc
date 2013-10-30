@@ -54,7 +54,7 @@ class MenuModel extends Model
 
     protected function installVersion1()
     {
-        $query = "CREATE TABLE `menu_group` (
+        $query = "CREATE TABLE IF NOT EXISTS `menu_group` (
         `id`  int(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
         `title`  varchar(255) DEFAULT NULL ,
         `code`  varchar(50) NOT NULL ,
@@ -68,7 +68,7 @@ class MenuModel extends Model
     protected function installVersion2()
     {
         $query = "
-        CREATE TABLE `{$this->_table}` (
+        CREATE TABLE IF NOT EXISTS `{$this->_table}` (
         `id`  int(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
         `parent_id`  int(11) NOT NULL ,
         `group_id`  int(11) UNSIGNED NOT NULL ,

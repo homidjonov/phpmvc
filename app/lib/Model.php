@@ -30,20 +30,24 @@ class Model
             $currentVersion   = $this->_version;
             $installedVersion = $this->getInstalledVersion();
             if ($installedVersion < $currentVersion) {
-                $name = get_class($this);
+                $success = $installedVersion;
+                $name    = get_class($this);
                 for ($i = $installedVersion; $i <= $currentVersion; $i++) {
                     $method = "installVersion$i";
                     if (method_exists($this, $method)) {
                         $result = false;
                         if ($result = $this->$method()) {
-                            if ($installedVersion == 0) {
-                                $query = "INSERT INTO `models`(`version`,`name`) VALUES ($i,'$name')";
-                            } else {
-                                $query = "UPDATE `models` SET `version`=$i WHERE `name`='$name'";
-                            }
-                            $this->getConnection()->query($query);
+                            $success = $i;
                         }
                     }
+                }
+                if ($success > $installedVersion) {
+                    if ($installedVersion == 0) {
+                        $query = "INSERT INTO `models`(`version`,`name`) VALUES ($success,'$name')";
+                    } else {
+                        $query = "UPDATE `models` SET `version`=$success WHERE `name`='$name'";
+                    }
+                    $this->getConnection()->query($query);
                 }
             }
         }
