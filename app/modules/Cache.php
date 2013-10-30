@@ -8,9 +8,9 @@
 class Cache extends Module
 {
     protected $_observers = array(
-        'module_after_render',
         'module_before_run',
         'page_before_cache',
+        'module_after_render',
     );
 
     public function page_before_cache($params)
@@ -29,7 +29,7 @@ class Cache extends Module
             if (file_exists($cache)) {
                 try {
                     $params['module'] = false;
-                    include_once $cache;
+                    include_once $cache; //which one is better? Include or echo file_get_contents()?
                     //$content = file_get_contents($cache);
                     //echo $content;
                 } catch (Exception $e) {
@@ -67,13 +67,6 @@ class Cache extends Module
     {
         $fileName = md5(trim($this->getRequest()->getRequestUrl(), '/?')) . '.cache';
         return APP_CACHE_PAGE_DIR . $fileName;
-    }
-
-    public function _defaultAction()
-    {
-        $action = explode('_', $this->getRequest()->getOrigAction());
-
-        $this->forward('index');
     }
 
     protected function fixCacheDirs()

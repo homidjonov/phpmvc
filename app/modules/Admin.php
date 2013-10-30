@@ -64,7 +64,7 @@ class Admin extends Module
 
         $form = $this->getLoginForm();
 
-        if ($this->getRequest()->getIsPost()) {
+        if ($this->getRequest()->hasPost()) {
             $form->init();
             $email    = $this->getRequest()->getPost('email');
             $password = $this->getRequest()->getPost('password');
