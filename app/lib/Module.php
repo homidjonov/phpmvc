@@ -339,10 +339,6 @@ class Module
         return $link;
     }
 
-    protected function _get()
-    {
-
-    }
 
     protected function getCurrentTheme()
     {

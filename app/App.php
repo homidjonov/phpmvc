@@ -55,8 +55,11 @@ class App
 
         self::$_requestManager = Request::getInstance();
         self::$_dbManager      = Db::getInstance();
-       // self::$_sessionManager = Session::getInstance(); //user and admin session separated
-
+        // self::$_sessionManager = Session::getInstance(); //user and admin session separated
+        if (self::getIsDeveloperMode()) {
+            /*install updates */
+            Model::getInstance();
+        }
 
         $found   = array();
         $modules = scandir(APP_MODULES_DIR);
@@ -70,6 +73,7 @@ class App
 
         self::$_moduleManager = Module::getInstance();
         self::$_modelManager  = Model::getInstance();
+
     }
 
     /**

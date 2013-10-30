@@ -34,7 +34,11 @@ class Model
                 for ($i = $installedVersion; $i <= $currentVersion; $i++) {
                     $method = "installVersion$i";
                     if (method_exists($this, $method)) {
-                        $result = $this->$method();
+                        try{
+                            $result = $this->$method();
+                        }catch (Exception $e){
+                            echo $e->getMessage();
+                        }
                     }
                 }
                 if ($installedVersion == 0) {

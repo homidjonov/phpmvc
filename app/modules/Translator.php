@@ -41,7 +41,7 @@ class TranslatorModel extends Model
         `lang`  varchar(3) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
         `name`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
         PRIMARY KEY (`id`)
-        )ENGINE=InnoDB";
+        )ENGINE=MyISAM";
         $this->getConnection()->query($query);
     }
 
@@ -53,10 +53,9 @@ class TranslatorModel extends Model
         `lang_id`  int(11) UNSIGNED NOT NULL ,
         `translation`  mediumtext CHARACTER SET utf8 COLLATE utf8_general_ci NULL ,
         PRIMARY KEY (`id`),
-        FOREIGN KEY (`lang_id`) REFERENCES `languages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-        INDEX `word` (`word`) USING BTREE ,
-        INDEX `lang_id` (`lang_id`) USING BTREE
-        )ENGINE=InnoDB";
+        INDEX `lang_id` (`lang_id`) USING BTREE,
+        INDEX `word` (`word`) USING BTREE
+        )ENGINE=MyISAM";
         $this->getConnection()->query($query);
     }
 }

@@ -36,7 +36,7 @@ define('APP_DEFAULT_THEME', 'myblog');
 define('APP_DB_HOST', 'localhost');
 define('APP_DB_USERNAME', 'root');
 define('APP_DB_PASSWORD', '');
-define('APP_DB_DATABASE', 'blog');
+define('APP_DB_DATABASE', 'blog1');
 
 //administrator configs
 define('APP_ADMIN_ROUTE', 'adminbox');

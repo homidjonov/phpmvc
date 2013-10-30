@@ -60,15 +60,15 @@ class MenuModel extends Model
         `code`  varchar(50) NOT NULL ,
         `lang_id`  int(11) UNSIGNED NOT NULL ,
         PRIMARY KEY (`id`),
-        FOREIGN KEY (`lang_id`) REFERENCES `languages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
         INDEX `languages` (`lang_id`) USING BTREE
-        )ENGINE=InnoDB";
+        )ENGINE=MyISAM;";
         $this->getConnection()->query($query);
     }
 
     protected function installVersion2()
     {
-        $query = "CREATE TABLE `{$this->_table}` (
+        $query = "
+        CREATE TABLE `{$this->_table}` (
         `id`  int(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
         `parent_id`  int(11) NOT NULL ,
         `group_id`  int(11) UNSIGNED NOT NULL ,
@@ -77,9 +77,8 @@ class MenuModel extends Model
         `caption`  varchar(255) NOT NULL ,
         `link`  varchar(255) DEFAULT NULL ,
         PRIMARY KEY (`id`),
-        FOREIGN KEY (`group_id`) REFERENCES `menu_group` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
         INDEX `menu_group` (`group_id`) USING BTREE
-        ) ENGINE=InnoDB";
+        ) ENGINE=MyISAM";
         $this->getConnection()->query($query);
     }
 }

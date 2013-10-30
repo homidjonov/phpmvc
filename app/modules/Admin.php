@@ -131,6 +131,7 @@ class UserModel extends Model
     protected $_username;
     protected $_password;
     protected $_table = 'users';
+    protected $_version = 1;
 
     public function loadByEmail($email)
     {
