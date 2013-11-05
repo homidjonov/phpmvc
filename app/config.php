@@ -15,6 +15,7 @@ define('DS', DIRECTORY_SEPARATOR);
 define('APP_DEVELOPER_MODE', true);
 define('APP_DEBUG_PARTS', true);
 define('APP_TRANSLATE_INTERFACE', false);
+define('APP_BOOTSTRAP_CDN', true);
 
 //folders and paths
 define('APP_MODULES_DIR', __DIR__ . DS . 'modules' . DS);
@@ -29,7 +30,7 @@ define('APP_CACHE_PART_DIR', APP_CACHE_DIR . 'part' . DS);
 
 //defaults
 define('APP_DEFAULT_ROUTE', 'page');
-define('APP_DEFAULT_THEME', 'myblog');
+define('APP_DEFAULT_THEME', 'responsive');
 
 
 //db login parollari
@@ -40,4 +41,4 @@ define('APP_DB_DATABASE', 'blog1');
 
 //administrator configs
 define('APP_ADMIN_ROUTE', 'adminbox');
-define('APP_CACHE_ENABLED', true);
+define('APP_CACHE_ENABLED', false);

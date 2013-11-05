@@ -136,7 +136,15 @@ class Module
 
     protected function getSession()
     {
+        if (App::isAdmin()) {
+            return AdminSession::getInstance();
+        }
         return Session::getInstance();
+    }
+
+    public function getMessages()
+    {
+        return $this->getSession()->getMessages();
     }
 
     protected function getRequest()
@@ -328,6 +336,7 @@ class Module
             $designDirs[] = App::getCurrentTemplateDir() . $module . DS . $part . '.phtml';
             $designDirs[] = App::getBaseTemplateDir() . $module . DS . $part . '.phtml';
         }
+
         for ($i = 0; $i < count($designDirs); $i++) {
             $file = $designDirs[$i];
             if (file_exists($file)) {
@@ -353,6 +362,17 @@ class Module
         return $link;
     }
 
+    public function getCss($file)
+    {
+        $file = $this->getLink('theme/' . $this->getCurrentTheme() . '/' . $file);
+        return "<link rel='stylesheet' href='$file'>";
+    }
+
+    public function getJs($file)
+    {
+        $file = $this->getLink('theme/' . $this->getCurrentTheme() . '/' . $file);
+        return "<script type='text/javascript' src='$file'></script>";
+    }
 
     protected function getCurrentTheme()
     {
@@ -388,7 +408,7 @@ class Module
 
     public function getBodyClassName()
     {
-        return $this->_bodyClassName;
+        return $this->_bodyClassName . ' ' . App::getRequest()->getFullActionName();
     }
 
     /**

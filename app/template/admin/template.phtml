@@ -6,9 +6,9 @@
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <?php $this->getPartAll('head'); ?>
-</head>
+
+<?php $this->getPart('head'); ?>
+
 <body class="<?= App::getRequest()->getFullActionName() ?> <?= $this->getBodyClassName() ?>">
 <div id="wrapper">
     <?php $this->getPart('navigation'); ?>

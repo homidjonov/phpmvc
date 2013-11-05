@@ -43,12 +43,17 @@ class Session
             }
             session_name($this->_space);
             session_start();
+            if (isset($_SESSION['messages'])) $this->_messages = $_SESSION['messages'];
+            else
+                $this->_initMessages(true);
             if (App::getRequest()->getCookie($this->getSessionName()) == $this->getSessionId()) {
                 App::getRequest()->setCookie($this->getSessionName(), $this->getSessionId());
             }
+
         }
         if (isset($_SESSION['userId'])) {
-            $this->_userId     = $_SESSION['userId'];
+            $this->_userId = $_SESSION['userId'];
+
             $this->_isLoggedIn = true;
         }
     }
@@ -99,15 +104,47 @@ class Session
         return $this;
     }
 
-    protected $_messages = array(
-        'notice'  => array(),
-        'warning' => array(),
-        'error'   => array(),
-    );
+    protected function _initMessages($clear = false)
+    {
+        if ($clear) {
+            $this->_messages = array(
+                'info'  => array(),
+                'warning' => array(),
+                'danger'   => array(),
+            );
+        }
+        $_SESSION['messages'] = $this->_messages;
+        return $this;
+    }
+
+    protected $_messages;
+
+    public function addMessage($message, $severity = 'notice')
+    {
+        $this->_messages[$severity][] = $message;
+        return $this->_initMessages();
+    }
 
     public function addError($message)
     {
-        $this->_messages['error'][] = $message;
+        return $this->addMessage($message, 'danger');
+    }
+
+    public function addNotice($message)
+    {
+        return $this->addMessage($message, 'info');
+    }
+
+    public function addWarning($message)
+    {
+        return $this->addMessage($message, 'warning');
+    }
+
+    public function getMessages()
+    {
+        $messages = $this->_messages;
+        $this->_initMessages(true);
+        return $messages;
     }
 
 } 

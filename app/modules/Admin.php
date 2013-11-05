@@ -14,6 +14,8 @@ class Admin extends Module
         'page_before_cache',
     );
 
+    protected $_allowedActions = array('login', 'restore');
+
     public function page_before_cache($params)
     {
         $params['can_cache'] &= !$this->getRequest()->isAdmin();
@@ -27,9 +29,13 @@ class Admin extends Module
     protected function _preDispatch()
     {
         $user = $this->getSession()->getUser();
-        if (!$this->getSession()->isLoggedIn()) {
+        if (!$this->getSession()->isLoggedIn() && !in_array($this->getRequest()->getAction(), $this->_allowedActions)) {
             $this->getRequest()->setBeforeAuthUrl($this->getRequest()->getRequestUrl());
             $this->getRequest()->setAction('login');
+        }
+
+        if ($this->getSession()->isLoggedIn() && in_array($this->getRequest()->getAction(), $this->_allowedActions)) {
+            $this->getRequest()->redirect($this->getAdminUrl('index'));
         }
     }
 
@@ -56,13 +62,28 @@ class Admin extends Module
         $this->forward('index');
     }
 
+    public function restoreAction()
+    {
+        $form = $this->getRestoreForm();
+        if ($this->getRequest()->hasPost()) {
+            $email = $this->getRequest()->getPost('email');
+            try {
+                /*if ($this->getSession()->authentificate($email, $password)) {
+                    $this->getRequest()->redirect($this->getRequest()->getBeforeAuthUrl());
+                }*/
+            } catch (Exception $e) {
+                $form->addValidationError($e->getMessage());
+            }
+            $this->getSession()->addNotice($this->__("Restore link has been send to provided e-mail."));
+         }
+        $this->setPart('restore_form', $form);
+        $this->render();
+    }
+
     public function loginAction()
     {
-        if ($this->getSession()->isLoggedIn()) {
-            $this->getRequest()->redirect($this->getAdminUrl('index'));
-        }
-
-        $form = $this->getLoginForm();
+        $this->_title = $this->__("Authentication");
+        $form         = $this->getLoginForm();
 
         if ($this->getRequest()->hasPost()) {
             $form->init();
@@ -73,7 +94,7 @@ class Admin extends Module
                     $this->getRequest()->redirect($this->getRequest()->getBeforeAuthUrl());
                 }
             } catch (Exception $e) {
-                $form->addValidationError($e->getMessage());
+                $this->getSession()->addError($this->__($e->getMessage()));
             }
         }
         $this->setPart('login_form', $form);
@@ -95,6 +116,32 @@ class Admin extends Module
     /**
      * @return Form
      */
+    protected function getRestoreForm()
+    {
+        $form = new Form();
+        $form->setElementWrapper('div', 'form-group input-group');
+
+        $form->addElement('text', 'email', array(
+            'name'        => 'email',
+            'placeholder' => $this->__('Email'),
+            'class'       => 'form-control',
+            'before'      => '<span class="input-group-addon"><i class="fa fa-envelope-o fa-fw"></i></span>'
+        ));
+
+        $login = $this->getAdminUrl('login');
+        $form->addElement('button', 'submit', array(
+            'caption' => 'Restore',
+            'type'    => 'submit',
+            'class'   => 'btn btn-primary',
+            'style'   => 'margin-right:10px',
+            'before'  => '<div>',
+            'after'   => "<a href='$login' class='text-muted' style='margin-left: 10px'>Back to Login <i class='fa fa-key'></i></a> <a href='/' class='text-info' style='margin-left: 10px'>Back to Home <i class='fa fa-home'></i></a></div>",
+        ));
+
+
+        return $form;
+    }
+
     protected function getLoginForm()
     {
         $form = new Form();
@@ -104,22 +151,26 @@ class Admin extends Module
             'name'        => 'email',
             'placeholder' => $this->__('Email'),
             'class'       => 'form-control',
-            'before'      => '<span class="input-group-addon"></span>'
+            'before'      => '<span class="input-group-addon"><i class="fa fa-envelope-o fa-fw"></i></span>'
         ));
 
         $form->addElement('password', 'password', array(
             'placeholder'  => $this->__('Password'),
             'autocomplite' => 'off',
             'class'        => 'form-control',
-            'before'       => '<span class="input-group-addon"></span>'
+            'before'       => '<span class="input-group-addon"><i class="fa fa-key fa-fw"></i></span>'
         ));
 
+        $forgot = $this->getAdminUrl('restore');
         $form->addElement('button', 'submit', array(
             'caption' => 'Login',
             'type'    => 'submit',
-            'style'   => 'float: right',
             'class'   => 'btn btn-primary',
+            'style'   => 'margin-right:10px',
+            'before'  => '<div>',
+            'after'   => "<a href='$forgot' class='text-muted' style='margin-left: 10px'>Forgot Password <i class='fa fa-question-circle'></i></a> <a href='/' class='text-info' style='margin-left: 10px'>Back to Home <i class='fa fa-home'></i></a></div>",
         ));
+
 
         return $form;
     }

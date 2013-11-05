@@ -1,0 +1,29 @@
+<?php
+/**
+ * @var $ths Module
+ */
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <?php $this->getPart('head'); ?>
+</head>
+<body class="<?= $this->getBodyClassName() ?>">
+<?php $this->getPart('menu/main_menu'); ?>
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <?php $this->getPart('content') ?>
+        </div>
+        <div class="col-md-4">
+            <?php $this->getPart('sidebar'); ?>
+        </div>
+    </div>
+    <hr>
+    <?php $this->getPart('footer'); ?>
+</div>
+<script type="text/javascript" src="<?= $this->getThemeFileLink('js/jquery-1.8.2.min.js') ?>"></script>
+<?= $this->getJs('js/bootstrap.min.js') ?>
+<?php $this->getPartAll('body_before_end'); ?>
+</body>
+</html>

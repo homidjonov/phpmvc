@@ -1,0 +1,31 @@
+<?php
+/**
+ * Created by JetBrains PhpStorm.
+ * User: Shavkat
+ * Date: 10/23/13
+ * Time: 12:10 PM
+ */
+
+/**
+ * @var $this Module
+ */
+?>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+<meta name="keywords" content="<?= $this->getKeywords() ?>"/>
+<meta name="description" content="<?= $this->getDescription() ?>"/>
+<meta name="robots" content="*"/>
+
+<title><?= $this->getTitle() ?></title>
+
+<link rel="icon" href="<?= $this->getThemeFileLink('images/favicon.ico') ?>" type="image/x-icon"/>
+<link rel="shortcut icon" href="<?= $this->getThemeFileLink('images/favicon.ico') ?>" type="image/x-icon">
+
+<?= $this->getCss('css/bootstrap.min.css') ?>
+<?= $this->getCss('css/blog-post.css') ?>
+<link rel="stylesheet" href="<?= $this->getThemeFileLink('font-awesome/css/font-awesome.min.css') ?>">
+
+<?php $this->getPartAll('head_part') ?>

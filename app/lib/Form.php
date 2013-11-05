@@ -104,11 +104,13 @@ class Form
     protected function renderValidationMessages()
     {
         $html    = "";
-        $wrapper = "<div class='validation-messages'>%s</div>";
+        $wrapper = "<div class='alert alert-danger alert-dismissable'>
+        <button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>
+        %s</div>";
         foreach ($this->_validationErrors as $message) {
             $html .= "<p>$message</p>";
         }
-        return sprintf($wrapper, $html);
+        return ($html)?sprintf($wrapper, $html):'';
     }
 
     protected function renderElements()
