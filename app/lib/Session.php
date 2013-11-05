@@ -92,8 +92,10 @@ class Session
     public function renew()
     {
         unset($_COOKIE[$this->getSessionName()]);
-        session_regenerate_id(true);
-
+        unset($_SESSION);
+        session_destroy();
+        session_regenerate_id(false);
+        //$this->_init();
         return $this;
     }
 

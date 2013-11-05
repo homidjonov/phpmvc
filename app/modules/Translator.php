@@ -23,7 +23,7 @@ class Translator extends Module
      */
     public function translate($word)
     {
-        return strtoupper($word);
+        return $word.'*';
     }
 
 }

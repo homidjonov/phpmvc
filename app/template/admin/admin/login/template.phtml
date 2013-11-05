@@ -10,14 +10,8 @@
     <?php $this->getPartAll('head'); ?>
 </head>
 <body class="<?= App::getRequest()->getFullActionName() ?> <?= $this->getBodyClassName() ?>">
-<div id="wrapper">
-    <?php $this->getPart('navigation'); ?>
-    <div id="page-wrapper">
-        <div class="content-main">
-            <?php $this->getPart('content_head') ?>
-            <?php $this->getPart('content') ?>
-        </div>
-    </div>
+<div id="page-wrapper">
+    <?php $this->getPart('content') ?>
 </div>
 <?php $this->getPartAll('body_before_end'); ?>
 </body>

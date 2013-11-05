@@ -7,6 +7,7 @@ class Form
     protected $_class = 'form-data';
     protected $_enctype;
     protected $_elementWrapper;
+    protected $_elementWrapperClass;
     protected $_elements = array();
     protected $_elementTypes = array(
         'text',
@@ -52,9 +53,10 @@ class Form
         return $this;
     }
 
-    public function setElementWrapper($tag)
+    public function setElementWrapper($tag, $class = false)
     {
-        $this->_elementWrapper = $tag;
+        $this->_elementWrapper      = $tag;
+        $this->_elementWrapperClass = $class;
         return $this;
     }
 
@@ -114,11 +116,14 @@ class Form
         $elements = array();
         $wrapper  = "%s\n%s\n";
         if ($this->_elementWrapper) {
-            $wrapper = "<{$this->_elementWrapper}>%s\n%s</{$this->_elementWrapper}>\n";
+            $wrapper = "<{$this->_elementWrapper} class='{$this->_elementWrapperClass}'>%s\n%s\n%s\n%s</{$this->_elementWrapper}>\n";
         }
         foreach ($this->_elements as $id => $element) {
-            $invoke = 'render' . ucfirst(strtolower($element['type']));
-            $label  = (isset($element['params']['label'])) ? $this->renderLabel($id, $element['params']['label']) : '';
+            $invoke     = 'render' . ucfirst(strtolower($element['type']));
+            $label      = (isset($element['params']['label'])) ? $this->renderLabel($id, $element['params']['label']) : '';
+            $beforeHtml = (isset($element['params']['before'])) ? $element['params']['before'] : '';
+            $afterHtml  = (isset($element['params']['after'])) ? $element['params']['after'] : '';
+
             if (method_exists($this, $invoke)) {
                 $elementHtml = $this->$invoke($id, $element['params']);
             } else {
@@ -126,14 +131,14 @@ class Form
                 $params      = $this->renderParams($element['params']);
                 $elementHtml = "<input type='$type' $params />";
             }
-            $elements[] = sprintf($wrapper, $label, $elementHtml);
+            $elements[] = sprintf($wrapper, $label, $beforeHtml, $elementHtml, $afterHtml);
         }
         return implode("\n", $elements);
     }
 
     public function render()
     {
-        $html = "\n<form id='{$this->_id}' method='{$this->_method}' action='{$this->_action}' accept-charset='utf-8' {$this->_enctype}>\n";
+        $html = "\n<form id='{$this->_id}' role='form' method='{$this->_method}' action='{$this->_action}' accept-charset='utf-8' {$this->_enctype}>\n";
         $html .= $this->renderValidationMessages();
         $html .= $this->renderElements();
         $html .= "</form>";
@@ -152,7 +157,7 @@ class Form
     protected function renderParams($params)
     {
         $html   = "";
-        $unSets = array('label', 'options');
+        $unSets = array('label', 'options', 'before', 'after');
         foreach ($unSets as $key) unset($params[$key]);
         foreach ($params as $param => $value) {
             $value = addcslashes($value, '\',"');
@@ -165,6 +170,14 @@ class Form
     {
         $params = $this->renderParams($params);
         $html   = "<input type='text' $params />";
+        return $html;
+    }
+
+    protected function renderButton($id, $params)
+    {
+        $text   = isset($params['caption']) ? $params['caption'] : '';
+        $params = $this->renderParams($params);
+        $html   = "<button $params >$text</button>";
         return $html;
     }
 

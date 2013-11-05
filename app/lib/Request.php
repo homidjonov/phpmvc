@@ -47,7 +47,7 @@ class Request
         $this->_moduleRoute  = App::getDefaultRoute();
         $this->_moduleAction = 'default';
 
-
+        $params = array();
         if (isset($_SERVER['REDIRECT_URL']) && $_SERVER['REDIRECT_URL']) {
             $this->_defaultRoute = strtolower(trim($_SERVER['REDIRECT_URL'], rtrim($_SERVER['SCRIPT_NAME'], 'index.php')));
             $parts               = explode('/', $this->_defaultRoute);
@@ -58,11 +58,17 @@ class Request
                 $this->_moduleAction     = $parts[1];
                 $this->_moduleOrigAction = $parts[1];
                 if ($c > 2) {
-                    $this->parseParams($parts, 3, $c);;
+                    for ($i = 3; $i < $c; $i += 2) {
+                        if (isset($parts[$i]) && isset($parts[$i + 1]) && $parts[$i] && $parts[$i + 1] !== '')
+                            $params[$parts[$i]] = $parts[$i + 1];
+                    }
                 }
             }
         }
-
+        foreach ($_GET as $key => $value) {
+            $params[$key] = $value;
+        }
+        $this->_getParams = $params;
     }
 
     protected function sanitizeInput()
@@ -73,19 +79,6 @@ class Request
         foreach ($_GET as $key => $value) {
             $_GET[$key] = mysql_real_escape_string($value);
         }
-    }
-
-    protected function parseParams($parts, $start, $count)
-    {
-        $params = array();
-        for ($i = $start; $i < $count; $i += 2) {
-            if (isset($parts[$i]) && isset($parts[$i + 1]) && $parts[$i] && $parts[$i + 1] !== '')
-                $params[$parts[$i]] = $parts[$i + 1];
-        }
-        foreach ($_GET as $key => $value) {
-            $params[$key] = mysql_real_escape_string($value);
-        }
-        $this->_getParams = $params;
     }
 
     public function getParam($key)
@@ -203,7 +196,7 @@ class Request
         return $_COOKIE;
     }
 
-    public function setCookie($name, $value, $period = null, $path = null, $domain = null, $secure = null, $httponly = null)
+    public function setCookie($name, $value, $period = null, $path = null, $domain = null, $secure = null, $httponly = true)
     {
         unset($_COOKIE[$name]);
         if (is_null($period)) {
@@ -219,7 +212,7 @@ class Request
         if (is_null($path)) {
             $path = '/';
             if (self::isAdmin()) {
-                $path = '/admin';
+                $path = '/'.APP_ADMIN_ROUTE ;
             }
         }
 
@@ -228,9 +221,6 @@ class Request
         }
         if (is_null($secure)) {
             $secure = $this->isSecure();
-        }
-        if (is_null($httponly)) {
-            $httponly = true;
         }
 
         setcookie($name, $value, $expire, $path, $domain, $secure, $httponly);

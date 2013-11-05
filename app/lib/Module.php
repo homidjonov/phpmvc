@@ -45,21 +45,35 @@ class Module
 
         App::addObserver($this->getName(), $this->_observers);
 
-        if (App::isAdmin() && $this->_adminMenu) {
-            foreach ($this->_adminMenu as $menuItem => $title) {
-                if (!isset(self::$_adminMenuItems[$menuItem])) {
-                    self::$_adminMenuItems[$menuItem]             = array();
-                    self::$_adminMenuItems[$menuItem]['children'] = array();
-                }
-            }
-        }
         foreach ($this->_predefinedFunctions as $function) {
             self::$_predefinedFunctionsArray[$function] = $this->getName();
         }
         $this->_init();
+        if (App::isAdmin()) $this->_initAdmin();
+    }
+
+    protected function getAdminMenu()
+    {
+        $order = array();
+        foreach (self::$_adminMenuItems as $action => $item) {
+            $order[$action] = $item['order'];
+        }
+        array_multisort($order, SORT_ASC, self::$_adminMenuItems);
+        return self::$_adminMenuItems;
+    }
+
+    protected function addAdminMenu($action, $title, $order = 100)
+    {
+        self::$_adminMenuItems[$this->getName() . '_' . $action] = array('action' => $action, 'title' => $title, 'order' => $order);
+        return $this;
     }
 
     protected function _init()
+    {
+
+    }
+
+    protected function _initAdmin()
     {
 
     }

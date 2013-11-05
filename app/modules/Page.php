@@ -10,16 +10,21 @@ class Page extends Module
     protected $_route = 'page';
     protected $_objectData;
 
-    protected $_adminMenu = array(
-        'index' => 'Page Management',
-        'new'   => 'Add NewPage'
-    );
-
-    public function viewAction()
+    protected function _initAdmin()
     {
-        //echo App::getRequest()->getParam('k');
+        $this
+            ->addAdminMenu('index', 'Pages', 0)
+            ->addAdminMenu('categories', 'Categories', 1);
     }
 
+    protected $_adminConfig = array(
+        'pages' => array(
+            'label'  => 'Page Management',
+            'fields' => array(
+                ''
+            ),
+        ),
+    );
 
     protected function defaultAction()
     {
@@ -69,8 +74,8 @@ class PageModel extends Model
     }
 
     protected function installVersion1()
-       {
-           $query = "CREATE TABLE IF NOT EXISTS `page_categories` (
+    {
+        $query = "CREATE TABLE IF NOT EXISTS `page_categories` (
            `id`  int(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
            `title`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
            `parent_id`  int(11) NULL DEFAULT NULL ,
@@ -79,8 +84,8 @@ class PageModel extends Model
            PRIMARY KEY (`id`),
            INDEX `languages` (`lang_id`) USING BTREE
            )ENGINE=MyISAM";
-           return $this->getConnection()->query($query);
-       }
+        return $this->getConnection()->query($query);
+    }
 
     protected function installVersion2()
     {

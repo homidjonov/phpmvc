@@ -13,7 +13,7 @@ define('DS', DIRECTORY_SEPARATOR);
 
 //App development specific configurations
 define('APP_DEVELOPER_MODE', true);
-define('APP_DEBUG_PARTS', false);
+define('APP_DEBUG_PARTS', true);
 define('APP_TRANSLATE_INTERFACE', false);
 
 //folders and paths

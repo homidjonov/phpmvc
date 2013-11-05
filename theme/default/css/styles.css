@@ -307,6 +307,26 @@ a {
     display: block;
 }
 
+.translation:hover {
+    padding-right: 15px;
+    background: url("images/trans.gif") no-repeat scroll right center rgba(0, 0, 0, 0);
+}
+
+.translation {
+    border: 1px dashed #a1a1a1;
+    padding: 3px;
+    cursor: pointer;
+    padding-right: 15px
+}
+
+.code {
+    font-family: "courier", "courier new";
+    font-weight: bold;
+    color: brown;
+
+}
+
+
 .part_border .info:hover {
     height: auto;
     width: 100%;
@@ -346,25 +366,6 @@ a {
     z-index: +1;
     background-color: transparent;
     cursor: pointer;
-}
-
-.translation:hover {
-    padding-right: 15px;
-    background: url("images/trans.gif") no-repeat scroll right center rgba(0, 0, 0, 0);
-}
-
-.translation {
-    border: 1px dashed #a1a1a1;
-    padding: 3px;
-    cursor: pointer;
-    padding-right: 15px
-}
-
-.code {
-    font-family: "courier", "courier new";
-    font-weight: bold;
-    color: brown;
-
 }
 
 #part_debug_button:hover {

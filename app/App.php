@@ -164,9 +164,9 @@ class App
     {
         if (App::getIsDeveloperMode() || $force) {
             $file   = 'system.log';
-            $string = "\nDATE: \t" . date('d-m-Y h:s:i') . "\nURL: \t" . $_SERVER['REQUEST_URI'] . "\n";
+            $string = "DATE: \t" . date('d-m-Y h:s:i') . "\n";
             if ($object instanceof Exception) {
-                $string .= "MESS: \t" . $object->getMessage() . " in " . $object->getFile() . " on line " . $object->getLine() . "\n";
+                $string .= "URL: \t" . $_SERVER['REQUEST_URI'] . "\nMESS: \t" . $object->getMessage() . " in " . $object->getFile() . " on line " . $object->getLine() . "\n";
                 $string .= print_r($object->getTraceAsString(), true) . "\n";
                 $file = 'exception.log';
             } elseif (is_array($object)) {
@@ -174,7 +174,7 @@ class App
             } else {
                 $string .= $object;
             }
-            file_put_contents(APP_LOG_DIR . (($logFile) ? $logFile : $file), "$string", FILE_APPEND);
+            file_put_contents(APP_LOG_DIR . (($logFile) ? $logFile : $file), "$string\n", FILE_APPEND);
         }
     }
 

@@ -86,40 +86,39 @@ class Admin extends Module
         $this->render();
     }
 
+    public function logoutAction()
+    {
+        $this->getSession()->renew();
+        $this->getRequest()->redirect($this->getAdminUrl('login'));
+    }
+
     /**
      * @return Form
      */
     protected function getLoginForm()
     {
         $form = new Form();
-        $form->setElementWrapper('p');
+        $form->setElementWrapper('div', 'form-group input-group');
 
         $form->addElement('text', 'email', array(
-            'name'  => 'email',
-            'label' => $this->__('Email'),
-            'class' => 'some_class valid-required',
+            'name'        => 'email',
+            'placeholder' => $this->__('Email'),
+            'class'       => 'form-control',
+            'before'      => '<span class="input-group-addon"></span>'
         ));
 
         $form->addElement('password', 'password', array(
-            'label'        => $this->__('Password'),
+            'placeholder'  => $this->__('Password'),
             'autocomplite' => 'off',
-            'class'        => 'some_class valid-required',
+            'class'        => 'form-control',
+            'before'       => '<span class="input-group-addon"></span>'
         ));
 
-        $form->addElement('select', 'role', array(
-            'label'   => $this->__('Test SelectBox'),
-            'value'   => 'admin',
-            'options' => array(
-                ''          => 'Select',
-                'admin'     => 'Admin',
-                'user'      => 'User',
-                'moderator' => 'Moderator',
-            )
-        ));
-
-        $form->addElement('submit', 'submit', array(
-            'value' => 'Login',
-            'class' => 'some_class valid-required',
+        $form->addElement('button', 'submit', array(
+            'caption' => 'Login',
+            'type'    => 'submit',
+            'style'   => 'float: right',
+            'class'   => 'btn btn-primary',
         ));
 
         return $form;
@@ -194,7 +193,9 @@ class AdminSession extends Session
         $admin->loadByEmail($email);
 
         if ($admin->validatePassword($password)) {
-            $this->renew()->setIsLoggedIn($admin);
+            $this
+                //->renew()
+                ->setIsLoggedIn($admin);
             return true;
         }
         throw new Exception('Invalid Username or Password');
