@@ -13,7 +13,7 @@ define('DS', DIRECTORY_SEPARATOR);
 
 //App development specific configurations
 define('APP_DEVELOPER_MODE', true);
-define('APP_DEBUG_PARTS', true);
+define('APP_DEBUG_PARTS', false);
 define('APP_TRANSLATE_INTERFACE', false);
 define('APP_BOOTSTRAP_CDN', true);
 
@@ -41,4 +41,4 @@ define('APP_DB_DATABASE', 'blog1');
 
 //administrator configs
 define('APP_ADMIN_ROUTE', 'adminbox');
-define('APP_CACHE_ENABLED', false);
+define('APP_CACHE_ENABLED', true);

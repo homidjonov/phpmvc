@@ -135,7 +135,7 @@ class Admin extends Module
             'class'   => 'btn btn-primary',
             'style'   => 'margin-right:10px',
             'before'  => '<div>',
-            'after'   => "<a href='$login' class='text-muted' style='margin-left: 10px'>Back to Login <i class='fa fa-key'></i></a> <a href='/' class='text-info' style='margin-left: 10px'>Back to Home <i class='fa fa-home'></i></a></div>",
+            'after'   => "<a href='$login' class='text-muted' style='margin-left: 10px'>Back to Login <i class='fa fa-key'></i></a> <a href='/' class='text-muted' style='margin-left: 10px'>Back to Home <i class='fa fa-home'></i></a></div>",
         ));
 
 
@@ -168,7 +168,7 @@ class Admin extends Module
             'class'   => 'btn btn-primary',
             'style'   => 'margin-right:10px',
             'before'  => '<div>',
-            'after'   => "<a href='$forgot' class='text-muted' style='margin-left: 10px'>Forgot Password <i class='fa fa-question-circle'></i></a> <a href='/' class='text-info' style='margin-left: 10px'>Back to Home <i class='fa fa-home'></i></a></div>",
+            'after'   => "<a href='$forgot' class='text-muted' style='margin-left: 10px'>Forgot Password <i class='fa fa-question-circle'></i></a> <a href='/' class='text-muted' style='margin-left: 10px'>Back to Home <i class='fa fa-home'></i></a></div>",
         ));
 
 
