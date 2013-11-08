@@ -1,0 +1,59 @@
+<?php
+/**
+ * @var $this     Module
+ * @var $category CategoryModel
+ */
+
+$category = $this->getParam('category');
+$pagination = Pagination::getInstance();
+$posts = $category->getPosts($pagination);
+?>
+<div>
+    <?php foreach ($posts as $id => $post): ?>
+
+        <h1>
+            <a href="<?= $this->getUrl($post->getUrl()) ?>"><?= $post->getTitle() ?></a>
+        </h1>
+        <h6>
+            <small>
+                <a href="#" class="tag date borderR"><?= $post->getCreatedFormatted() ?></a>
+                <a href="#" class="tag date"> <i class="fa fa-eye"></i> <?= $post->getViews() ?></a>
+                <a href="#" class="tag date"> <i class="fa fa-comment"></i> <?= $post->getComments() ?></a>
+                <a href="#" class="tag date borderR marginR"> <i
+                        class="fa fa-download"></i> <?= $post->getDownloads() ?></a>
+                <a href="#" class="tag">Programming</a>
+                <a href="#" class="tag">Data Structures</a>
+                <a href="#" class="tag">Linear</a>
+            </small>
+        </h6>
+        <div class="row">
+            <div class="col-lg-4 col-sm-3 col-xs-4"><img src="<?= $post->getImageUrl() ?>"
+                                                         alt="<?= $post->getTitle() ?>"
+                                                         class="img-thumbnail img-responsive">
+            </div>
+            <div class="col-lg-8 col-sm-9 col-xs-12"><?= $post->getIntro() ?>
+                <div class="col-sm-2">
+                    <a class="btn-sm visible-xs "
+                       href="<?= $this->getUrl($post->getUrl()) ?>"><?= $this->__("Read More") ?></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row  hidden-xs">
+            <div class="col-lg-4 col-sm-3"></div>
+            <div class="col-lg-6 col-sm-7"></div>
+            <div class="col-lg-2 col-sm-2">
+                <a class="btn btn-primary"
+                   href="<?= $this->getUrl($post->getUrl()) ?>"><?= $this->__("Read More") ?> </a>
+            </div>
+        </div>
+        <hr>
+    <?php endforeach ?>
+    <div class="row">
+        <div class="col-md-12">
+            <?= $pagination->render() ?>
+        </div>
+    </div>
+
+</div>
+

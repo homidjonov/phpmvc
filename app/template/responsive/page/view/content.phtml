@@ -1,0 +1,27 @@
+<?php
+/**
+ * @var $this Module
+ */
+$post = $this->getParam('page');
+?>
+<div>
+    <h1><a href="<?= $this->getUrl($post->getUrl()) ?>"><?= $post->getTitle() ?></a></h1>
+    <?php if ($post->isPostType()): ?>
+        <h6>
+            <small>
+                <a href="#" class="tag date borderR">12 September, 2013</a>
+                <a href="#" class="tag date"> <i class="fa fa-eye"></i> 20</a>
+                <a href="#" class="tag date"> <i class="fa fa-comment"></i> 5</a>
+                <a href="#" class="tag date borderR marginR"> <i class="fa fa-download"></i> 10</a>
+                <a href="#" class="tag">Programming</a>
+                <a href="#" class="tag">Data Structures</a>
+                <a href="#" class="tag">Linear</a>
+            </small>
+        </h6>
+    <?php endif ?>
+    <hr>
+    <div class="post_data">
+        <?= $post->getContent() ?>
+    </div>
+</div>
+

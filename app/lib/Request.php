@@ -60,7 +60,7 @@ class Request
                 $this->_moduleAction     = $parts[1];
                 $this->_moduleOrigAction = $parts[1];
                 if ($c > 2) {
-                    for ($i = 3; $i < $c; $i += 2) {
+                    for ($i = 2; $i < $c; $i += 2) {
                         if (isset($parts[$i]) && isset($parts[$i + 1]) && $parts[$i] && $parts[$i + 1] !== '')
                             $params[$parts[$i]] = $parts[$i + 1];
                     }
@@ -171,7 +171,7 @@ class Request
     public function setAction($action)
     {
         $this->_moduleOrigAction = $this->_moduleAction;
-        $this->_moduleAction     = $action;
+        $this->_moduleAction     = strtolower($action);
         return $this;
     }
 

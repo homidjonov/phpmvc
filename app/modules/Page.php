@@ -7,7 +7,8 @@
  */
 class Page extends Module
 {
-    protected $_route = 'page';
+    //multiple routing
+    protected $_route = 'page:category:tag';
     protected $_objectData;
 
     protected $_predefinedFunctions = array('getStaticBlock');
@@ -28,24 +29,45 @@ class Page extends Module
         ),
     );
 
+
     /** --------------FRONTEND ACTIONS---------------------- */
+
+    protected function viewAction()
+    {
+        if ($id = (int)$this->getRequest()->getParam('id')) {
+            $page = new PageModel();
+            $page->loadById($id);
+            if ($page->getId() && $page->isActive()) {
+                return $this->renderPage($page);
+            }
+        }
+        $this->_defaultNoRouteAction();
+    }
+
     protected function defaultAction()
     {
         if ($url = App::getRequest()->getDefaultRoute()) {
             $page = new PageModel();
             $page->loadPageByUrl($url);
-
             if ($page->getId() && $page->isActive()) {
-                $this->_bodyClassName = $url;
-                $this->_title         = $page->getData('meta_title');
-                $this->_keywords      = $page->getData('meta_keywords');
-                $this->_description   = $page->getData('meta_description');
-                return $this->render(array('page' => $page));
+                return $this->renderPage($page);
             } else {
                 return $this->forward('category');
             }
         } else {
             return $this->forward('home');
+        }
+        $this->_defaultNoRouteAction();
+    }
+
+    protected function categoryViewAction()
+    {
+        if ($id = (int)$this->getRequest()->getParam('id')) {
+            $category = new CategoryModel();
+            $category->loadById($id);
+            if ($category->getId()) {
+                return $this->renderCategory($category);
+            }
         }
         $this->_defaultNoRouteAction();
     }
@@ -56,21 +78,41 @@ class Page extends Module
             $category = new CategoryModel();
             $category->loadCategoryByUrl($url);
             if ($category->getId()) {
-                Pagination::getInstance()->setItemsCount($category->getPostCount())->setUrl($category->getUrl());
-                $this->_bodyClassName = $url;
-                $this->_title         = $category->getData('meta_title');
-                $this->_keywords      = $category->getData('meta_keywords');
-                $this->_description   = $category->getData('meta_description');
-                return $this->render(array('category' => $category));
+                return $this->renderCategory($category);
             }
         }
         $this->_defaultNoRouteAction();
+    }
+
+
+    protected function renderPage($page)
+    {
+        $this->_title       = $page->getData('meta_title');
+        $this->_keywords    = $page->getData('meta_keywords');
+        $this->_description = $page->getData('meta_description');
+        return $this->render(array('page' => $page));
+    }
+
+    protected function renderCategory($category)
+    {
+        Pagination::getInstance()->setItemsCount($category->getPostCount());
+        $this->_title       = $category->getData('meta_title');
+        $this->_keywords    = $category->getData('meta_keywords');
+        $this->_description = $category->getData('meta_description');
+        return $this->render(array('category' => $category));
     }
 
     protected function homeAction()
     {
         $this->render();
     }
+
+
+    protected function tagViewAction()
+    {
+        $this->render();
+    }
+
 
     /** --------------ADMIN ACTIONS-------------- */
     public function adminNew()
@@ -112,6 +154,12 @@ class PageModel extends Model
     {
         $url   = trim($url, '/');
         $query = "SELECT * FROM {$this->_table} WHERE `url`='$url'";
+        return $this->loadOneModel($query);
+    }
+
+    public function loadPageById($id)
+    {
+        $query = "SELECT * FROM {$this->_table} WHERE `id`='$id'";
         return $this->loadOneModel($query);
     }
 

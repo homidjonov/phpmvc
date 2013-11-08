@@ -152,6 +152,12 @@ class Model
         return $this;
     }
 
+    public function loadById($id)
+    {
+        $query = "SELECT * FROM {$this->_table} WHERE `id`='$id'";
+        return $this->loadOneModel($query);
+    }
+
     /**
      * @param $method
      * @param $args

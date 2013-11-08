@@ -39,7 +39,10 @@ class Module
         if ($this->getName() != 'module') {
             self::$_modules[$this->getName()] = $this;
             if ($this->canRoute()) {
-                self::$_routes[$this->_route] = $this->getName();
+                $routes = explode(':', $this->_route);
+                foreach ($routes as $route) {
+                    self::$_routes[$route] = $this->getName();
+                }
             }
         }
 
@@ -180,6 +183,11 @@ class Module
         return $this->_route != null;
     }
 
+    public function isMultipleRoute()
+    {
+        return strpos($this->_route, ':');
+    }
+
     public function getRoute()
     {
         return $this->_route;
@@ -188,7 +196,12 @@ class Module
 
     protected function _preDispatch()
     {
+        //multiple route handle
+        if ($this->isMultipleRoute() && App::getRequest()->getModule() != $this->getName()) {
+            $action = App::getRequest()->getModule() . ucfirst(App::getRequest()->getAction());
+            App::getRequest()->setAction($action);
 
+        }
     }
 
     protected function _postDispatch()
@@ -293,10 +306,12 @@ class Module
         }
         $files = array(
             $this->getCurrentTemplateDir() . $module . DS . $action . DS . $part,
+            $this->getCurrentTemplateDir() . $module . DS . 'default' . DS . $part,
             $this->getCurrentTemplateDir() . $module . DS . $part,
             $this->getCurrentTemplateDir() . 'page' . DS . $part,
             $this->getCurrentTemplateDir() . $part,
             App::getBaseTemplateDir() . $module . DS . $action . DS . $part,
+            App::getBaseTemplateDir() . $module . DS . 'default' . DS . $part,
             App::getBaseTemplateDir() . $module . DS . $part,
             App::getBaseTemplateDir() . 'page' . DS . $part,
             App::getBaseTemplateDir() . $part,
