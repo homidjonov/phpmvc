@@ -112,6 +112,15 @@ class Model
         return $this;
     }
 
+    protected function getCount($query)
+    {
+        $result = $this->getConnection()->query($query);
+        if ($row = mysql_fetch_row($result)) {
+            return (int)$row[0];
+        }
+        return 0;
+    }
+
     protected function loadModelCollection($query, $model = false)
     {
         $collection = array();

@@ -85,7 +85,7 @@ class Page extends Module
 class PageModel extends Model
 {
     protected $_table = 'pages';
-    protected $_version = 1;
+    protected $_version = 2;
 
     public function loadPageByUrl($url)
     {
@@ -102,7 +102,6 @@ class PageModel extends Model
         `title`  varchar(255) NULL ,
         `author`  varchar(255) NULL ,
         `content`  text NULL ,
-        `category_id`  int(11) UNSIGNED NOT NULL ,
         `lang_id`  int(11) UNSIGNED NOT NULL ,
         `image`  varchar(255) NULL ,
         `meta_keywords`  varchar(255) NULL ,
@@ -111,9 +110,21 @@ class PageModel extends Model
         `status`  int(1) UNSIGNED NULL DEFAULT 1 ,
         PRIMARY KEY (`id`),
         INDEX `lang_id` (`lang_id`) USING BTREE,
-        INDEX `category_id` (`category_id`) USING BTREE,
         UNIQUE INDEX `url` (`url`) USING BTREE
         )ENGINE=MyISAM;";
+        return $this->getConnection()->query($query);
+    }
+
+    protected function installVersion2()
+    {
+        $query = "CREATE TABLE IF NOT EXISTS `page_categories` (
+            `id`  int(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
+            `page_id`   int(11) UNSIGNED NOT NULL ,
+            `category_id`   int(11) UNSIGNED NOT NULL ,
+            PRIMARY KEY (`id`),
+            INDEX `page_id` (`page_id`) USING BTREE,
+            INDEX `category_id` (`category_id`) USING BTREE
+            )ENGINE=MyISAM;";
         return $this->getConnection()->query($query);
     }
 
@@ -140,7 +151,7 @@ class PageModel extends Model
 
 class CategoryModel extends Model
 {
-    protected $_table = 'page_categories';
+    protected $_table = 'categories';
     protected $_version = 1;
 
     public function loadCategoryByUrl($url)
@@ -150,13 +161,33 @@ class CategoryModel extends Model
         return $this->loadOneModel($query);
     }
 
-    public function getPosts()
+    public function getPosts($page = 1, $limit = false)
     {
-        if ($id = $this->getId()) {
-            $query = "SELECT * FROM  `pages` WHERE `category_id`=$id";
+        if (!$limit) {
+            $limit = MD_PAGE_POST_LIMIT;
+        }
+        $start = $limit * ($page - 1);
+        if ($id = $this->getId() && $this->getStatus() == 1) {
+            $query = "
+            SELECT *, pc.category_id as  category_id FROM  `pages` as p
+            LEFT JOIN page_categories as pc ON pc.page_id=p.id and pc.`category_id`=$id
+            WHERE p.status=1
+            ORDER BY p.created ASC
+            LIMIT $start, $limit";
             return $this->loadModelCollection($query, 'PageModel');
         }
         return array();
+    }
+
+    public function getPostCount()
+    {
+        if ($id = $this->getId()) {
+            $query = "
+            SELECT count(1) as `count` FROM  `pages` as p
+            LEFT JOIN page_categories as pc ON pc.page_id=p.id and pc.`category_id`=$id
+            WHERE p.status=1";
+            return $this->getCount($query);
+        }
     }
 
     protected function installVersion1()

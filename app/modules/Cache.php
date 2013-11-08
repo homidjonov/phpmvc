@@ -65,7 +65,7 @@ class Cache extends Module
 
     protected function getFileNameForRequest()
     {
-        $fileName = md5(trim($this->getRequest()->getRequestUrl(), '/?')) . '.cache';
+        $fileName = md5(trim($this->getRequest()->getRequestUrl(), '/?') . $this->getRequest()->getQueryString()) . '.cache';
         return APP_CACHE_PAGE_DIR . $fileName;
     }
 

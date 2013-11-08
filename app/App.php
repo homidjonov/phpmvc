@@ -18,12 +18,13 @@ class App
      * @var array
      */
     protected $_autoloads = array(
-        'db'      => 'Db.php',
-        'request' => 'Request.php',
-        'module'  => 'Module.php',
-        'model'   => 'Model.php',
-        'session' => 'Session.php',
-        'form'    => 'Form.php',
+        'db'         => 'Db.php',
+        'request'    => 'Request.php',
+        'module'     => 'Module.php',
+        'model'      => 'Model.php',
+        'session'    => 'Session.php',
+        'form'       => 'Form.php',
+        'pagination' => 'Pagination.php',
     );
 
     public function __construct()

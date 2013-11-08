@@ -33,7 +33,9 @@ class Request
     {
         $this->sanitizeInput();
 
-        $this->_request  = strtolower($_SERVER['REQUEST_URI']);
+        $this->_request = strtolower($_SERVER['REQUEST_URI']);
+        if (isset($_SERVER['QUERY_STRING']) && $_SERVER['QUERY_STRING'])
+            $this->_request = substr($this->_request, 0, strpos($this->_request, $_SERVER['QUERY_STRING']) - 1);
         $this->_domain   = $_SERVER['HTTP_HOST'];
         $this->_isSecure = $_SERVER['SERVER_PORT'] == 443;
         $this->_query    = strtolower($_SERVER['QUERY_STRING']);
@@ -81,10 +83,10 @@ class Request
         }
     }
 
-    public function getParam($key)
+    public function getParam($key, $default = null)
     {
         if (isset($this->_getParams[$key])) return $this->_getParams[$key];
-        return null;
+        return $default;
     }
 
     public static function getInstance()
@@ -108,6 +110,11 @@ class Request
     public function getHost()
     {
         return $this->_host;
+    }
+
+    public function getQueryString()
+    {
+        return $this->_query;
     }
 
     public function isSecure()
@@ -212,7 +219,7 @@ class Request
         if (is_null($path)) {
             $path = '/';
             if (self::isAdmin()) {
-                $path = '/'.APP_ADMIN_ROUTE ;
+                $path = '/' . APP_ADMIN_ROUTE;
             }
         }
 
