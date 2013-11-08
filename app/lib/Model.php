@@ -104,15 +104,57 @@ class Model
         return false;
     }
 
+    protected function assignData($data)
+    {
+        if (is_array($data)) {
+            $this->_data = $data;
+        }
+        return $this;
+    }
+
+    protected function loadModelCollection($query, $model = false)
+    {
+        $collection = array();
+        if (!$model) {
+            $model = get_class($this);
+        }
+        $result = $this->getConnection()->query($query);
+        while ($row = mysql_fetch_assoc($result)) {
+            $model = new $model();
+            $model->assignData($row);
+            $collection[] = $model;
+        }
+        return $collection;
+    }
+
     protected function loadOneModel($query)
     {
         $result = $this->getConnection()->query($query);
         if ($row = mysql_fetch_assoc($result)) {
-            $this->_id   = $row['id'];
+            $this->_id   = (int)$row['id'];
             $this->_data = $row;
         }
         return $this;
     }
 
+    /**
+     * @param $method
+     * @param $args
+     * @return mixed
+     * Predefined callable functions
+     */
+    public function __call($method, $args)
+    {
+        if (strpos($method, 'get') === 0) {
+            $key = $this->_underscore(substr($method, 3));
+            return $this->getData($key);
+        }
+    }
+
+    protected function _underscore($name)
+    {
+        $result = strtolower(preg_replace('/(.)([A-Z])/', "$1_$2", $name));
+        return $result;
+    }
 
 }

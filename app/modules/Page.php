@@ -10,6 +10,7 @@ class Page extends Module
     protected $_route = 'page';
     protected $_objectData;
 
+
     protected function _initAdmin()
     {
         $this
@@ -36,15 +37,35 @@ class Page extends Module
                 $this->_title         = $page->getData('meta_title');
                 $this->_keywords      = $page->getData('meta_keywords');
                 $this->_description   = $page->getData('meta_description');
-                $this->render(array('page' => $page));
-                return;
+                return $this->render(array('page' => $page));
+            } else {
+                return $this->forward('category');
             }
         } else {
-            Request::getInstance()->setAction('home');
-            $this->render();
-            return;
+            return $this->forward('home');
         }
         $this->_defaultNoRouteAction();
+    }
+
+    protected function categoryAction()
+    {
+        if ($url = App::getRequest()->getDefaultRoute()) {
+            $category = new CategoryModel();
+            $category->loadCategoryByUrl($url);
+            if ($category->getId()) {
+                $this->_bodyClassName = $url;
+                $this->_title         = $category->getData('meta_title');
+                $this->_keywords      = $category->getData('meta_keywords');
+                $this->_description   = $category->getData('meta_description');
+                return $this->render(array('category' => $category));
+            }
+        }
+        $this->_defaultNoRouteAction();
+    }
+
+    protected function homeAction()
+    {
+        $this->render();
     }
 
     public function adminNew()
@@ -58,36 +79,22 @@ class Page extends Module
         $this->_title = $this->__('Create New Page');
         $this->render();
     }
+
 }
 
 class PageModel extends Model
 {
     protected $_table = 'pages';
-    protected $_version = 2;
-
-    protected $_translateable = true;
+    protected $_version = 1;
 
     public function loadPageByUrl($url)
     {
+        $url   = trim($url, '/');
         $query = "SELECT * FROM {$this->_table} WHERE `url`='$url'";
         return $this->loadOneModel($query);
     }
 
     protected function installVersion1()
-    {
-        $query = "CREATE TABLE IF NOT EXISTS `page_categories` (
-           `id`  int(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
-           `title`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
-           `parent_id`  int(11) NULL DEFAULT NULL ,
-           `lang_id`  int(11) UNSIGNED NOT NULL ,
-           `status`  int(1) NULL DEFAULT 1 ,
-           PRIMARY KEY (`id`),
-           INDEX `languages` (`lang_id`) USING BTREE
-           )ENGINE=MyISAM";
-        return $this->getConnection()->query($query);
-    }
-
-    protected function installVersion2()
     {
         $query = "CREATE TABLE IF NOT EXISTS `{$this->_table}` (
         `id`  int(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
@@ -114,4 +121,59 @@ class PageModel extends Model
     {
         return $this->getData('created');
     }
+
+
+    public function getIntro()
+    {
+        if ($content = $this->getData('intro')) {
+            return $content;
+        } elseif ($content = $this->getData('content')) {
+            $start     = strpos($content, '<p>');
+            $end       = strpos($content, '</p>', $start);
+            $paragraph = substr($content, $start, $end - $start + 4);
+            return $paragraph;
+        }
+        return "";
+    }
+
+}
+
+class CategoryModel extends Model
+{
+    protected $_table = 'page_categories';
+    protected $_version = 1;
+
+    public function loadCategoryByUrl($url)
+    {
+        $url   = trim($url, '/');
+        $query = "SELECT * FROM  `{$this->_table}` WHERE `url`='$url'";
+        return $this->loadOneModel($query);
+    }
+
+    public function getPosts()
+    {
+        if ($id = $this->getId()) {
+            $query = "SELECT * FROM  `pages` WHERE `category_id`=$id";
+            return $this->loadModelCollection($query, 'PageModel');
+        }
+        return array();
+    }
+
+    protected function installVersion1()
+    {
+        $query = "CREATE TABLE IF NOT EXISTS  `{$this->_table}` (
+           `id`  int(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
+           `title`  varchar(255) NOT NULL ,
+           `url`  varchar(255) NOT NULL ,
+           `parent_id`  int(11) NULL DEFAULT NULL ,
+           `lang_id`  int(11) UNSIGNED NOT NULL ,
+           `status`  int(1) NULL DEFAULT 1 ,
+           PRIMARY KEY (`id`),
+           INDEX `languages` (`lang_id`) USING BTREE,
+           UNIQUE INDEX `url` (`url`) USING BTREE
+           )ENGINE=MyISAM";
+        return $this->getConnection()->query($query);
+    }
+
+
 }

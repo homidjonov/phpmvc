@@ -41,4 +41,4 @@ define('APP_DB_DATABASE', 'blog1');
 
 //administrator configs
 define('APP_ADMIN_ROUTE', 'adminbox');
-define('APP_CACHE_ENABLED', true);
+define('APP_CACHE_ENABLED', false);
