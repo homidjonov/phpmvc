@@ -7,14 +7,11 @@
  */
 class Model
 {
-
     protected $_table = 'models';
     protected $_version = 1;
     protected static $_instance;
     protected $_id;
     protected $_data;
-
-    protected $_translateable;
 
     public static function getInstance()
     {
@@ -24,31 +21,37 @@ class Model
         return self::$_instance;
     }
 
-    public function __construct()
+    public function __construct($install = false)
     {
-        if (App::getIsDeveloperMode()) {
-            $currentVersion   = $this->_version;
-            $installedVersion = $this->getInstalledVersion();
-            if ($installedVersion < $currentVersion) {
-                $success = $installedVersion;
-                $name    = get_class($this);
-                for ($i = $installedVersion; $i <= $currentVersion; $i++) {
-                    $method = "installVersion$i";
-                    if (method_exists($this, $method)) {
-                        $result = false;
-                        if ($result = $this->$method()) {
-                            $success = $i;
-                        }
+        if (App::getIsDeveloperMode() && $install) {
+            $this->installUpdates();
+        }
+    }
+
+    public function installUpdates()
+    {
+        $currentVersion   = $this->_version;
+        $installedVersion = $this->getInstalledVersion();
+
+        if ($installedVersion < $currentVersion) {
+            $success = $installedVersion;
+            $name    = get_class($this);
+            for ($i = $installedVersion; $i <= $currentVersion; $i++) {
+                $method = "installVersion$i";
+                if (method_exists($this, $method)) {
+                    $result = false;
+                    if ($result = $this->$method()) {
+                        $success = $i;
                     }
                 }
-                if ($success > $installedVersion) {
-                    if ($installedVersion == 0) {
-                        $query = "INSERT INTO `models`(`version`,`name`) VALUES ($success,'$name')";
-                    } else {
-                        $query = "UPDATE `models` SET `version`=$success WHERE `name`='$name'";
-                    }
-                    $this->getConnection()->query($query);
+            }
+            if ($success > $installedVersion) {
+                if ($installedVersion == 0) {
+                    $query = "INSERT INTO `models`(`version`,`name`) VALUES ($success,'$name')";
+                } else {
+                    $query = "UPDATE `models` SET `version`=$success WHERE `name`='$name'";
                 }
+                $this->getConnection()->query($query);
             }
         }
     }
@@ -62,7 +65,7 @@ class Model
         PRIMARY KEY (`model_id`),
         UNIQUE INDEX `name` (`name`) USING BTREE
         );";
-        $this->getConnection()->query($query);
+        return $this->getConnection()->query($query);
     }
 
     protected function getInstalledVersion()

@@ -40,7 +40,6 @@ class Menu extends Module
 class MenuModel extends Model
 {
     protected $_table = 'menu_item';
-    protected $_version = 2;
 
     public function getMenuData($group)
     {
@@ -51,6 +50,12 @@ class MenuModel extends Model
         }
         return $data;
     }
+
+}
+
+class MenuInstaller extends Model
+{
+    protected $_version = 2;
 
     protected function installVersion1()
     {
@@ -68,7 +73,7 @@ class MenuModel extends Model
     protected function installVersion2()
     {
         $query = "
-        CREATE TABLE IF NOT EXISTS `{$this->_table}` (
+        CREATE TABLE IF NOT EXISTS `menu_item` (
         `id`  int(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
         `parent_id`  int(11) NOT NULL ,
         `group_id`  int(11) UNSIGNED NOT NULL ,

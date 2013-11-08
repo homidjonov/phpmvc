@@ -85,7 +85,10 @@ class Page extends Module
 class PageModel extends Model
 {
     protected $_table = 'pages';
-    protected $_version = 2;
+
+    const TYPE_POST   = 'post';
+    const TYPE_PAGE   = 'page';
+    const TYPE_STATIC = 'static';
 
     public function loadPageByUrl($url)
     {
@@ -94,45 +97,21 @@ class PageModel extends Model
         return $this->loadOneModel($query);
     }
 
-    protected function installVersion1()
+    public function getCreatedFormatted()
     {
-        $query = "CREATE TABLE IF NOT EXISTS `{$this->_table}` (
-        `id`  int(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
-        `url`  varchar(255) NOT NULL ,
-        `title`  varchar(255) NULL ,
-        `author`  varchar(255) NULL ,
-        `content`  text NULL ,
-        `lang_id`  int(11) UNSIGNED NOT NULL ,
-        `image`  varchar(255) NULL ,
-        `meta_keywords`  varchar(255) NULL ,
-        `meta_description`  varchar(255) NULL ,
-        `created`  datetime NULL ,
-        `status`  int(1) UNSIGNED NULL DEFAULT 1 ,
-        PRIMARY KEY (`id`),
-        INDEX `lang_id` (`lang_id`) USING BTREE,
-        UNIQUE INDEX `url` (`url`) USING BTREE
-        )ENGINE=MyISAM;";
-        return $this->getConnection()->query($query);
+        $date = $this->getData('created');
+        return date(MD_PAGE_DARE_FORMAT, strtotime($date));
     }
 
-    protected function installVersion2()
+    public function getImageUrl()
     {
-        $query = "CREATE TABLE IF NOT EXISTS `page_categories` (
-            `id`  int(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
-            `page_id`   int(11) UNSIGNED NOT NULL ,
-            `category_id`   int(11) UNSIGNED NOT NULL ,
-            PRIMARY KEY (`id`),
-            INDEX `page_id` (`page_id`) USING BTREE,
-            INDEX `category_id` (`category_id`) USING BTREE
-            )ENGINE=MyISAM;";
-        return $this->getConnection()->query($query);
+        $url = $this->getData('image');
+        if (strpos($url, 'http') === 0) {
+            return $url;
+        } else {
+            return App::getRequest()->getBaseUrl() . "media/images/$url";
+        }
     }
-
-    public function getCreatedDate()
-    {
-        return $this->getData('created');
-    }
-
 
     public function getIntro()
     {
@@ -147,12 +126,17 @@ class PageModel extends Model
         return "";
     }
 
+    public function isPostType()
+    {
+        return $this->getData('type') == self::TYPE_POST;
+    }
+
 }
+
 
 class CategoryModel extends Model
 {
     protected $_table = 'categories';
-    protected $_version = 1;
 
     public function loadCategoryByUrl($url)
     {
@@ -172,7 +156,7 @@ class CategoryModel extends Model
             SELECT *, pc.category_id as  category_id FROM  `pages` as p
             LEFT JOIN page_categories as pc ON pc.page_id=p.id and pc.`category_id`=$id
             WHERE p.status=1
-            ORDER BY p.created ASC
+            ORDER BY p.created DESC
             LIMIT $start, $limit";
             return $this->loadModelCollection($query, 'PageModel');
         }
@@ -190,19 +174,84 @@ class CategoryModel extends Model
         }
     }
 
+
+}
+
+class TagModel extends Model
+{
+    protected $_table = 'tags';
+}
+
+
+class PageInstaller extends Model
+{
+    protected $_pages = 'pages';
+    protected $_version = 4;
+
     protected function installVersion1()
     {
-        $query = "CREATE TABLE IF NOT EXISTS  `{$this->_table}` (
-           `id`  int(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
-           `title`  varchar(255) NOT NULL ,
-           `url`  varchar(255) NOT NULL ,
-           `parent_id`  int(11) NULL DEFAULT NULL ,
-           `lang_id`  int(11) UNSIGNED NOT NULL ,
-           `status`  int(1) NULL DEFAULT 1 ,
-           PRIMARY KEY (`id`),
-           INDEX `languages` (`lang_id`) USING BTREE,
-           UNIQUE INDEX `url` (`url`) USING BTREE
-           )ENGINE=MyISAM";
+        $query = "CREATE TABLE IF NOT EXISTS `pages` (
+        `id`  int(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
+        `url`  varchar(255) NOT NULL ,
+        `title`  varchar(255) NULL ,
+        `author`  varchar(255) NULL ,
+        `content`  text NULL ,
+        `lang_id`  int(11) UNSIGNED NOT NULL ,
+        `image`  varchar(255) NULL ,
+        `meta_keywords`  varchar(255) NULL ,
+        `meta_description`  varchar(255) NULL ,
+        `status`  int(1) UNSIGNED NULL DEFAULT 1 ,
+        `type`  enum('post','page','static') NULL DEFAULT 'post' ,
+        `created`  datetime NULL DEFAULT NULL ,
+        `views`  int(10) NOT NULL DEFAULT 1 ,
+        `downloads`  int(10) NOT NULL DEFAULT 0 ,
+        `comments`  int(10) NOT NULL DEFAULT 0,
+        PRIMARY KEY (`id`),
+        INDEX `lang_id` (`lang_id`) USING BTREE,
+        UNIQUE INDEX `url` (`url`) USING BTREE
+        )ENGINE=MyISAM;";
+        return $this->getConnection()->query($query);
+    }
+
+    protected function installVersion2()
+    {
+        $query = "CREATE TABLE IF NOT EXISTS  `categories` (
+              `id`  int(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
+              `title`  varchar(255) NOT NULL ,
+              `url`  varchar(255) NOT NULL ,
+              `parent_id`  int(11) NULL DEFAULT NULL ,
+              `lang_id`  int(11) UNSIGNED NOT NULL ,
+              `status`  int(1) NULL DEFAULT 1 ,
+              PRIMARY KEY (`id`),
+              INDEX `languages` (`lang_id`) USING BTREE,
+              UNIQUE INDEX `url` (`url`) USING BTREE
+              )ENGINE=MyISAM";
+        return $this->getConnection()->query($query);
+    }
+
+    protected function installVersion3()
+    {
+        $query = "CREATE TABLE IF NOT EXISTS `page_categories` (
+            `id`  int(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
+            `page_id`   int(11) UNSIGNED NOT NULL ,
+            `category_id`   int(11) UNSIGNED NOT NULL ,
+            PRIMARY KEY (`id`),
+            INDEX `page_id` (`page_id`) USING BTREE,
+            INDEX `category_id` (`category_id`) USING BTREE
+            )ENGINE=MyISAM;";
+        return $this->getConnection()->query($query);
+    }
+
+    protected function installVersion4()
+    {
+        $query = "CREATE TABLE IF NOT EXISTS `page_tags` (
+            `id`  int(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
+            `page_id`   int(11) UNSIGNED NOT NULL ,
+            `tag_id`   int(11) UNSIGNED NOT NULL ,
+            PRIMARY KEY (`id`),
+            INDEX `page_id` (`page_id`) USING BTREE,
+            INDEX `tag_id` (`tag_id`) USING BTREE
+            )ENGINE=MyISAM;";
         return $this->getConnection()->query($query);
     }
 

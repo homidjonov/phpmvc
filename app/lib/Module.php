@@ -50,6 +50,14 @@ class Module
         }
         $this->_init();
         if (App::isAdmin()) $this->_initAdmin();
+
+        if (App::getIsDeveloperMode()) {
+            $installer = get_class($this) . 'Installer';
+            if (class_exists($installer)) {
+                $installer = new $installer();
+                $installer->installUpdates();
+            }
+        }
     }
 
     protected function getAdminMenu()

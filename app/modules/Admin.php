@@ -181,7 +181,6 @@ class UserModel extends Model
     protected $_username;
     protected $_password;
     protected $_table = 'users';
-    protected $_version = 1;
 
     public function loadByEmail($email)
     {
@@ -207,21 +206,6 @@ class UserModel extends Model
     {
         if (!$salt) $salt = substr(md5(time()), 0, 10);
         return $salt . hash('sha256', $password . $salt);
-    }
-
-    protected function installVersion1()
-    {
-        $query = "CREATE TABLE IF NOT EXISTS `{$this->_table}` (
-        `id`  int(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
-        `username`  varchar(20) DEFAULT NULL ,
-        `email`  varchar(50) NOT NULL ,
-        `password`  varchar(255) NOT NULL ,
-        `role`  enum('user','admin') DEFAULT 'user' ,
-        `status`  int(1) NULL DEFAULT 1 ,
-        PRIMARY KEY (`id`),
-        UNIQUE INDEX `email` (`email`) USING BTREE
-        )ENGINE=MyISAM";
-        return $this->getConnection()->query($query);
     }
 }
 
@@ -251,7 +235,25 @@ class AdminSession extends Session
         }
         throw new Exception('Invalid Username or Password');
     }
-
-
 }
 
+
+class AdminInstaller extends Model
+{
+    protected $_version = 1;
+
+    protected function installVersion1()
+    {
+        $query = "CREATE TABLE IF NOT EXISTS `users` (
+        `id`  int(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
+        `username`  varchar(20) DEFAULT NULL ,
+        `email`  varchar(50) NOT NULL ,
+        `password`  varchar(255) NOT NULL ,
+        `role`  enum('user','admin') DEFAULT 'user' ,
+        `status`  int(1) NULL DEFAULT 1 ,
+        PRIMARY KEY (`id`),
+        UNIQUE INDEX `email` (`email`) USING BTREE
+        )ENGINE=MyISAM";
+        return $this->getConnection()->query($query);
+    }
+}

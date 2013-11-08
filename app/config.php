@@ -37,11 +37,13 @@ define('APP_DEFAULT_THEME', 'responsive');
 define('APP_DB_HOST', 'localhost');
 define('APP_DB_USERNAME', 'root');
 define('APP_DB_PASSWORD', '');
-define('APP_DB_DATABASE', 'blog1');
+define('APP_DB_DATABASE', 'blog2');
 
 //administrator configs
 define('APP_ADMIN_ROUTE', 'adminbox');
-define('APP_CACHE_ENABLED', true);
+define('APP_CACHE_ENABLED', false);
 
 //modules configs
 define('MD_PAGE_POST_LIMIT', 5);
+//define('MD_PAGE_DARE_FORMAT', 'Y-m-d');
+define('MD_PAGE_DARE_FORMAT', 'd M, Y');

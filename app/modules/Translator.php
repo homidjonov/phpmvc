@@ -9,7 +9,6 @@ class Translator extends Module
 {
     protected $_route = 'translator';
 
-
     protected function _init()
     {
         //TODO laod translations
@@ -23,7 +22,7 @@ class Translator extends Module
      */
     public function translate($word)
     {
-        return $word.'*';
+        return $word . '*';
     }
 
 }
@@ -32,7 +31,11 @@ class TranslatorModel extends Model
 {
     protected $_table = 'translations';
     protected $_version = 2;
+}
 
+class TranslatorInstaller extends Model
+{
+    protected $_version = 2;
 
     protected function installVersion1()
     {
@@ -47,7 +50,7 @@ class TranslatorModel extends Model
 
     protected function installVersion2()
     {
-        $query = "CREATE TABLE IF NOT EXISTS `{$this->_table}` (
+        $query = "CREATE TABLE IF NOT EXISTS `translations` (
         `id`  int(11) UNSIGNED NOT NULL AUTO_INCREMENT ,
         `word`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL ,
         `lang_id`  int(11) UNSIGNED NOT NULL ,
