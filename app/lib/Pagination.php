@@ -32,6 +32,14 @@ class Pagination
     public function setItemsCount($count)
     {
         $this->_itemsCount = $count;
+        $this->_pages      = ceil($this->_itemsCount / $this->_limit);
+        if ($this->_page > $this->_pages || $this->_page < 1) {
+            $this->_page  = 1;
+            $this->_pages = 0;
+            $this->_limit = 0;
+            /** I hate from face requests */
+            App::getRequest()->redirect('/' . App::getRequest()->getDefaultRoute());
+        }
         return $this;
     }
 
@@ -44,19 +52,30 @@ class Pagination
     public function __construct()
     {
         $this->_limit = MD_PAGE_POST_LIMIT;
-        $this->_page  = App::getRequest()->getParam('page', 1);
+        $this->_page  = (int)App::getRequest()->getParam('page', 1);
         $this->_url   = App::getRequest()->getRequestUrl();
+    }
+
+    public function getCurrentPage()
+    {
+        return $this->_page;
+    }
+
+    public function getPageLimit()
+    {
+        return $this->_limit;
     }
 
     public function render()
     {
-        $pages = ceil($this->_itemsCount / $this->_limit);
+        $pages = $this->_pages;
         if ($pages > 1) {
             $wrapper = "<{$this->_groupWrapper} class='{$this->_groupWrapperClass}'>%s</{$this->_groupWrapper}>";
             $items   = array();
             $curPage = $this->_page;
+            if ($curPage > $pages) $curPage = $pages;
             $maxItem = $this->_maxItem;
-            $delta   = 0;
+
             if ($pages > $maxItem) {
                 $delta = floor($maxItem / 2);
                 $start = $curPage - $delta;

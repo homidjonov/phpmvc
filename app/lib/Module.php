@@ -48,7 +48,7 @@ class Module
         foreach ($this->_predefinedFunctions as $function) {
             self::$_predefinedFunctionsArray[$function] = $this->getName();
         }
-        $this->_init();
+
         if (App::isAdmin()) $this->_initAdmin();
 
         if (App::getIsDeveloperMode()) {
@@ -58,6 +58,8 @@ class Module
                 $installer->installUpdates();
             }
         }
+
+        $this->_init();
     }
 
     protected function getAdminMenu()

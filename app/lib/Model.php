@@ -124,11 +124,14 @@ class Model
         return 0;
     }
 
-    protected function loadModelCollection($query, $model = false)
+    protected function loadModelCollection($query, $model = false, Pagination $p = null)
     {
         $collection = array();
         if (!$model) {
             $model = get_class($this);
+        }
+        if ($p instanceof Pagination) {
+            $query .= sprintf(" LIMIT %s, %s;", $p->getCurrentPage() - 1, $p->getPageLimit());
         }
         $result = $this->getConnection()->query($query);
         while ($row = mysql_fetch_assoc($result)) {

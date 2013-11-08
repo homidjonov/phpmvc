@@ -10,6 +10,7 @@ class Page extends Module
     protected $_route = 'page';
     protected $_objectData;
 
+    protected $_predefinedFunctions = array('getStaticBlock');
 
     protected function _initAdmin()
     {
@@ -27,12 +28,14 @@ class Page extends Module
         ),
     );
 
+    /** --------------FRONTEND ACTIONS---------------------- */
     protected function defaultAction()
     {
         if ($url = App::getRequest()->getDefaultRoute()) {
             $page = new PageModel();
             $page->loadPageByUrl($url);
-            if ($page->getId()) {
+
+            if ($page->getId() && $page->isActive()) {
                 $this->_bodyClassName = $url;
                 $this->_title         = $page->getData('meta_title');
                 $this->_keywords      = $page->getData('meta_keywords');
@@ -53,6 +56,7 @@ class Page extends Module
             $category = new CategoryModel();
             $category->loadCategoryByUrl($url);
             if ($category->getId()) {
+                Pagination::getInstance()->setItemsCount($category->getPostCount())->setUrl($category->getUrl());
                 $this->_bodyClassName = $url;
                 $this->_title         = $category->getData('meta_title');
                 $this->_keywords      = $category->getData('meta_keywords');
@@ -68,6 +72,7 @@ class Page extends Module
         $this->render();
     }
 
+    /** --------------ADMIN ACTIONS-------------- */
     public function adminNew()
     {
         $this->_title = $this->__('Create New Page');
@@ -80,11 +85,24 @@ class Page extends Module
         $this->render();
     }
 
+
+    /** --------------Predefined Functions-------------- */
+    public function getStaticBlock($alias = false)
+    {
+        if ($alias) {
+            $page = new PageModel();
+            return $page->loadStaticBlock($alias)->getData('content');
+        }
+        return '';
+    }
 }
 
 class PageModel extends Model
 {
     protected $_table = 'pages';
+
+    const STATUS_ENABLED  = 1;
+    const STATUS_DISABLED = 0;
 
     const TYPE_POST   = 'post';
     const TYPE_PAGE   = 'page';
@@ -94,6 +112,12 @@ class PageModel extends Model
     {
         $url   = trim($url, '/');
         $query = "SELECT * FROM {$this->_table} WHERE `url`='$url'";
+        return $this->loadOneModel($query);
+    }
+
+    public function loadStaticBlock($url)
+    {
+        $query = "SELECT * FROM {$this->_table} WHERE `url`='$url' AND `type`='static'";
         return $this->loadOneModel($query);
     }
 
@@ -131,6 +155,11 @@ class PageModel extends Model
         return $this->getData('type') == self::TYPE_POST;
     }
 
+    public function isActive()
+    {
+        return $this->getData('status') == self::STATUS_ENABLED;
+    }
+
 }
 
 
@@ -145,20 +174,16 @@ class CategoryModel extends Model
         return $this->loadOneModel($query);
     }
 
-    public function getPosts($page = 1, $limit = false)
+    public function getPosts(Pagination $p = null)
     {
-        if (!$limit) {
-            $limit = MD_PAGE_POST_LIMIT;
-        }
-        $start = $limit * ($page - 1);
         if ($id = $this->getId() && $this->getStatus() == 1) {
             $query = "
             SELECT *, pc.category_id as  category_id FROM  `pages` as p
             LEFT JOIN page_categories as pc ON pc.page_id=p.id and pc.`category_id`=$id
             WHERE p.status=1
             ORDER BY p.created DESC
-            LIMIT $start, $limit";
-            return $this->loadModelCollection($query, 'PageModel');
+            ";
+            return $this->loadModelCollection($query, 'PageModel', $p);
         }
         return array();
     }

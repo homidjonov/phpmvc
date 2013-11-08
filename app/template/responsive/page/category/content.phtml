@@ -1,9 +1,12 @@
 <?php
 /**
- * @var $this Module
+ * @var $this     Module
+ * @var $category CategoryModel
  */
+
 $category = $this->getParam('category');
-$posts = $category->getPosts(App::getRequest()->getParam('page', 1));
+$pagination = Pagination::getInstance();
+$posts = $category->getPosts($pagination);
 ?>
 <div>
     <?php foreach ($posts as $id => $post): ?>
@@ -16,7 +19,8 @@ $posts = $category->getPosts(App::getRequest()->getParam('page', 1));
                 <a href="#" class="tag date borderR"><?= $post->getCreatedFormatted() ?></a>
                 <a href="#" class="tag date"> <i class="fa fa-eye"></i> <?= $post->getViews() ?></a>
                 <a href="#" class="tag date"> <i class="fa fa-comment"></i> <?= $post->getComments() ?></a>
-                <a href="#" class="tag date borderR marginR"> <i class="fa fa-download"></i> <?= $post->getDownloads() ?></a>
+                <a href="#" class="tag date borderR marginR"> <i
+                        class="fa fa-download"></i> <?= $post->getDownloads() ?></a>
                 <a href="#" class="tag">Programming</a>
                 <a href="#" class="tag">Data Structures</a>
                 <a href="#" class="tag">Linear</a>
@@ -47,7 +51,7 @@ $posts = $category->getPosts(App::getRequest()->getParam('page', 1));
     <?php endforeach ?>
     <div class="row">
         <div class="col-md-12">
-            <?= Pagination::getInstance()->setItemsCount($category->getPostCount())->setUrl($category->getUrl())->render() ?>
+            <?= $pagination->render() ?>
         </div>
     </div>
 
