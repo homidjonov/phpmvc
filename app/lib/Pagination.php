@@ -50,12 +50,6 @@ class Pagination
 
     public function render()
     {
-
-        //all Pages 25
-        //max Items 10
-        //cur Page 1
-
-        $a     = array();
         $pages = ceil($this->_itemsCount / $this->_limit);
         if ($pages > 1) {
             $wrapper = "<{$this->_groupWrapper} class='{$this->_groupWrapperClass}'>%s</{$this->_groupWrapper}>";
