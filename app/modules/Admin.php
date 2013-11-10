@@ -131,12 +131,12 @@ class Admin extends Module
 
         $login = $this->getAdminUrl('login');
         $form->addElement('button', 'submit', array(
-            'caption' => 'Restore',
+            'caption' => $this->__('Restore'),
             'type'    => 'submit',
             'class'   => 'btn btn-primary',
             'style'   => 'margin-right:10px',
             'before'  => '<div>',
-            'after'   => "<a href='$login' class='text-muted' style='margin-left: 10px'>Back to Login <i class='fa fa-key'></i></a> <a href='/' class='text-muted' style='margin-left: 10px'>Back to Home <i class='fa fa-home'></i></a></div>",
+            'after'   => "<a href='$login' class='text-muted' style='margin-left: 10px'>" . $this->__("Back to Login") . "<i class='fa fa-key'></i></a> <a href='/' class='text-muted' style='margin-left: 10px'>" . $this->__("Back to Home") . " <i class='fa fa-home'></i></a></div>",
         ));
 
 
@@ -164,12 +164,12 @@ class Admin extends Module
 
         $forgot = $this->getAdminUrl('restore');
         $form->addElement('button', 'submit', array(
-            'caption' => 'Login',
+            'caption' => $this->__('Sign In'),
             'type'    => 'submit',
             'class'   => 'btn btn-primary',
             'style'   => 'margin-right:10px',
             'before'  => '<div>',
-            'after'   => "<a href='$forgot' class='text-muted' style='margin-left: 10px'>Forgot Password <i class='fa fa-question-circle'></i></a> <a href='/' class='text-muted' style='margin-left: 10px'>Back to Home <i class='fa fa-home'></i></a></div>",
+            'after'   => "<a href='$forgot' class='text-muted' style='margin-left: 10px'>" . $this->__("Forgot Password") . "<i class='fa fa-question-circle'></i></a> <a href='/' class='text-muted' style='margin-left: 10px'>" . $this->__("Back to Home") . "<i class='fa fa-home'></i></a></div>",
         ));
 
 

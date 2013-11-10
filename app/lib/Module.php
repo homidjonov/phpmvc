@@ -454,7 +454,7 @@ class Module
     {
         if (App::canTranslateInterface()) {
             $word = $this->getTranslator()->translate($word);
-            $word = "<span class='translation'>$word</span>";
+            //$word = "<span class='translation'>$word</span>";
         }
         return $word;
     }

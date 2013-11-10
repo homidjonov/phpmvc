@@ -14,7 +14,7 @@ define('DS', DIRECTORY_SEPARATOR);
 //App development specific configurations
 define('APP_DEVELOPER_MODE', true);
 define('APP_DEBUG_PARTS', true);
-define('APP_TRANSLATE_INTERFACE', false);
+define('APP_TRANSLATE_INTERFACE', true);
 define('APP_BOOTSTRAP_CDN', true);
 
 //folders and paths
