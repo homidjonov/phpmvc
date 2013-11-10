@@ -11,6 +11,7 @@ class Translator extends Module
 
     protected function _init()
     {
+        App::$_hasTranslator = true;
         //TODO laod translations
         $translator = new TranslatorModel();
     }

@@ -12,6 +12,7 @@ class App
     protected static $_dbManager;
     protected static $_modelManager;
     protected static $_sessionManager;
+    public static $_hasTranslator = false;
 
     /**
      * avtoyuklanuvchi fayllar
@@ -21,7 +22,9 @@ class App
         'db'         => 'Db.php',
         'request'    => 'Request.php',
         'module'     => 'Module.php',
+        'object'     => 'Object.php',
         'model'      => 'Model.php',
+        'cookie'     => 'Cookie.php',
         'session'    => 'Session.php',
         'form'       => 'Form.php',
         'pagination' => 'Pagination.php',
@@ -57,7 +60,7 @@ class App
         self::$_requestManager = Request::getInstance();
         self::$_dbManager      = Db::getInstance();
         self::$_modelManager   = Model::getInstance();
-        // self::$_sessionManager = Session::getInstance(); //user and admin session separated
+        //self::$_sessionManager = Session::getInstance(); //user and admin session separated
         if (self::getIsDeveloperMode()) {
             /*install updates */
             Model::getInstance()->installUpdates();
@@ -128,7 +131,7 @@ class App
 
     static public function canTranslateInterface()
     {
-        return APP_TRANSLATE_INTERFACE;
+        return APP_TRANSLATE_INTERFACE && self::$_hasTranslator;
     }
 
     /**
@@ -248,5 +251,18 @@ class App
     static public function getBaseThemeDir()
     {
         return self::getThemeDir() . self::getBaseTheme() . DS;
+    }
+
+    protected static $_singletons = array();
+
+    public static function getSingleton($className)
+    {
+        $className = ucfirst($className);
+        if (!class_exists($className)) throw new Exception("Class [$className] not found");
+        if (!isset(self::$_singletons[$className])) {
+            self::$_singletons[$className] = new $className();
+        }
+
+        return self::$_singletons[$className];
     }
 }

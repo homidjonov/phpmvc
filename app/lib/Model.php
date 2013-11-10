@@ -5,13 +5,12 @@
  * Date: 10/23/13
  * Time: 1:01 AM
  */
-class Model
+class Model extends Object
 {
     protected $_table = 'models';
     protected $_version = 1;
     protected static $_instance;
     protected $_id;
-    protected $_data;
 
     public static function getInstance()
     {
@@ -21,11 +20,12 @@ class Model
         return self::$_instance;
     }
 
-    public function __construct($install = false)
+    public function __construct()
     {
-        if (App::getIsDeveloperMode() && $install) {
+        if (App::getIsDeveloperMode()) {
             $this->installUpdates();
         }
+        parent::__construct();
     }
 
     public function installUpdates()
@@ -96,25 +96,6 @@ class Model
         return $this->getConnection()->query($query);
     }
 
-    public function getId()
-    {
-        return $this->_id;
-    }
-
-    public function getData($key)
-    {
-        if (isset($this->_data[$key])) return $this->_data[$key];
-        return false;
-    }
-
-    protected function assignData($data)
-    {
-        if (is_array($data)) {
-            $this->_data = $data;
-        }
-        return $this;
-    }
-
     protected function getCount($query)
     {
         $result = $this->getConnection()->query($query);
@@ -146,36 +127,17 @@ class Model
     {
         $result = $this->getConnection()->query($query);
         if ($row = mysql_fetch_assoc($result)) {
-            $this->_id   = (int)$row['id'];
-            $this->_data = $row;
+            $this->_id = (int)$row['id'];
+            $this->assignData($row);
         }
         return $this;
     }
 
     public function loadById($id)
     {
-        $query = "SELECT * FROM {$this->_table} WHERE `id`='$id'";
+        $query = "SELECT * FROM {$this->_table} WHERE `{$this->_idFieldName}`='$id'";
         return $this->loadOneModel($query);
     }
 
-    /**
-     * @param $method
-     * @param $args
-     * @return mixed
-     * Predefined callable functions
-     */
-    public function __call($method, $args)
-    {
-        if (strpos($method, 'get') === 0) {
-            $key = $this->_underscore(substr($method, 3));
-            return $this->getData($key);
-        }
-    }
-
-    protected function _underscore($name)
-    {
-        $result = strtolower(preg_replace('/(.)([A-Z])/', "$1_$2", $name));
-        return $result;
-    }
 
 }

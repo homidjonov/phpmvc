@@ -112,6 +112,16 @@ class Request
         return $this->_host;
     }
 
+    public function getRemoteAddr()
+    {
+        return (string)$_SERVER['REMOTE_ADDR'];
+    }
+
+    public function getUserAgent()
+    {
+        return (string)$_SERVER['HTTP_USER_AGENT'];
+    }
+
     public function getQueryString()
     {
         return $this->_query;
@@ -195,44 +205,6 @@ class Request
         return $this->_moduleRoute . '_' . $this->_moduleAction;
     }
 
-    public function getCookie($key = false, $default = null)
-    {
-        if ($key) {
-            return (isset($_COOKIE[$key])) ? $_COOKIE[$key] : $default;
-        }
-        return $_COOKIE;
-    }
-
-    public function setCookie($name, $value, $period = null, $path = null, $domain = null, $secure = null, $httponly = true)
-    {
-        unset($_COOKIE[$name]);
-        if (is_null($period)) {
-            $period = 3600 * 24 * 7; //default week
-        }
-
-        if ($period == 0) {
-            $expire = 0;
-        } else {
-            $expire = time() + $period;
-        }
-
-        if (is_null($path)) {
-            $path = '/';
-            if (self::isAdmin()) {
-                $path = '/' . APP_ADMIN_ROUTE;
-            }
-        }
-
-        if (is_null($domain)) {
-            $domain = $this->getDomain();
-        }
-        if (is_null($secure)) {
-            $secure = $this->isSecure();
-        }
-
-        setcookie($name, $value, $expire, $path, $domain, $secure, $httponly);
-    }
-
     public function hasPost()
     {
         return count($_POST) > 0;
@@ -248,5 +220,13 @@ class Request
     {
         header('Location: ' . $url);
         die;
+    }
+
+    /**
+     * @return Cookie
+     */
+    public static function getCookie()
+    {
+        return Cookie::getInstance();
     }
 }

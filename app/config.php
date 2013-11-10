@@ -32,8 +32,7 @@ define('APP_CACHE_PART_DIR', APP_CACHE_DIR . 'part' . DS);
 define('APP_DEFAULT_ROUTE', 'page');
 define('APP_DEFAULT_THEME', 'responsive');
 
-
-//db login parollari
+//db login parolari
 define('APP_DB_HOST', 'localhost');
 define('APP_DB_USERNAME', 'root');
 define('APP_DB_PASSWORD', '');
@@ -41,9 +40,14 @@ define('APP_DB_DATABASE', 'blog1');
 
 //administrator configs
 define('APP_ADMIN_ROUTE', 'adminbox');
-define('APP_CACHE_ENABLED', false);
+define('APP_CACHE_ENABLED', 0);
 
 //modules configs
 define('MD_PAGE_POST_LIMIT', 5);
+
 //define('MD_PAGE_DARE_FORMAT', 'Y-m-d');
 define('MD_PAGE_DARE_FORMAT', 'd M, Y');
+
+
+//Config
+define('CONFIG_COOKIE_LIFETIME', 1800);

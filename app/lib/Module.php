@@ -149,9 +149,6 @@ class Module
 
     protected function getSession()
     {
-        if (App::isAdmin()) {
-            return AdminSession::getInstance();
-        }
         return Session::getInstance();
     }
 
@@ -196,6 +193,7 @@ class Module
 
     protected function _preDispatch()
     {
+        $this->setBodyClassName(App::getRequest()->getFullActionName());
         //multiple route handle
         if ($this->isMultipleRoute() && App::getRequest()->getModule() != $this->getName()) {
             $action = App::getRequest()->getModule() . ucfirst(App::getRequest()->getAction());
@@ -455,8 +453,8 @@ class Module
      */
     public function __($word)
     {
-        $word = $this->getTranslator()->translate($word);
         if (App::canTranslateInterface()) {
+            $word = $this->getTranslator()->translate($word);
             $word = "<span class='translation'>$word</span>";
         }
         return $word;

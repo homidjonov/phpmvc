@@ -75,7 +75,7 @@ class Admin extends Module
                 $form->addValidationError($e->getMessage());
             }
             $this->getSession()->addNotice($this->__("Restore link has been send to provided e-mail."));
-         }
+        }
         $this->setPart('restore_form', $form);
         $this->render();
     }
@@ -90,7 +90,7 @@ class Admin extends Module
             $email    = $this->getRequest()->getPost('email');
             $password = $this->getRequest()->getPost('password');
             try {
-                if ($this->getSession()->authentificate($email, $password)) {
+                if ($this->getSession()->authenticate($email, $password)) {
                     $this->getRequest()->redirect($this->getRequest()->getBeforeAuthUrl());
                 }
             } catch (Exception $e) {
@@ -109,7 +109,8 @@ class Admin extends Module
 
     public function logoutAction()
     {
-        $this->getSession()->renew();
+        $this->getSession()->clear()->renew();
+        $this->getSession()->addSuccess($this->__('You have logged out.'));
         $this->getRequest()->redirect($this->getAdminUrl('login'));
     }
 
@@ -184,17 +185,16 @@ class UserModel extends Model
 
     public function loadByEmail($email)
     {
-        $query = "SELECT * FROM {$this->_table} WHERE `email`='$email'";
-        if ($result = mysql_fetch_assoc($this->query($query))) {
-            $this->_username = $result['username'];
-            $this->_password = $result['password'];
-            $this->_id       = (int)$result['id'];
-        }
-        return $this;
+        $query           = "SELECT * FROM {$this->_table} WHERE `email`='$email'";
+        $model           = $this->loadOneModel($query);
+        $this->_password = $this->getData('password');
+        $this->_username = $this->getData('username');
+        return $model;
     }
 
     public function validatePassword($password)
     {
+
         if ($this->_password) {
             $salt = substr($this->_password, 0, 10);
             return $this->_password == $this->encryptPassword($password, $salt);
@@ -211,25 +211,25 @@ class UserModel extends Model
 
 class AdminSession extends Session
 {
-    protected $_space = 'admin';
-    private static $_instance;
+    protected $_nameSpace = 'admin';
+    private static $_adminInstance;
 
     public static function getInstance()
     {
-        if (self::$_instance == null) {
-            self::$_instance = new  AdminSession();
+        if (self::$_adminInstance == null) {
+            self::$_adminInstance = new  AdminSession();
         }
-        return self::$_instance;
+        return self::$_adminInstance;
     }
 
-    public function authentificate($email, $password)
+    public function authenticate($email, $password)
     {
         $admin = new UserModel();
         $admin->loadByEmail($email);
 
         if ($admin->validatePassword($password)) {
             $this
-                //->renew()
+                ->renew()
                 ->setIsLoggedIn($admin);
             return true;
         }

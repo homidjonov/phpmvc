@@ -6,33 +6,26 @@
  * Time: 2:40 AM
  */
 
-class Session
+class Session extends Object
 {
-    protected $_space = 'user';
+    protected $_nameSpace = 'user';
     protected $_user = false;
     protected $_userId = false;
     protected $_savePath;
     protected $_isLoggedIn;
+    protected $_cookie;
+
+    const VALIDATION_KEY            = '_session_validation_key';
+    const VALIDATION_REMOTE_ADD_KEY = 'remote_address';
+    const VALIDATION_HTTP_AGENT_KEY = 'http_user_agent';
 
     public function __construct()
     {
-        $this->_init();
-        //$this->setUser('blabla');
-    }
-
-    public function isLoggedIn()
-    {
-        return $this->_isLoggedIn;
-    }
-
-    public function setIsLoggedIn(Model $model)
-    {
-        $this->_isLoggedIn  = true;
-        $_SESSION['userId'] = $model->getId();
+        $this->start();
     }
 
 
-    protected function _init()
+    protected function start()
     {
         if (!isset($_SESSION)) {
             session_module_name('files');
@@ -41,21 +34,85 @@ class Session
             } else {
                 mkdir($this->getSessionSavePath());
             }
-            session_name($this->_space);
+            $this->setSessionName($this->_nameSpace);
+
+            $cookie       = $this->getCookie();
+            $cookieParams = array(
+                'lifetime' => $cookie->getLifetime(),
+                'path'     => $cookie->getPath(),
+                'domain'   => $cookie->getDomain(),
+                'secure'   => $cookie->isSecure(),
+                'httponly' => $cookie->getHttponly()
+            );
+            call_user_func_array('session_set_cookie_params', $cookieParams);
             session_start();
-            if (isset($_SESSION['messages'])) $this->_messages = $_SESSION['messages'];
-            else
-                $this->_initMessages(true);
-            if (App::getRequest()->getCookie($this->getSessionName()) == $this->getSessionId()) {
-                App::getRequest()->setCookie($this->getSessionName(), $this->getSessionId());
+            if ($cookie->get($this->getSessionName()) == $this->getSessionId()) {
+                $cookie->renew(session_name());
             }
-
         }
-        if (isset($_SESSION['userId'])) {
-            $this->_userId = $_SESSION['userId'];
+        $this->_init();
+    }
 
+    protected function _init()
+    {
+        if (!isset($_SESSION[$this->_nameSpace])) {
+            $_SESSION[$this->_nameSpace] = array();
+        }
+        $this->_data = & $_SESSION[$this->_nameSpace];
+
+        if (isset($this->_data['user_id'])) {
             $this->_isLoggedIn = true;
+            $this->_userId     = $this->_data['user_id'];
         }
+        if (!isset($this->_data['messages'])) $this->_clearMessages(true);
+        $this->validate();
+    }
+
+    public function validate()
+    {
+        if (!isset($this->_data[self::VALIDATION_KEY])) {
+            $this->_data[self::VALIDATION_KEY] = $this->getValidationData();
+        } else {
+            $valid          = true;
+            $sessionData    = $this->_data[self::VALIDATION_KEY];
+            $validationData = $this->getValidationData();
+            foreach ($validationData as $key => $value) {
+                $valid &= $sessionData[$key] == $validationData[$key];
+            }
+            if (!$valid) {
+                throw new Exception('Fake session');
+            }
+        }
+        return $this;
+    }
+
+
+    public function getValidationData()
+    {
+        $data = array(
+            self::VALIDATION_REMOTE_ADD_KEY => App::getRequest()->getRemoteAddr(),
+            self::VALIDATION_HTTP_AGENT_KEY => App::getRequest()->getUserAgent(),
+        );
+        return $data;
+    }
+
+    /**
+     * @return Cookie
+     */
+    protected function getCookie()
+    {
+        return App::getRequest()->getCookie();
+    }
+
+    public function setSessionName($name)
+    {
+        session_name($name);
+        return $this;
+    }
+
+    public function clear()
+    {
+        return $this->unsetData();
     }
 
     public function getSessionId()
@@ -67,6 +124,20 @@ class Session
     {
         return session_name();
     }
+
+
+    public function isLoggedIn()
+    {
+        return $this->_isLoggedIn;
+    }
+
+    public function setIsLoggedIn(Model $model)
+    {
+
+        $this->_isLoggedIn = true;
+        $this->setData('user_id', $model->getId());
+    }
+
 
     protected function getSessionSavePath()
     {
@@ -96,24 +167,19 @@ class Session
 
     public function renew()
     {
-        unset($_COOKIE[$this->getSessionName()]);
-        unset($_SESSION);
-        session_destroy();
-        session_regenerate_id(false);
-        //$this->_init();
+        $this->getCookie()->delete($this->getSessionName());
+        session_regenerate_id(true);
         return $this;
     }
 
-    protected function _initMessages($clear = false)
+    protected function _clearMessages()
     {
-        if ($clear) {
-            $this->_messages = array(
-                'info'  => array(),
-                'warning' => array(),
-                'danger'   => array(),
-            );
-        }
-        $_SESSION['messages'] = $this->_messages;
+        $this->_data['messages'] = array(
+            'success' => array(),
+            'info'    => array(),
+            'warning' => array(),
+            'danger'  => array(),
+        );
         return $this;
     }
 
@@ -121,13 +187,18 @@ class Session
 
     public function addMessage($message, $severity = 'notice')
     {
-        $this->_messages[$severity][] = $message;
-        return $this->_initMessages();
+        $this->_data['messages'][$severity][] = $message;
+        return $this;
     }
 
     public function addError($message)
     {
         return $this->addMessage($message, 'danger');
+    }
+
+    public function addSuccess($message)
+    {
+        return $this->addMessage($message, 'success');
     }
 
     public function addNotice($message)
@@ -142,8 +213,8 @@ class Session
 
     public function getMessages()
     {
-        $messages = $this->_messages;
-        $this->_initMessages(true);
+        $messages = $this->getData('messages');
+        $this->_clearMessages();
         return $messages;
     }
 
