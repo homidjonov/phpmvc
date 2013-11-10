@@ -60,9 +60,8 @@ class Session extends Object
         }
         $this->_data = & $_SESSION[$this->_nameSpace];
 
-        if (isset($this->_data['user_id'])) {
+        if (isset($this->_data['user'])) {
             $this->_isLoggedIn = true;
-            $this->_userId     = $this->_data['user_id'];
         }
         if (!isset($this->_data['messages'])) $this->_clearMessages(true);
         $this->validate();
@@ -136,9 +135,13 @@ class Session extends Object
     {
 
         $this->_isLoggedIn = true;
-        $this->setData('user_id', $model->getId());
+        $this->setData('user', $model->unsetData('password'));
     }
 
+    public function getUser()
+    {
+        return $this->getData('user');
+    }
 
     protected function getSessionSavePath()
     {
@@ -153,11 +156,6 @@ class Session extends Object
             self::$_instance = new Session();
         }
         return self::$_instance;
-    }
-
-    public function getUser()
-    {
-        return $this->_user;
     }
 
     public function setUser($user)

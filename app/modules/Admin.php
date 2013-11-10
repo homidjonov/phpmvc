@@ -28,7 +28,6 @@ class Admin extends Module
 
     protected function _preDispatch()
     {
-        $user = $this->getSession()->getUser();
         if (!$this->getSession()->isLoggedIn() && !in_array($this->getRequest()->getAction(), $this->_allowedActions)) {
             $this->getRequest()->setBeforeAuthUrl($this->getRequest()->getRequestUrl());
             $this->getRequest()->setAction('login');
@@ -179,9 +178,9 @@ class Admin extends Module
 
 final class UserModel extends Model
 {
-    protected $_username;
-    protected $_password;
     protected $_table = 'users';
+
+    const STATUS_ACTIVE = 1;
 
     public function loadByEmail($email)
     {
@@ -190,18 +189,22 @@ final class UserModel extends Model
 
     public function validatePassword($password)
     {
-        $this->_password = $this->getData('password');
-        if ($this->_password) {
-            $salt = substr($this->_password, 0, 10);
-            return $this->_password == $this->encryptPassword($password, $salt);
+        if ($secure = $this->getData('password')) {
+            $salt = substr($secure, 0, 10);
+            return $secure == $this->encryptPassword($password, $salt);
         }
-        return $this->_password == $password;
+        return false;
     }
 
     protected function encryptPassword($password, $salt = false)
     {
         if (!$salt) $salt = substr(md5(time()), 0, 10);
         return $salt . hash('sha256', $password . $salt);
+    }
+
+    public function isActive()
+    {
+        return $this->getData('status') == self::STATUS_ACTIVE;
     }
 }
 
@@ -221,7 +224,8 @@ final class AdminSession extends Session
     public function authenticate($email, $password)
     {
         $admin = new UserModel();
-        if ($admin->loadByEmail($email)->validatePassword($password)) {
+        $admin->loadByEmail($email);
+        if ($admin->isActive() && $admin->validatePassword($password)) {
             $this
                 ->renew()
                 ->setIsLoggedIn($admin);

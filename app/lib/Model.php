@@ -157,7 +157,7 @@ class Model extends Object
             $result = $this->query($query);
         }
 
-        if ($row = $result->fetch()) {
+        if ($row = $result->fetch(PDO::FETCH_ASSOC)) {
             $this->_id = (int)$row['id'];
             $this->assignData($row);
         }
@@ -174,6 +174,11 @@ class Model extends Object
     public function loadById(int $id)
     {
         return $this->loadOneModel(false, array($this->_idFieldName => $id));
+    }
+
+    public function __($word)
+    {
+        return Module::__($word);
     }
 
 }

@@ -450,10 +450,10 @@ class Module
      * Translator
      * TODO translate functionality
      */
-    public function __($word)
+    public static function __($word)
     {
         if (App::canTranslateInterface()) {
-            $word = $this->getTranslator()->translate($word);
+            $word = self::getTranslator()->translate($word);
             //$word = "<span class='translation'>$word</span>";
         }
         return $word;
@@ -462,7 +462,7 @@ class Module
     /**
      * @return Translator
      */
-    protected function getTranslator()
+    protected static function getTranslator()
     {
         return self::$_modules['translator'];
     }
