@@ -193,7 +193,6 @@ class Module
 
     protected function _preDispatch()
     {
-        $this->setBodyClassName(App::getRequest()->getFullActionName());
         //multiple route handle
         if ($this->isMultipleRoute() && App::getRequest()->getModule() != $this->getName()) {
             $action = App::getRequest()->getModule() . ucfirst(App::getRequest()->getAction());
@@ -240,12 +239,12 @@ class Module
         $this->_params = $params;
         App::runObserver('module_before_render', array('module' => $this, 'params' => &$params));
         ob_start();
+        $this->setBodyClassName(App::getRequest()->getFullActionName());
         $this->getPart('template');
         $content = ob_get_contents();
         ob_end_clean();
         App::runObserver('module_after_render', array('module' => $this, 'content' => &$content));
         echo $content;
-
     }
 
     public function getParams()
@@ -431,7 +430,7 @@ class Module
 
     public function getBodyClassName()
     {
-        return $this->_bodyClassName . ' ' . App::getRequest()->getFullActionName();
+        return $this->_bodyClassName;
     }
 
     /**
@@ -441,7 +440,7 @@ class Module
      */
     public function setBodyClassName($name)
     {
-        $this->_bodyClassName = $name;
+        $this->_bodyClassName .= "$name ";
         return $this;
     }
 

@@ -62,9 +62,14 @@ class Page extends Module
 
     protected function categoryViewAction()
     {
-        if ($id = (int)$this->getRequest()->getParam('id')) {
+        if ($id = $this->getRequest()->getParam('id')) {
             $category = new CategoryModel();
-            $category->loadById($id);
+            if ($id = intval($id)) {
+                $category->loadById($id);
+            } else {
+                $category->loadCategoryByUrl($this->getRequest()->getParam('id'));
+            }
+
             if ($category->getId()) {
                 return $this->renderCategory($category);
             }
@@ -90,6 +95,7 @@ class Page extends Module
         $this->_title       = $page->getData('meta_title');
         $this->_keywords    = $page->getData('meta_keywords');
         $this->_description = $page->getData('meta_description');
+        $this->setBodyClassName($page->getData('type'));
         return $this->render(array('page' => $page));
     }
 
@@ -99,6 +105,7 @@ class Page extends Module
         $this->_title       = $category->getData('meta_title');
         $this->_keywords    = $category->getData('meta_keywords');
         $this->_description = $category->getData('meta_description');
+        $this->setBodyClassName('category_' . $category->getData('url'));
         return $this->render(array('category' => $category));
     }
 
