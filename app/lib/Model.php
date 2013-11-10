@@ -171,7 +171,7 @@ class Model extends Object
     }
 
 
-    public function loadById(int $id)
+    public function loadById($id)
     {
         return $this->loadOneModel(false, array($this->_idFieldName => $id));
     }

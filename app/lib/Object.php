@@ -26,10 +26,15 @@ class Object
         return $this->getData($this->getIdFieldName());
     }
 
-    public function getData($key)
+    public function getAllData()
+    {
+        return $this->_data;
+    }
+
+    public function getData($key,$default = null)
     {
         if (isset($this->_data[$key])) return $this->_data[$key];
-        return null;
+        return $default;
     }
 
     public function setData($key, $value)

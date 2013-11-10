@@ -83,6 +83,7 @@ class Page extends Module
             $category = new CategoryModel();
             $category->loadByUrl($url);
             if ($category->getId()) {
+                if ($category->getRenderer()) $this->setPart('content', $category->render());
                 return $this->renderCategory($category);
             }
         }
@@ -96,6 +97,7 @@ class Page extends Module
         $this->_keywords    = $page->getData('meta_keywords');
         $this->_description = $page->getData('meta_description');
         $this->setBodyClassName($page->getData('type'));
+        $this->setRenderer('content', $page->getData('type'));
         return $this->render(array('page' => $page));
     }
 
@@ -109,6 +111,7 @@ class Page extends Module
         $this->_keywords    = $category->getData('meta_keywords');
         $this->_description = $category->getData('meta_description');
         $this->setBodyClassName('category_' . $category->getData('url'));
+        if ($category->getData('renderer')) $this->setRenderer('content', $category->getData('renderer'));
         return $this->render(array('category' => $category));
     }
 

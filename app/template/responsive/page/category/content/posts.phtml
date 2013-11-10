@@ -2,6 +2,7 @@
 /**
  * @var $this     Module
  * @var $category CategoryModel
+ *dynamic renderer
  */
 
 $category = $this->getParam('category');
@@ -17,6 +18,8 @@ $posts = $category->getPosts($pagination);
         <h6>
             <small>
                 <a href="#" class="tag date borderR"><?= $post->getCreatedFormatted() ?></a>
+                <a href="#" class="tag date"> <i class="fa fa-eye"></i> <?= $post->getViews() ?></a>
+                <a href="#" class="tag date"> <i class="fa fa-comment"></i> <?= $post->getComments() ?></a>
                 <a href="#" class="tag date borderR marginR"> <i
                         class="fa fa-download"></i> <?= $post->getDownloads() ?></a>
                 <a href="#" class="tag">Programming</a>

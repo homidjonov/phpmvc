@@ -15,21 +15,22 @@ class Cache extends Module
 
     public function page_before_cache($params)
     {
-        $params['can_cache'] &= APP_CACHE_ENABLED;
-        $params['can_cache'] &= !$this->getRequest()->hasPost();
-        $params['can_cache'] &= $this->getRequest()->getAction() != '404';
+        $canCache = $params->getData('can_cache');
+        $canCache &= APP_CACHE_ENABLED & !$this->getRequest()->hasPost() & $this->getRequest()->getAction() != '404';
+        $params->setData('can_cache', $canCache);
     }
 
     public function module_before_run($params)
     {
-        $module = $params['module'];
+        $module = $params->getData('module');
 
         if ($this->canCacheThisRequest()) {
             $cache = $this->getFileNameForRequest();
             if (file_exists($cache)) {
                 try {
-                    $params['module'] = false;
-                    include_once $cache; //which one is better? Include or echo file_get_contents()?
+                    $params->setData('module', false);
+                    include_once $cache;
+                    //which one is better? Include or echo file_get_contents()?
                     //$content = file_get_contents($cache);
                     //echo $content;
                 } catch (Exception $e) {
@@ -59,7 +60,7 @@ class Cache extends Module
     protected function canCacheThisRequest()
     {
         $canCacheThisPage = true;
-        App::runObserver('page_before_cache', array('can_cache' => & $canCacheThisPage));
+        App::runObserver('page_before_cache', array('can_cache' => &$canCacheThisPage));
         return $canCacheThisPage;
     }
 

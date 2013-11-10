@@ -9,8 +9,6 @@ class Admin extends Module
 {
     protected $_route = APP_ADMIN_ROUTE;
     protected $_observers = array(
-        'module_before_run',
-        'module_after_run',
         'page_before_cache',
     );
 
@@ -18,7 +16,8 @@ class Admin extends Module
 
     public function page_before_cache($params)
     {
-        $params['can_cache'] &= !$this->getRequest()->isAdmin();
+        $canCache = $params->getData('can_cache');
+        $params->setData('can_cache', $canCache && !$this->getRequest()->isAdmin());
     }
 
     protected function getSession()

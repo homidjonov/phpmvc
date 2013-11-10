@@ -12,6 +12,7 @@ class Module
     protected $_route;
     protected $_name;
     protected $_params;
+    protected $_renderers;
     protected $_observers;
     protected $_adminMenu;
     protected $_predefinedFunctions = array();
@@ -36,6 +37,8 @@ class Module
         if (!$this->_name) {
             $this->_name = strtolower(get_class($this));
         }
+        $this->_params    = new Object();
+        $this->_renderers = new Object();
         if ($this->getName() != 'module') {
             self::$_modules[$this->getName()] = $this;
             if ($this->canRoute()) {
@@ -114,7 +117,6 @@ class Module
         $params = array('data' => &$data, 'type' => $type);
         if ($type) {
             //Is it necessary to add event observer to only meta tags? I don't now really.
-            //App::runObserver('load_meta_' . $type, $params);
         }
         return $params['data'];
     }
@@ -236,14 +238,14 @@ class Module
 
     protected function render($params = false)
     {
-        $this->_params = $params;
-        App::runObserver('module_before_render', array('module' => $this, 'params' => &$params));
+        if (is_array($params)) $this->_params->addData($params);
+        App::runObserver('module_before_render', array('module' => $this));
         ob_start();
         $this->setBodyClassName(App::getRequest()->getFullActionName());
         $this->getPart('template');
         $content = ob_get_contents();
         ob_end_clean();
-        App::runObserver('module_after_render', array('module' => $this, 'content' => &$content));
+        App::runObserver('module_after_render', array('module' => $this));
         echo $content;
     }
 
@@ -252,10 +254,9 @@ class Module
         return $this->_params;
     }
 
-    public function getParam($key)
+    public function getParam($key, $default = null)
     {
-        if (isset($this->_params[$key])) return $this->_params[$key];
-        return false;
+        return $this->_params->getData($key, $default);
     }
 
     protected static $_parts = array();
@@ -268,6 +269,20 @@ class Module
     public static function getParts()
     {
         return self::$_parts;
+    }
+
+    public function getRenderer($alias)
+    {
+        if ($template = $this->_renderers->getData($alias)) {
+            return $template;
+        }
+        return false;
+    }
+
+    public function setRenderer($alias, $file)
+    {
+        $this->_renderers->setData($alias, $file);
+        return $this;
     }
 
     /**
@@ -301,7 +316,9 @@ class Module
             App::runObserver('part_after_output', array('part' => $part, 'alias' => $alias, 'data' => &$data));
             return;
         }
-        $files = array(
+        $default = $this->getRenderer($alias);
+        $files   = array(
+            ($default) ? $this->getCurrentTemplateDir() . $module . DS . $action . DS . $part . DS . $default : $this->getCurrentTemplateDir() . $module . DS . $action . DS . $part,
             $this->getCurrentTemplateDir() . $module . DS . $action . DS . $part,
             $this->getCurrentTemplateDir() . $module . DS . 'default' . DS . $part,
             $this->getCurrentTemplateDir() . $module . DS . $part,
@@ -313,7 +330,7 @@ class Module
             App::getBaseTemplateDir() . 'page' . DS . $part,
             App::getBaseTemplateDir() . $part,
         );
-        $files = array_unique($files);
+        $files   = array_unique($files);
         //App::log($files);
         foreach ($files as $file) {
             $file = $file . '.phtml';

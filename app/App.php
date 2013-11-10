@@ -187,11 +187,12 @@ class App
 
     static public function runObserver($observerName, $params)
     {
+        if (is_array($params)) $params = new Object($params);
         if (isset(self::$_observers[$observerName])) {
             foreach (self::$_observers[$observerName] as $module) {
                 $instance = self::getModuleManager()->getModule($module);
                 if (method_exists($instance, $observerName)) {
-                    $instance->$observerName($params);
+                    call_user_func_array(array($instance, $observerName), array($params));
                 }
             }
         }
