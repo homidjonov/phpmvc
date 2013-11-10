@@ -60,7 +60,7 @@ class App
         self::$_requestManager = Request::getInstance();
         self::$_dbManager      = Db::getInstance();
         self::$_modelManager   = Model::getInstance();
-        //self::$_sessionManager = Session::getInstance(); //user and admin session separated
+        ///self::$_sessionManager = Session::getInstance(); //user and admin session separated
         if (self::getIsDeveloperMode()) {
             /*install updates */
             Model::getInstance()->installUpdates();

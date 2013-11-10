@@ -34,8 +34,8 @@ class Cookie
 
     public function getPath()
     {
-        // or return '/';
-        return $this->getRequest()->getBaseUrl();
+
+        return App::isAdmin() ? '/' . APP_ADMIN_ROUTE : '/';
     }
 
     public function getLifetime()

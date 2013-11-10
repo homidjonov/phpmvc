@@ -20,23 +20,49 @@ a.tag {
 }
 
 a.date {
-   background-color: rgba(0, 0, 0, 0);
-   border-radius: 0;
-   font-size: 12px;
-   padding-right: 10px;
-   color: #b7b7b7;
+    background-color: rgba(0, 0, 0, 0);
+    border-radius: 0;
+    font-size: 12px;
+    padding-right: 10px;
+    color: #b7b7b7;
 }
-.marginR{
+
+.marginR {
     margin-right: 15px;
 }
-.borderR{
+
+.borderR {
     border-right: 4px solid #E3E3E3;
 }
+
 body {
-  font-size: 16px;
-  line-height: 1.428571429;
-  color: #535353;
+    font-size: 16px;
+    line-height: 1.428571429;
+    color: #535353;
 }
-.pagination{
+
+.pagination {
     text-align: center;
+}
+
+#logo {
+    margin-top: -4px;
+}
+
+.search-box:hover, .search-box:focus {
+    border-bottom: 1px solid #eeeeee;
+    color: #545454;
+}
+
+.search-box {
+    background: none repeat scroll 0 0 transparent;
+    border: medium none;
+    border-bottom: 1px solid #fdfdfd;
+    padding: 5px 20px;
+    min-width: 1px;
+    margin: 0 -14px;
+    font-size: 18px;
+    font-family: "Courier New", Courier, monospace;
+    width: 100%;
+    color: #eeeeee;
 }

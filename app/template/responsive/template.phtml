@@ -10,6 +10,21 @@
 </head>
 <body class="<?= $this->getBodyClassName() ?>">
 <div class="container">
+    <div class="row" style="margin: 10px 0 ">
+        <div class="col col-sm-0 visible-lg visible-md col-md-4">
+            <a class="img-responsive" id="logo" href="/">
+                <img class="img-responsive" src="<?= $this->getThemeFileLink('images/logo.png') ?>">
+            </a>
+        </div>
+        <div class="col col-sm-0 col-md-4">
+        </div>
+        <div class="col col-sm-12 col-md-4">
+            <span class="fa fa-chevron-left" style="width: 100%;">
+                <?php $search=$this->__('search...')?>
+                <input class="search-box" type="text" value="<?=$search?>" onblur="if(this.value.length==0)this.value='<?=$search?>'" onfocus="if(this.value=='<?=$search?>')this.value=''"><span class="fa fa-chevron-right"></span></span>
+        </div>
+    </div>
+
     <?php $this->getPart('menu/main_menu'); ?>
     <div class="row">
         <div class="col-md-8">

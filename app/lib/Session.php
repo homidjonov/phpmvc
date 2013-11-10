@@ -80,7 +80,8 @@ class Session extends Object
                 $valid &= $sessionData[$key] == $validationData[$key];
             }
             if (!$valid) {
-                throw new Exception('Fake session');
+                $this->clear()->renew();
+                return $this->_init();
             }
         }
         return $this;
