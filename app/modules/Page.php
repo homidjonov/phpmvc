@@ -93,7 +93,7 @@ class Page extends Module
 
     protected function renderPage($page)
     {
-        $this->_title       = $page->getData('meta_title');
+        $this->_title       = $page->getData('title');
         $this->_keywords    = $page->getData('meta_keywords');
         $this->_description = $page->getData('meta_description');
         $this->setBodyClassName($page->getData('type'));
