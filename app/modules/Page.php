@@ -48,7 +48,7 @@ class Page extends Module
     {
         if ($url = App::getRequest()->getDefaultRoute()) {
             $page = new PageModel();
-            $page->loadPageByUrl($url);
+            $page->loadByUrl($url);
             if ($page->getId() && $page->isActive()) {
                 return $this->renderPage($page);
             } else {
@@ -67,7 +67,7 @@ class Page extends Module
             if ($id = intval($id)) {
                 $category->loadById($id);
             } else {
-                $category->loadCategoryByUrl($this->getRequest()->getParam('id'));
+                $category->loadByUrl($this->getRequest()->getParam('id'));
             }
 
             if ($category->getId()) {
@@ -81,7 +81,7 @@ class Page extends Module
     {
         if ($url = App::getRequest()->getDefaultRoute()) {
             $category = new CategoryModel();
-            $category->loadCategoryByUrl($url);
+            $category->loadByUrl($url);
             if ($category->getId()) {
                 return $this->renderCategory($category);
             }
@@ -99,6 +99,9 @@ class Page extends Module
         return $this->render(array('page' => $page));
     }
 
+    /**
+     * @param $category CategoryModel
+     */
     protected function renderCategory($category)
     {
         Pagination::getInstance()->setItemsCount($category->getPostCount());
@@ -157,23 +160,10 @@ class PageModel extends Model
     const TYPE_PAGE   = 'page';
     const TYPE_STATIC = 'static';
 
-    public function loadPageByUrl($url)
-    {
-        $url   = trim($url, '/');
-        $query = "SELECT * FROM {$this->_table} WHERE `url`='$url'";
-        return $this->loadOneModel($query);
-    }
-
-    public function loadPageById($id)
-    {
-        $query = "SELECT * FROM {$this->_table} WHERE `id`='$id'";
-        return $this->loadOneModel($query);
-    }
 
     public function loadStaticBlock($url)
     {
-        $query = "SELECT * FROM {$this->_table} WHERE `url`='$url' AND `type`='static'";
-        return $this->loadOneModel($query);
+        return $this->loadOneModel(false, array('url' => $url, 'type' => 'static'));
     }
 
     public function getCreatedFormatted()
@@ -222,13 +212,6 @@ class CategoryModel extends Model
 {
     protected $_table = 'categories';
 
-    public function loadCategoryByUrl($url)
-    {
-        $url   = trim($url, '/');
-        $query = "SELECT * FROM  `{$this->_table}` WHERE `url`='$url'";
-        return $this->loadOneModel($query);
-    }
-
     public function getPosts(Pagination $p = null)
     {
         if ($id = $this->getId() && $this->getStatus() == 1) {
@@ -253,8 +236,6 @@ class CategoryModel extends Model
             return $this->getCount($query);
         }
     }
-
-
 }
 
 class TagModel extends Model

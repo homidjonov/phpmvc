@@ -177,7 +177,7 @@ class Admin extends Module
     }
 }
 
-class UserModel extends Model
+final class UserModel extends Model
 {
     protected $_username;
     protected $_password;
@@ -185,16 +185,12 @@ class UserModel extends Model
 
     public function loadByEmail($email)
     {
-        $query           = "SELECT * FROM {$this->_table} WHERE `email`='$email'";
-        $model           = $this->loadOneModel($query);
-        $this->_password = $this->getData('password');
-        $this->_username = $this->getData('username');
-        return $model;
+        return $this->loadOneModel(false, array('email' => $email));
     }
 
     public function validatePassword($password)
     {
-
+        $this->_password = $this->getData('password');
         if ($this->_password) {
             $salt = substr($this->_password, 0, 10);
             return $this->_password == $this->encryptPassword($password, $salt);
@@ -209,7 +205,7 @@ class UserModel extends Model
     }
 }
 
-class AdminSession extends Session
+final class AdminSession extends Session
 {
     protected $_nameSpace = 'admin';
     private static $_adminInstance;
@@ -225,9 +221,7 @@ class AdminSession extends Session
     public function authenticate($email, $password)
     {
         $admin = new UserModel();
-        $admin->loadByEmail($email);
-
-        if ($admin->validatePassword($password)) {
+        if ($admin->loadByEmail($email)->validatePassword($password)) {
             $this
                 ->renew()
                 ->setIsLoggedIn($admin);

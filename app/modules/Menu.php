@@ -45,9 +45,7 @@ class MenuModel extends Model
     {
         $data  = array();
         $query = "SELECT * FROM {$this->_table} WHERE group_id IN (SELECT id FROM menu_group WHERE code='$group') ORDER BY `order`";
-        if ($rows = $this->query($query)) {
-            while ($row = mysql_fetch_assoc($rows)) $data[] = $row;
-        }
+        $data  = $this->fetchAll($query);
         return $data;
     }
 

@@ -74,8 +74,8 @@ class Model extends Object
         $query = "SELECT version FROM `models` WHERE `name`='$name'";
 
         try {
-            $result = $this->getConnection()->query($query);
-            if ($row = mysql_fetch_assoc($result)) {
+            if ($result = $this->getConnection()->query($query)) {
+                $row = $result->fetch();
                 return (int)$row['version'];
             }
         } catch (Exception $e) {
@@ -84,11 +84,11 @@ class Model extends Object
     }
 
     /**
-     * @return Db
+     * @return PDO
      */
     protected function getConnection()
     {
-        return App::getDb();
+        return App::getDb()->getConnection();
     }
 
     protected function query($query)
@@ -96,13 +96,24 @@ class Model extends Object
         return $this->getConnection()->query($query);
     }
 
+
     protected function getCount($query)
     {
         $result = $this->getConnection()->query($query);
-        if ($row = mysql_fetch_row($result)) {
+        if ($row = $result->fetch()) {
             return (int)$row[0];
         }
         return 0;
+    }
+
+
+    public function fetchAll($query)
+    {
+        $data = array();
+        if ($result = $this->query($query)) {
+            $data = $result->fetchAll(PDO::FETCH_ASSOC);
+        }
+        return $data;
     }
 
     protected function loadModelCollection($query, $model = false, Pagination $p = null)
@@ -115,7 +126,7 @@ class Model extends Object
             $query .= sprintf(" LIMIT %s, %s;", $p->getCurrentPage() - 1, $p->getPageLimit());
         }
         $result = $this->getConnection()->query($query);
-        while ($row = mysql_fetch_assoc($result)) {
+        while ($row = $result->fetch()) {
             $model = new $model();
             $model->assignData($row);
             $collection[] = $model;
@@ -123,21 +134,46 @@ class Model extends Object
         return $collection;
     }
 
-    protected function loadOneModel($query)
+    public function whereQuery($query, array $where)
     {
-        $result = $this->getConnection()->query($query);
-        if ($row = mysql_fetch_assoc($result)) {
+        $binds = array();
+        foreach ($where as $field => $value) {
+            $binds [] = sprintf("`%s`=:%s", $field, $field);
+        }
+        $query  = sprintf("$query WHERE %s", implode(' AND ', $binds));
+        $result = $this->getConnection()->prepare($query);
+        $result->execute($where);
+        return $result;
+    }
+
+    protected function loadOneModel($query = false, $where = null)
+    {
+        if (!$query) {
+            $query = "SELECT * FROM {$this->_table} ";
+        }
+        if (is_array($where)) {
+            $result = $this->whereQuery($query, $where);
+        } else {
+            $result = $this->query($query);
+        }
+
+        if ($row = $result->fetch()) {
             $this->_id = (int)$row['id'];
             $this->assignData($row);
         }
         return $this;
     }
 
-    public function loadById($id)
+    public function loadByUrl($url)
     {
-        $query = "SELECT * FROM {$this->_table} WHERE `{$this->_idFieldName}`='$id'";
-        return $this->loadOneModel($query);
+        $url = trim($url, '/');
+        return $this->loadOneModel(false, array('url' => $url));
     }
 
+
+    public function loadById(int $id)
+    {
+        return $this->loadOneModel(false, array($this->_idFieldName => $id));
+    }
 
 }
