@@ -228,6 +228,11 @@ class App
         return APP_VIEW_DIR;
     }
 
+    public static function getAdminRoute()
+    {
+        return APP_ADMIN_ROUTE;
+    }
+
 
     static public function getThemeDir()
     {

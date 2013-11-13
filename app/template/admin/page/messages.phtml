@@ -1,18 +1,20 @@
-<?php
-/**
- * @var $this Module
- */
+<div>
+    <?php
+    /**
+     * @var $this Module
+     */
 
-$messages = $this->getMessages();
-$has = false;
-$html = "<div class='alert alert-%s alert-dismissable'><button class='close' aria-hidden='true' data-dismiss='alert' type='button'>×</button><p>%s</p></div>";
-$block = "";
-foreach ($messages as $type => $items) {
-    if (count($items)) {
-        $has = true;
-        $block .= sprintf($html, $type, implode('</p><p>', $items));
+    $messages = $this->getMessages();
+    $has = false;
+    $html = "<div class='alert alert-%s alert-dismissable'><button class='close' aria-hidden='true' data-dismiss='alert' type='button'>×</button><p>%s</p></div>";
+    $block = "";
+    foreach ($messages as $type => $items) {
+        if (count($items)) {
+            $has = true;
+            $block .= sprintf($html, $type, implode('</p><p>', $items));
+        }
     }
-}
-if ($has):?>
-    <div id="messages-area"><?= $block ?></div>
-<?php endif; ?>
+    if ($has):?>
+        <div id="messages-area"><?= $block ?></div>
+    <?php endif; ?>
+</div>

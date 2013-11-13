@@ -104,8 +104,9 @@ class Request
 
     public function isAdmin()
     {
-        return $this->_moduleRoute == APP_ADMIN_ROUTE;
+        return $this->_moduleRoute == App::getAdminRoute();
     }
+
 
     public function getHost()
     {

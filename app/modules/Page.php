@@ -10,14 +10,19 @@ class Page extends Module
     //multiple routing
     protected $_route = 'page:category:tag';
     protected $_objectData;
-
     protected $_predefinedFunctions = array('getStaticBlock');
+
 
     protected function _initAdmin()
     {
-        $this
-            ->addAdminMenu('index', 'Pages', 0)
-            ->addAdminMenu('categories', 'Categories', 1);
+        $this->addAdminMenu('page_index', 'Content', array(
+            'page_index'     => 'Pages',
+            'page_add'       => 'New Page',
+            'category_index' => 'Categories',
+            'category_add'   => 'New Category',
+            'tag_index'      => 'Tags',
+            'tag_add'        => 'New Tag',
+        ), 10, 'fa-file');
     }
 
     protected $_adminConfig = array(
@@ -57,6 +62,7 @@ class Page extends Module
         } else {
             return $this->forward('home');
         }
+
         $this->_defaultNoRouteAction();
     }
 
@@ -128,18 +134,47 @@ class Page extends Module
 
 
     /** --------------ADMIN ACTIONS-------------- */
-    public function adminNew()
+    public function adminPageDefault()
     {
-        $this->_title = $this->__('Create New Page');
+        $this->_title = 'Pages';
         $this->render();
     }
 
-    public function adminIndex()
+    public function adminPageIndex()
     {
-        $this->_title = $this->__('Create New Page');
+        $this->_title = 'Page Management';
         $this->render();
     }
 
+    public function adminPageAdd()
+    {
+        $this->_title = 'Create New Page';
+        $this->render();
+    }
+
+    public function adminCategoryAdd()
+    {
+        $this->_title = 'Create New Category';
+        $this->render();
+    }
+
+    public function adminCategoryIndex()
+    {
+        $this->_title = 'Category Management';
+        $this->render();
+    }
+
+    public function adminTagAdd()
+    {
+        $this->_title = 'Create Tags';
+        $this->render();
+    }
+
+    public function adminTagIndex()
+    {
+        $this->_title = 'Tag Management';
+        $this->render();
+    }
 
     /** --------------Predefined Functions-------------- */
     public function getStaticBlock($alias = false)
@@ -286,6 +321,7 @@ class PageInstaller extends Model
               `parent_id`  int(11) NULL DEFAULT NULL ,
               `lang_id`  int(11) UNSIGNED NOT NULL ,
               `status`  int(1) NULL DEFAULT 1 ,
+              `renderer`  varchar(255) DEFAULT NULL ,
               PRIMARY KEY (`id`),
               INDEX `languages` (`lang_id`) USING BTREE,
               UNIQUE INDEX `url` (`url`) USING BTREE

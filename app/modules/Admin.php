@@ -37,27 +37,30 @@ class Admin extends Module
         }
     }
 
-    public function defaultAction()
+    public function run()
     {
-        $action = explode('_', $this->getRequest()->getOrigAction());
-        if (count($action) == 2) {
-            $module = false;
-            try {
-                $module = $this->getModule($action[0]);
-            } catch (Exception $e) {
-                //module not found
-            }
-            if ($module) {
-                $invoke = 'admin' . ucfirst($action[1]);
-                if (method_exists($module, $invoke)) {
-                    $this->getRequest()->setAction($action[1]);
-                    $module->$invoke();
-                    return;
+        $this->_preDispatch();
+        $action = App::getRequest()->getAction();
+        if ($action) {
+            $action .= 'Action';
+            if (method_exists($this, $action)) {
+                $this->$action();
+            } else {
+                $action = explode('_', $this->getRequest()->getOrigAction(), 2);
+                if (count($action) == 1) $action[1] = 'default';
+                $module = $this->getModuleForRoute($action[0]);
+                if ($module) {
+                    $invoke = 'admin' . ucfirst($action[0]) . ucfirst($action[1]);
+                    if (method_exists($module, $invoke)) {
+                        $this->getRequest()->setAction($action[1]);
+                        $module->$invoke();
+                    }else{
+                        $this->_defaultNoRouteAction();
+                    }
                 }
             }
-            $this->_defaultNoRouteAction();
         }
-        $this->forward('index');
+        $this->_postDispatch();
     }
 
     public function restoreAction()

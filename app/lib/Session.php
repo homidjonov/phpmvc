@@ -79,8 +79,8 @@ class Session extends Object
                 $valid &= $sessionData[$key] == $validationData[$key];
             }
             if (!$valid) {
-                $this->clear()->renew();
-                return $this->_init();
+                $this->clear()->renew()->_init();
+                $this->addError('Session Renewed');
             }
         }
         return $this;
@@ -128,13 +128,11 @@ class Session extends Object
 
     public function isLoggedIn()
     {
-        return $this->_isLoggedIn;
+        return $this->getUser() != null;
     }
 
     public function setIsLoggedIn(Model $model)
     {
-
-        $this->_isLoggedIn = true;
         $this->setData('user', $model->unsetData('password'));
     }
 

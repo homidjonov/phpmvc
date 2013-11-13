@@ -15,6 +15,9 @@ class Module
     protected $_renderers;
     protected $_observers;
     protected $_adminMenu;
+
+    protected $_adminActions = array();
+
     protected $_predefinedFunctions = array();
 
     protected static $_modules;
@@ -55,7 +58,6 @@ class Module
             self::$_predefinedFunctionsArray[$function] = $this->getName();
         }
 
-        if (App::isAdmin()) $this->_initAdmin();
 
         if (App::getIsDeveloperMode()) {
             $installer = get_class($this) . 'Installer';
@@ -65,22 +67,23 @@ class Module
             }
         }
 
+        if (App::isAdmin()) $this->_initAdmin();
         $this->_init();
     }
 
     protected function getAdminMenu()
     {
         $order = array();
-        foreach (self::$_adminMenuItems as $action => $item) {
-            $order[$action] = $item['order'];
+        foreach (self::$_adminMenuItems as $module => $item) {
+            $order[$module] = $item['order'];
         }
         array_multisort($order, SORT_ASC, self::$_adminMenuItems);
         return self::$_adminMenuItems;
     }
 
-    protected function addAdminMenu($action, $title, $order = 100)
+    protected function addAdminMenu($action, $title, $child = array(), $order = 100,$iconClass)
     {
-        self::$_adminMenuItems[$this->getName() . '_' . $action] = array('action' => $action, 'title' => $title, 'order' => $order);
+        self::$_adminMenuItems[$this->getName()] = array('action' => $action, 'title' => $title, 'order' => $order, 'child' => $child,'icon'=>$iconClass);
         return $this;
     }
 
@@ -91,7 +94,7 @@ class Module
 
     protected function _initAdmin()
     {
-
+        //App::log(get_class_methods($this));
     }
 
     protected function getTitle()
@@ -164,11 +167,6 @@ class Module
         return App::getRequest();
     }
 
-    /**
-     * @param $name
-     * @return Module
-     */
-
     public function getModule($name)
     {
         if (isset(self::$_modules[$name])) {
@@ -195,11 +193,9 @@ class Module
 
     protected function _preDispatch()
     {
-        //multiple route handle
         if ($this->isMultipleRoute() && App::getRequest()->getModule() != $this->getName()) {
             $action = App::getRequest()->getModule() . ucfirst(App::getRequest()->getAction());
             App::getRequest()->setAction($action);
-
         }
     }
 
@@ -304,11 +300,13 @@ class Module
      */
     public function getPart($part, $alias = false)
     {
+
         if (!$alias) $alias = $part;
         $part   = str_replace('/', DS, $part);
         $module = $this->getName();
         $action = App::getRequest()->getAction();
-
+        // App::log($module);
+        //       App::log($action);
         if (isset(self::$_partsContent[$part])) {
             $data = self::$_partsContent[$part];
             App::runObserver('part_before_output', array('part' => $part, 'alias' => $alias, 'data' => &$data));
@@ -324,13 +322,17 @@ class Module
             $this->getCurrentTemplateDir() . $module . DS . $part,
             $this->getCurrentTemplateDir() . 'page' . DS . $part,
             $this->getCurrentTemplateDir() . $part,
-            App::getBaseTemplateDir() . $module . DS . $action . DS . $part,
-            App::getBaseTemplateDir() . $module . DS . 'default' . DS . $part,
-            App::getBaseTemplateDir() . $module . DS . $part,
-            App::getBaseTemplateDir() . 'page' . DS . $part,
-            App::getBaseTemplateDir() . $part,
         );
-        $files   = array_unique($files);
+
+        if (!App::isAdmin()) {
+            $files[] = App::getBaseTemplateDir() . $module . DS . $action . DS . $part;
+            $files[] = App::getBaseTemplateDir() . $module . DS . 'default' . DS . $part;
+            $files[] = App::getBaseTemplateDir() . $module . DS . $part;
+            $files[] = App::getBaseTemplateDir() . 'page' . DS . $part;
+            $files[] = App::getBaseTemplateDir() . $part;
+        }
+
+        $files = array_unique($files);
         //App::log($files);
         foreach ($files as $file) {
             $file = $file . '.phtml';
