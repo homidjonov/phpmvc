@@ -81,9 +81,9 @@ class Module
         return self::$_adminMenuItems;
     }
 
-    protected function addAdminMenu($action, $title, $child = array(), $order = 100,$iconClass)
+    protected function addAdminMenu($action, $title, $child = array(), $order = 100, $iconClass)
     {
-        self::$_adminMenuItems[$this->getName()] = array('action' => $action, 'title' => $title, 'order' => $order, 'child' => $child,'icon'=>$iconClass);
+        self::$_adminMenuItems[$this->getName()] = array('action' => $action, 'title' => $title, 'order' => $order, 'child' => $child, 'icon' => $iconClass);
         return $this;
     }
 
@@ -241,7 +241,7 @@ class Module
         $this->getPart('template');
         $content = ob_get_contents();
         ob_end_clean();
-        App::runObserver('module_after_render', array('module' => $this));
+        App::runObserver('module_after_render', array('module' => $this, 'content' => $content));
         echo $content;
     }
 

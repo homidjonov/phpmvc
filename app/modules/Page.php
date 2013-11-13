@@ -9,7 +9,6 @@ class Page extends Module
 {
     //multiple routing
     protected $_route = 'page:category:tag';
-    protected $_objectData;
     protected $_predefinedFunctions = array('getStaticBlock');
 
 
@@ -207,7 +206,7 @@ class PageModel extends Model
     public function getCreatedFormatted()
     {
         $date = $this->getData('created');
-        return date(MD_PAGE_DARE_FORMAT, strtotime($date));
+        return date(MD_PAGE_DATE_FORMAT, strtotime($date));
     }
 
     public function getImageUrl()

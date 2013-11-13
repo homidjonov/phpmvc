@@ -44,7 +44,7 @@ class Cache extends Module
     {
         if ($this->canCacheThisRequest()) {
             try {
-                $content = $params['content'];
+                $content = $params->getData('content');
                 file_put_contents($this->getFileNameForRequest(), $content);
             } catch (Exception $e) {
                 if ($e->getCode() == 2) {

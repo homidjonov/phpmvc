@@ -40,13 +40,13 @@ define('APP_DB_DATABASE', 'blog1');
 
 //administrator configs
 define('APP_ADMIN_ROUTE', 'adminbox');
-define('APP_CACHE_ENABLED', 0);
+define('APP_CACHE_ENABLED', 1);
 
 //modules configs
 define('MD_PAGE_POST_LIMIT', 5);
 
-//define('MD_PAGE_DARE_FORMAT', 'Y-m-d');
-define('MD_PAGE_DARE_FORMAT', 'd M, Y');
+//define('MD_PAGE_DATE_FORMAT', 'Y-m-d');
+define('MD_PAGE_DATE_FORMAT', 'd M, Y');
 
 
 //Config
