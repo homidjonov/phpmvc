@@ -52,9 +52,9 @@ class Admin extends Module
                 if ($module) {
                     $invoke = 'admin' . ucfirst($action[0]) . ucfirst($action[1]);
                     if (method_exists($module, $invoke)) {
-                        $this->getRequest()->setAction($action[1]);
+                        $this->getRequest()->setAction($action[0] . $action[1]);
                         $module->$invoke();
-                    }else{
+                    } else {
                         $this->_defaultNoRouteAction();
                     }
                 }
@@ -92,6 +92,7 @@ class Admin extends Module
             $password = $this->getRequest()->getPost('password');
             try {
                 if ($this->getSession()->authenticate($email, $password)) {
+                    $this->getSession()->addSuccess($this->__("Login Successful"));
                     $this->getRequest()->redirect($this->getRequest()->getBeforeAuthUrl());
                 }
             } catch (Exception $e) {
@@ -137,7 +138,7 @@ class Admin extends Module
             'class'   => 'btn btn-primary',
             'style'   => 'margin-right:10px',
             'before'  => '<div>',
-            'after'   => "<a href='$login' class='text-muted' style='margin-left: 10px'>" . $this->__("Back to Login") . "<i class='fa fa-key'></i></a> <a href='/' class='text-muted' style='margin-left: 10px'>" . $this->__("Back to Home") . " <i class='fa fa-home'></i></a></div>",
+            'after'   => "<a href='$login' class='text-muted' style='margin-left: 10px'>" . $this->__("Back to Login") . "<i class='fa fa-key'></i></a> </div>",
         ));
 
 
@@ -170,7 +171,7 @@ class Admin extends Module
             'class'   => 'btn btn-primary',
             'style'   => 'margin-right:10px',
             'before'  => '<div>',
-            'after'   => "<a href='$forgot' class='text-muted' style='margin-left: 10px'>" . $this->__("Forgot Password") . "<i class='fa fa-question-circle'></i></a> <a href='/' class='text-muted' style='margin-left: 10px'>" . $this->__("Back to Home") . "<i class='fa fa-home'></i></a></div>",
+            'after'   => "<a href='$forgot' class='text-muted' style='margin-left: 10px'>" . $this->__("Forgot Password") . "<i class='fa fa-question-circle'></i></a> </div>",
         ));
 
 

@@ -1,0 +1,31 @@
+<?php
+/**
+ * @var $this Module
+ */
+
+$menus = $this->getAdminMenu();
+
+?>
+<?php if ($actions = $this->getActions()): ?>
+    <div class="panel panel-warning">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <i class="fa <?= $actions['icon'] ?>"></i> <?=$actions['title']?>
+            </h3>
+        </div>
+
+        <div class="panel-body">
+            <ul class="nav">
+                <?php foreach ($actions['child'] as $action => $title): ?>
+                    <li action="<?= $action ?>">
+                        <a href="<?= $this->getAdminUrl($action) ?>">
+                            <i class="fa"></i> <?= $this->__($title) ?>
+                        </a>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+
+    </div>
+<?php endif; ?>
+

@@ -28,6 +28,7 @@ class App
         'session'    => 'Session.php',
         'form'       => 'Form.php',
         'pagination' => 'Pagination.php',
+        'grid'       => 'Grid.php',
     );
 
     public function __construct()
@@ -157,7 +158,8 @@ class App
             }
         } catch (Exception $e) {
             if (self::getIsDeveloperMode()) {
-                echo "<pre>" . $e->getMessage();
+                echo "<pre>";
+                print_r($e->getTraceAsString());
             } else {
                 echo "Something is wrong!  :)"; //Default error page
             }
@@ -270,5 +272,30 @@ class App
         }
 
         return self::$_singletons[$className];
+    }
+
+    public static function getUrl($link, $params = array())
+    {
+        $url = self::getRequest()->getBaseUrl() . trim($link, '/');
+        if (count($params)) {
+            $params = http_build_query($params);
+            $url .= '?' . $params;
+        }
+        return $url;
+    }
+
+    public static function getAdminUrl($link, $params = array())
+    {
+        return self::getUrl(self::getAdminRoute() . "/" . $link, $params);
+    }
+
+    public static function formatDate($date)
+    {
+        return date(CONFIG_DATE_FORMAT, strtotime($date));
+    }
+
+    public static function formatDateTime($date)
+    {
+        return date(CONFIG_DATETIME_FORMAT, strtotime($date));
     }
 }

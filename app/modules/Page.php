@@ -133,15 +133,55 @@ class Page extends Module
 
 
     /** --------------ADMIN ACTIONS-------------- */
-    public function adminPageDefault()
+    public function adminPageIndex()
     {
-        $this->_title = 'Pages';
+        $this->_title = 'Content Management';
+        $page         = new PageModel();
+        $table        = new Grid();
+        $table
+            ->setPanel('Content Management ')
+            ->setModel($page)
+            ->addColumn('id', array(
+                'title' => '#',
+            ))
+            ->addColumn('title')
+            ->addColumn('created', array(
+                'type' => Grid::TYPE_DATETIME
+            ))
+            ->addColumn('type', array(
+                'type'    => Grid::TYPE_OPTION,
+                'options' => $page->getTypeOptions(),
+            ))
+            ->addColumn('edit', array(
+                'type'   => Grid::TYPE_ACTION,
+                'action' => 'getAdminEditLink'
+            ));
+        $this->setPart('content', $table);
         $this->render();
     }
 
-    public function adminPageIndex()
+    public function adminCategoryIndex()
     {
-        $this->_title = 'Page Management';
+        $this->_title = 'Content Management';
+        $model        = new CategoryModel();
+        $table        = new Grid();
+        $table
+            ->setPanel('Category Management ')
+            ->setModel($model)
+            ->addColumn('id', array(
+                'title' => '#',
+            ))
+            ->addColumn('title')
+            ->addColumn('url')
+            ->addColumn('status', array(
+                'type'    => Grid::TYPE_OPTION,
+                'options' => $model->getStatusOptions(),
+            ))
+            ->addColumn('edit', array(
+                'type'   => Grid::TYPE_ACTION,
+                'action' => 'getAdminEditLink'
+            ));
+        $this->setPart('content', $table);
         $this->render();
     }
 
@@ -157,11 +197,6 @@ class Page extends Module
         $this->render();
     }
 
-    public function adminCategoryIndex()
-    {
-        $this->_title = 'Category Management';
-        $this->render();
-    }
 
     public function adminTagAdd()
     {
@@ -190,13 +225,19 @@ class PageModel extends Model
 {
     protected $_table = 'pages';
 
-    const STATUS_ENABLED  = 1;
-    const STATUS_DISABLED = 0;
-
     const TYPE_POST   = 'post';
     const TYPE_PAGE   = 'page';
     const TYPE_STATIC = 'static';
 
+
+    static public function getTypeOptions()
+    {
+        return array(
+            self::TYPE_PAGE   => 'Page',
+            self::TYPE_POST   => 'Post',
+            self::TYPE_STATIC => 'Static',
+        );
+    }
 
     public function loadStaticBlock($url)
     {
@@ -242,6 +283,11 @@ class PageModel extends Model
         return $this->getData('status') == self::STATUS_ENABLED;
     }
 
+    public function getAdminEditLink()
+    {
+        return sprintf("<a href='%s'>%s</a>", App::getAdminUrl('page_edit', array($this->getIdFieldName() => $this->getId())), 'Edit');
+    }
+
 }
 
 
@@ -272,6 +318,11 @@ class CategoryModel extends Model
             WHERE p.status=1";
             return $this->getCount($query);
         }
+    }
+
+    public function getAdminEditLink()
+    {
+        return sprintf("<a href='%s'>%s</a>", App::getAdminUrl('category_edit', array($this->getIdFieldName() => $this->getId())), 'Edit');
     }
 }
 

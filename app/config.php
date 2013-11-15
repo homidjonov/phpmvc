@@ -51,3 +51,5 @@ define('MD_PAGE_DATE_FORMAT', 'd M, Y');
 
 //Config
 define('CONFIG_COOKIE_LIFETIME', 1800);
+define('CONFIG_DATE_FORMAT', 'd M, Y');
+define('CONFIG_DATETIME_FORMAT', 'd M, Y h:m');

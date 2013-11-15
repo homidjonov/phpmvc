@@ -7,57 +7,57 @@ $menus = $this->getAdminMenu();
 
 ?>
 
-<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
     <div class="navbar-header">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="<?= $this->getAdminUrl('index') ?>" style="width: 225px"><i
-                class="fa fa-dashboard"></i> <?= $this->__('Admin Dashboard') ?></a>
+        <button type="button" class="navbar-toggle" data-toggle="collapse"
+                data-target="#bs-example-navbar-collapse-1"><span class="sr-only">Toggle navigation</span><span
+                class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button>
+
+        <a class="navbar-brand" href="<?= $this->getAdminUrl('index') ?>"><i
+                class="fa fa-dashboard"></i> <?= $this->__('Dashboard') ?></a>
     </div>
 
-    <div class="collapse navbar-collapse navbar-ex1-collapse">
-        <!-- <ul class="nav navbar-nav side-nav">
-            <?php /*foreach ($menus as $action => $menuItem): */?>
-                <li class="<?/*=$action*/?>">
-                    <a href="<?/*= $this->getAdminUrl($action) */?>">
-                        <i class="fa fa-<?/*= $action */?>"></i> <?/*= $this->__($menuItem['title']) */?>
-                    </a>
-                </li>
-            <?php /*endforeach; */?>
-        </ul>-->
-
-        <ul class="nav navbar-nav navbar-left navbar-user">
-            <?php
-            $actions = $this->getAdminMenu();
-            $rAction = App::getRequest()->getOrigAction();
-            ?>
-            <?php foreach ($actions as $group => $menu): ?>
-                <li class="<?= ($group == $this->getName()) ? 'active' : '' ?> dropdown" group="<?= $group ?>">
-                    <?php if (count($menu['child'])) { ?>
-                        <a class="dropdown-toggle" data-toggle="dropdown"
-                           href="<?= $this->getAdminUrl($menu['action']) ?>"><i class="fa <?=$menu['icon']?>"></i>
-                            <?= $this->__($menu['title']) ?><b
-                                class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            <?php foreach ($menu['child'] as $action => $title): ?>
-                                <li action="<?= $action ?>">
-                                    <a href="<?= $this->getAdminUrl($action) ?>">
-                                        <i class="fa"></i> <?= $this->__($title) ?>
-                                    </a>
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
-                    <?php } else { ?>
-                        <a href="<?= $this->getAdminUrl($menu['action']) ?>"><i class="fa <?=$menu['icon']?>"></i> <?= $this->__($menu['title']) ?></a>
-                    <?php } ?>
-                </li>
-            <?php endforeach; ?>
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+            <li>
+                <a href="<?= $this->getUrl('/') ?>"><i class="fa fa-home"></i> Home</a>
+            </li>
+            <?php if (AdminSession::getInstance()->getUser()): ?>
+                <?php
+                $actions = $this->getAdminMenu();
+                $rAction = App::getRequest()->getOrigAction();
+                ?>
+                <?php foreach ($actions as $group => $menu): ?>
+                    <li class="<?= ($group == $this->getName()) ? 'active' : '' ?> dropdown" group="<?= $group ?>">
+                        <?php if (count($menu['child'])) { ?>
+                            <a class="dropdown-toggle" data-toggle="dropdown"
+                               href="<?= $this->getAdminUrl($menu['action']) ?>"><i class="fa <?= $menu['icon'] ?>"></i>
+                                <?= $this->__($menu['title']) ?><b
+                                    class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <?php foreach ($menu['child'] as $action => $title): ?>
+                                    <li action="<?= $action ?>">
+                                        <a href="<?= $this->getAdminUrl($action) ?>">
+                                            <i class="fa"></i> <?= $this->__($title) ?>
+                                        </a>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php } else { ?>
+                            <a href="<?= $this->getAdminUrl($menu['action']) ?>"><i
+                                    class="fa <?= $menu['icon'] ?>"></i> <?= $this->__($menu['title']) ?></a>
+                        <?php } ?>
+                    </li>
+                <?php endforeach; ?>
+            <?php endif ?>
         </ul>
-        <ul class="nav navbar-nav navbar-right navbar-user">
+
+        <ul class="nav navbar-nav navbar-right">
+            <form class="navbar-form navbar-left" role="search">
+                <div class="form-group">
+                    <input class="form-control" type="text">
+                </div>
+            </form>
             <?php if (App::canDebugParts()): ?>
                 <li>
                     <a href="#" onclick="switchPartDebug()">
@@ -65,19 +65,22 @@ $menus = $this->getAdminMenu();
                     </a>
                 </li>
             <?php endif ?>
-            <li class="dropdown user-dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> John Smith
-                    <b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                    <li><a href="#"><i class="fa fa-user"></i> Profile</a></li>
-                    <li><a href="#"><i class="fa fa-envelope"></i> Inbox <span class="badge">7</span></a></li>
-                    <li><a href="#"><i class="fa fa-gear"></i> Settings</a></li>
-                    <li class="divider"></li>
-                    <li><a href="<?= $this->getAdminUrl('logout') ?>"><i
-                                class="fa fa-power-off"></i> <?= $this->__('Log Out') ?></a></li>
-                </ul>
-            </li>
+            <?php if ($user = AdminSession::getInstance()->getUser()): ?>
+                <li class="dropdown user-dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> <?=$user->getUsername()?>
+                        <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#"><i class="fa fa-user"></i> Profile</a></li>
+                        <li><a href="#"><i class="fa fa-envelope"></i> Inbox <span class="badge">7</span></a></li>
+                        <li><a href="#"><i class="fa fa-gear"></i> Settings</a></li>
+                        <li class="divider"></li>
+                        <li><a href="<?= $this->getAdminUrl('logout') ?>"><i
+                                    class="fa fa-power-off"></i> <?= $this->__('Log Out') ?></a></li>
+                    </ul>
+                </li>
+            <?php endif ?>
         </ul>
     </div>
-    <!-- /.navbar-collapse -->
+
 </nav>
+

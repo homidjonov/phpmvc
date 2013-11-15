@@ -31,6 +31,9 @@ class Pagination
 
     public function setItemsCount($count)
     {
+        if ($count === null) {
+            throw new Exception("Unknown count");
+        }
         $this->_itemsCount = $count;
         $this->_pages      = ceil($this->_itemsCount / $this->_limit);
         if ($this->_page > $this->_pages || $this->_page < 1) {
@@ -64,6 +67,12 @@ class Pagination
     public function getPageLimit()
     {
         return $this->_limit;
+    }
+
+    public function setPageLimit($limit)
+    {
+        $this->_limit = $limit;
+        return $this;
     }
 
     public function render()

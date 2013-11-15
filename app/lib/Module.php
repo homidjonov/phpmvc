@@ -81,6 +81,15 @@ class Module
         return self::$_adminMenuItems;
     }
 
+    public function getActions()
+    {
+
+        if (isset(self::$_adminMenuItems[$this->getName()])) {
+            return self::$_adminMenuItems[$this->getName()];
+        }
+        return false;
+    }
+
     protected function addAdminMenu($action, $title, $child = array(), $order = 100, $iconClass)
     {
         self::$_adminMenuItems[$this->getName()] = array('action' => $action, 'title' => $title, 'order' => $order, 'child' => $child, 'icon' => $iconClass);
@@ -435,14 +444,14 @@ class Module
         return App::getRequest()->getBaseUrl() . $part;
     }
 
-    public function getUrl($link)
+    public function getUrl($link, $params = array())
     {
-        return $this->getRequest()->getBaseUrl() . trim($link, '/');
+        return App::getUrl($link, $params);
     }
 
-    public function getAdminUrl($link)
+    public function getAdminUrl($link, $params = array())
     {
-        return $this->getUrl(APP_ADMIN_ROUTE . "/" . $link);
+        return App::getAdminUrl($link, $params);
     }
 
     protected $_bodyClassName;

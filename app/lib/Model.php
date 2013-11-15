@@ -12,6 +12,17 @@ class Model extends Object
     protected static $_instance;
     protected $_id;
 
+    const STATUS_ENABLED  = 1;
+    const STATUS_DISABLED = 0;
+
+    static public function getStatusOptions()
+    {
+        return array(
+            self::STATUS_ENABLED  => 'Enable',
+            self::STATUS_DISABLED => 'Disable',
+        );
+    }
+
     public static function getInstance()
     {
         if (self::$_instance == null) {
@@ -56,6 +67,11 @@ class Model extends Object
         }
     }
 
+    public function getName()
+    {
+        return get_class($this);
+    }
+
     protected function installVersion1()
     {
         $query = "CREATE TABLE IF NOT EXISTS `{$this->_table}` (
@@ -97,13 +113,16 @@ class Model extends Object
     }
 
 
-    protected function getCount($query)
+    public function getCount($query = false, $where = false)
     {
+        if (!$query) {
+            $query = "SELECT count(1) FROM {$this->_table} ";
+        }
         $result = $this->getConnection()->query($query);
         if ($row = $result->fetch()) {
             return (int)$row[0];
         }
-        return 0;
+        return null;
     }
 
 
@@ -116,14 +135,25 @@ class Model extends Object
         return $data;
     }
 
-    protected function loadModelCollection($query, $model = false, Pagination $p = null)
+    public function getCollection(Pagination $p = null, $where = false)
+    {
+        return $this->loadModelCollection(false, false, $p, $where);
+    }
+
+    protected function loadModelCollection($query = false, $model = false, Pagination $p = null, $where = false)
     {
         $collection = array();
         if (!$model) {
             $model = get_class($this);
         }
+        if (!$query) {
+            $query = "SELECT * FROM {$this->_table} ";
+        }
+        if (is_array($where)) {
+            $query .= $this->renderWhere($where);
+        }
         if ($p instanceof Pagination) {
-            $query .= sprintf(" LIMIT %s, %s;", $p->getCurrentPage() - 1, $p->getPageLimit());
+            $query .= sprintf(" LIMIT %s, %s;", ($p->getCurrentPage() - 1) * $p->getPageLimit(), $p->getPageLimit());
         }
         $result = $this->getConnection()->query($query);
         while ($row = $result->fetch()) {
@@ -132,6 +162,13 @@ class Model extends Object
             $collection[] = $model;
         }
         return $collection;
+    }
+
+    protected function renderWhere(array $where)
+    {
+        foreach ($where as $item) {
+
+        }
     }
 
     public function whereQuery($query, array $where)
@@ -181,4 +218,8 @@ class Model extends Object
         return Module::__($word);
     }
 
+    public function getAdminEditLink()
+    {
+        return sprintf("<a href='%s'>%s</a>", App::getAdminUrl('page_edit', array($this->getIdFieldName() => $this->getId())), 'Edit');
+    }
 }
