@@ -17,9 +17,13 @@
             <?php $this->getPart('navigation'); ?>
         </div>
     </div>
-    <div class="row clearfix">
-        <?php $this->getPart('messages') ?>
 
+    <div class="row clearfix">
+        <div class="col-md-12 column">
+            <?php $this->getPart('messages') ?>
+        </div>
+    </div>
+    <div class="row clearfix">
         <div class="col-md-3 col-lg-2 column">
             <div class="bs-sidebar affix">
                 <?php $this->getPart('actions'); ?>

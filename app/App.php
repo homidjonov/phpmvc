@@ -159,6 +159,8 @@ class App
         } catch (Exception $e) {
             if (self::getIsDeveloperMode()) {
                 echo "<pre>";
+                print_r($e->getMessage());
+                echo "\n";
                 print_r($e->getTraceAsString());
             } else {
                 echo "Something is wrong!  :)"; //Default error page

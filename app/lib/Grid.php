@@ -90,9 +90,13 @@ class Grid
             }
             if (!$this->_pagination) {
                 $pagination        = new Pagination();
-                $this->_pagination = $pagination->setPageLimit($this->_pageLimit)->setItemsCount($this->_model->getCount());
+                $this->_pagination = $pagination->setPageLimit(App::getRequest()->getParam('limit', $this->_pageLimit))->setItemsCount($this->_model->getCount());
             }
-            $this->_collection = $this->_model->getCollection($this->_pagination);
+            $order = null;
+            foreach ($this->_columns as $field => $column) {
+                if (isset($column['order'])) $order[$field] = $column['order'];
+            }
+            $this->_collection = $this->_model->getCollection($this->_pagination, false, $order);
         }
         return $this;
     }
@@ -130,11 +134,22 @@ class Grid
             $html = "<thead><tr>\n%s\n</tr></thead>";
             $cols = array();
             foreach ($this->_columns as $column) {
-                $cols[] = "<th>{$column['title']}</th>";
+                $css    = $this->getColStyle($column);
+                $cols[] = "<th $css>{$column['title']}</th>";
             }
             return sprintf($html, implode("\n", $cols));
         }
         return '';
+    }
+
+    protected function getColStyle($column)
+    {
+        $styles = array('width', 'height');
+        $css    = "";
+        foreach ($styles as $style) {
+            if (isset($column[$style])) $css .= "$style:$column[$style];";
+        }
+        return " style='$css'";
     }
 
     protected function renderRows()

@@ -109,9 +109,8 @@ class Model extends Object
 
     protected function query($query)
     {
-        return $this->getConnection()->query($query);
+        return App::getDb()->query($query);
     }
-
 
     public function getCount($query = false, $where = false)
     {
@@ -135,12 +134,12 @@ class Model extends Object
         return $data;
     }
 
-    public function getCollection(Pagination $p = null, $where = false)
+    public function getCollection(Pagination $p = null, $where = null, $order = null)
     {
-        return $this->loadModelCollection(false, false, $p, $where);
+        return $this->loadModelCollection(false, false, $p, $where, $order);
     }
 
-    protected function loadModelCollection($query = false, $model = false, Pagination $p = null, $where = false)
+    protected function loadModelCollection($query = false, $model = false, Pagination $p = null, $where = false, $order = false)
     {
         $collection = array();
         if (!$model) {
@@ -149,13 +148,16 @@ class Model extends Object
         if (!$query) {
             $query = "SELECT * FROM {$this->_table} ";
         }
-        if (is_array($where)) {
+        if (is_array($where) && count($where)) {
             $query .= $this->renderWhere($where);
+        }
+        if (is_array($order) && count($order)) {
+            $query .= $this->renderOrder($order);
         }
         if ($p instanceof Pagination) {
             $query .= sprintf(" LIMIT %s, %s;", ($p->getCurrentPage() - 1) * $p->getPageLimit(), $p->getPageLimit());
         }
-        $result = $this->getConnection()->query($query);
+        $result = $this->query($query);
         while ($row = $result->fetch()) {
             $model = new $model();
             $model->assignData($row);
@@ -169,6 +171,15 @@ class Model extends Object
         foreach ($where as $item) {
 
         }
+    }
+
+    protected function renderOrder(array $order)
+    {
+        $data = array();
+        foreach ($order as $col => $val) {
+            $data[] = "$col $val";
+        }
+        return sprintf("ORDER BY %s", implode(', ', $data));
     }
 
     public function whereQuery($query, array $where)

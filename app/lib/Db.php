@@ -54,7 +54,11 @@ class Db
 
     public function query($query)
     {
-        return $this->_pdo->query($query);
+        $res = $this->_pdo->query($query);
+        if (!$res) {
+            throw new Exception("Error in query: $query", $this->_pdo->errorCode());
+        }
+        return $res;
     }
 
 

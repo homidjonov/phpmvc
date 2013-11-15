@@ -8,15 +8,15 @@
 class Page extends Module
 {
     //multiple routing
-    protected $_route = 'page:category:tag';
+    protected $_route = 'page:category:tag:content';
     protected $_predefinedFunctions = array('getStaticBlock');
 
 
     protected function _initAdmin()
     {
         $this->addAdminMenu('page_index', 'Content', array(
-            'page_index'     => 'Pages',
-            'page_add'       => 'New Page',
+            'content_index'  => 'Contents',
+            'content_add'    => 'New Content',
             'category_index' => 'Categories',
             'category_add'   => 'New Category',
             'tag_index'      => 'Tags',
@@ -133,7 +133,7 @@ class Page extends Module
 
 
     /** --------------ADMIN ACTIONS-------------- */
-    public function adminPageIndex()
+    public function adminContentIndex()
     {
         $this->_title = 'Content Management';
         $page         = new PageModel();
@@ -142,15 +142,22 @@ class Page extends Module
             ->setPanel('Content Management ')
             ->setModel($page)
             ->addColumn('id', array(
-                'title' => '#',
+                'title' => 'ID',
+                'width' => '40px'
             ))
             ->addColumn('title')
-            ->addColumn('created', array(
-                'type' => Grid::TYPE_DATETIME
+            ->addColumn('views')
+            ->addColumn('status', array(
+                'type'    => Grid::TYPE_OPTION,
+                'options' => $page->getStatusOptions(),
             ))
             ->addColumn('type', array(
                 'type'    => Grid::TYPE_OPTION,
                 'options' => $page->getTypeOptions(),
+            ))
+            ->addColumn('created', array(
+                'type'  => Grid::TYPE_DATETIME,
+                'order' => 'DESC'
             ))
             ->addColumn('edit', array(
                 'type'   => Grid::TYPE_ACTION,
@@ -169,7 +176,8 @@ class Page extends Module
             ->setPanel('Category Management ')
             ->setModel($model)
             ->addColumn('id', array(
-                'title' => '#',
+                'title' => 'ID',
+                'width' => '40px'
             ))
             ->addColumn('title')
             ->addColumn('url')
@@ -229,6 +237,13 @@ class PageModel extends Model
     const TYPE_PAGE   = 'page';
     const TYPE_STATIC = 'static';
 
+    static public function getStatusOptions()
+    {
+        return array(
+            self::STATUS_ENABLED  => 'Published',
+            self::STATUS_DISABLED => 'Draft',
+        );
+    }
 
     static public function getTypeOptions()
     {
@@ -285,7 +300,7 @@ class PageModel extends Model
 
     public function getAdminEditLink()
     {
-        return sprintf("<a href='%s'>%s</a>", App::getAdminUrl('page_edit', array($this->getIdFieldName() => $this->getId())), 'Edit');
+        return sprintf("<a href='%s'>%s</a>", App::getAdminUrl($this->getData('type') . '_edit', array($this->getIdFieldName() => $this->getId())), 'Edit');
     }
 
 }

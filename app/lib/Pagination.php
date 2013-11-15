@@ -106,21 +106,21 @@ class Pagination
             $link    = ($curPage > 1) ? $this->_url . "?page=$prev" : '#';
             $items[] = "<{$this->_itemWrapper} class='$class'><a href='$link'><i class='fa fa-angle-left'></i> </a></{$this->_itemWrapper}>";
 
-            /* if ($start > 1) {
+             if ($start > 1) {
                  $items[] = "<{$this->_itemWrapper}><a href='{$this->_url}?page=1'>1</a></{$this->_itemWrapper}>";
              }
              if ($start == 3) {
                  $items[] = "<{$this->_itemWrapper}><a href='{$this->_url}?page=2'>2</a></{$this->_itemWrapper}>";
              } elseif ($start > 3) {
                  $items[] = "<{$this->_itemWrapper} class='{$this->_itemWrapperDisableClass}'><a href='#'>...</a></{$this->_itemWrapper}>";
-             }*/
+             }
 
             for ($i = $start; $i <= $end; $i++) {
                 $class   = ($curPage == $i) ? $this->_itemWrapperActiveClass : '';
                 $items[] = "<{$this->_itemWrapper} class='$class'><a href='{$this->_url}?page=$i'>$i</a></{$this->_itemWrapper}>";
             }
 
-            /*
+
             if ($pages - $end == 2) {
                 $num     = $pages - 1;
                 $items[] = "<{$this->_itemWrapper}><a href='{$this->_url}?page=$num'>$num</a></{$this->_itemWrapper}>";
@@ -129,8 +129,7 @@ class Pagination
             }
             if ($pages - $end >= 1) {
                 $items[] = "<{$this->_itemWrapper}><a href='{$this->_url}?page=$pages'>$pages</a></{$this->_itemWrapper}>";
-            }*/
-
+            }
             $class   = ($curPage == $pages) ? $this->_itemWrapperDisableClass : '';
             $next    = $curPage + 1;
             $link    = ($curPage < $pages) ? $this->_url . "?page=$next" : '#';

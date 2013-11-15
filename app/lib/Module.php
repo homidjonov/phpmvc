@@ -163,6 +163,9 @@ class Module
 
     protected function getSession()
     {
+        if (App::isAdmin()) {
+            return AdminSession::getInstance();
+        }
         return Session::getInstance();
     }
 
