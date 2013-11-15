@@ -232,9 +232,9 @@ class Module
     }
 
 
-    protected function render($params = false)
+    protected function render($params = array())
     {
-        if (is_array($params)) $this->_params->addData($params);
+        $this->_params->addData($params);
         App::runObserver('module_before_render', array('module' => $this));
         ob_start();
         $this->setBodyClassName(App::getRequest()->getFullActionName());
