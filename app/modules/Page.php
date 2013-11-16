@@ -191,10 +191,46 @@ class Page extends Module
         $this->render();
     }
 
-    public function adminPageAdd()
+    public function adminContentAdd()
     {
         $this->_title = 'Create New Page';
+        $this->setPart('form', $this->getEditForm());
         $this->render();
+    }
+
+    protected function getEditForm()
+    {
+        $form = new Form();
+        $form
+            ->setClass('form-horizontal')
+            ->setElementWrapper('div', 'form-group')
+            ->addTab('tab_2', 'Content')
+            ->addElement('text', 'title', array(
+                'placeholder' => $this->__('Title'),
+                'wrapper'     => '<div class="col-sm-12">%s</div>',
+            ))
+            ->addElement('editor', 'content', array(
+                'wrapper' => '<div class="col-sm-12">%s</div>',
+            ))
+            ->addTab('tab_3', 'Meta Data')
+            ->addElement('editormini', 'intro', array(
+                'label'       => $this->__('Introduction'),
+                'label_class' => 'col-sm-2',
+                'wrapper'     => '<div class="col-sm-10">%s</div>',
+            ))
+            ->addElement('text', 'meta_keywords', array(
+                'label'       => $this->__('Meta Keywords'),
+                'label_class' => 'col-sm-2',
+                'wrapper'     => '<div class="col-sm-10">%s</div>',
+            ))
+            ->addElement('textarea', 'meta_description', array(
+                'label'       => $this->__('Meta Description'),
+                'label_class' => 'col-sm-2',
+                'rows'        => '6',
+                'wrapper'     => '<div class="col-sm-10">%s</div>',
+            ))
+            ->addTab('tab_4', 'Configuration');
+        return $form->expand();
     }
 
     public function adminCategoryAdd()
