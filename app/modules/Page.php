@@ -135,7 +135,7 @@ class Page extends Module
     /** --------------ADMIN ACTIONS-------------- */
     public function adminContentIndex()
     {
-        $this->_title = 'Content Management';
+        $this->_title = 'Category Management';
         $page         = new PageModel();
         $table        = new Grid();
         $table

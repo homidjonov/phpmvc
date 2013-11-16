@@ -11,10 +11,12 @@ class Module
 {
     protected $_route;
     protected $_name;
-    protected $_params;
-    protected $_renderers;
     protected $_observers;
     protected $_adminMenu;
+
+    protected static $_renderers;
+    protected static $_params;
+    protected static $_partsContent;
 
     protected $_adminActions = array();
 
@@ -26,6 +28,7 @@ class Module
 
     private static $_routes = array();
     protected static $_adminMenuItems = array();
+    protected $_bodyClassName;
 
     /**
      * Page title, keywords, description
@@ -34,14 +37,25 @@ class Module
     protected $_title;
     protected $_description;
 
+    protected static $_instance;
+
+    public static function getInstance()
+    {
+        if (self::$_instance == null) {
+            self::$_instance     = new Module();
+            self::$_currentTheme = App::getCurrentTheme();
+        }
+        return self::$_instance;
+    }
 
     public function __construct()
     {
-        if (!$this->_name) {
-            $this->_name = strtolower(get_class($this));
-        }
-        $this->_params    = new Object();
-        $this->_renderers = new Object();
+        $this->_name = strtolower(get_class($this));
+
+        self::$_params       = new Object();
+        self::$_renderers    = new Object();
+        self::$_partsContent = new Object();
+
         if ($this->getName() != 'module') {
             self::$_modules[$this->getName()] = $this;
             if ($this->canRoute()) {
@@ -58,7 +72,6 @@ class Module
             self::$_predefinedFunctionsArray[$function] = $this->getName();
         }
 
-
         if (App::getIsDeveloperMode()) {
             $installer = get_class($this) . 'Installer';
             if (class_exists($installer)) {
@@ -69,6 +82,14 @@ class Module
 
         if (App::isAdmin()) $this->_initAdmin();
         $this->_init();
+    }
+
+    protected function _init()
+    {
+    }
+
+    protected function _initAdmin()
+    {
     }
 
     protected function getAdminMenu()
@@ -83,7 +104,6 @@ class Module
 
     public function getActions()
     {
-
         if (isset(self::$_adminMenuItems[$this->getName()])) {
             return self::$_adminMenuItems[$this->getName()];
         }
@@ -94,16 +114,6 @@ class Module
     {
         self::$_adminMenuItems[$this->getName()] = array('action' => $action, 'title' => $title, 'order' => $order, 'child' => $child, 'icon' => $iconClass);
         return $this;
-    }
-
-    protected function _init()
-    {
-
-    }
-
-    protected function _initAdmin()
-    {
-        //App::log(get_class_methods($this));
     }
 
     protected function getTitle()
@@ -133,25 +143,10 @@ class Module
         return $params['data'];
     }
 
-    protected static $_instance;
-
-
-    public function getName()
-    {
-
-        return $this->_name;
-    }
-
-    public static function getInstance()
-    {
-        if (self::$_instance == null) {
-            self::$_instance     = new Module();
-            self::$_currentTheme = App::getCurrentTheme();
-        }
-        return self::$_instance;
-    }
-
-
+    /**
+     * @param $name
+     * @return Module | Page | Admin
+     */
     public function getModuleForRoute($name)
     {
         if (isset(self::$_routes[$name])) {
@@ -161,6 +156,22 @@ class Module
         return self::$_modules['page'];
     }
 
+    /**
+     * @param $name
+     * @return Module
+     * @throws Exception
+     */
+    public function getModule($name)
+    {
+        if (isset(self::$_modules[$name])) {
+            return self::$_modules[$name];
+        }
+        throw new Exception("Module [$name] not found");
+    }
+
+    /**
+     * @return AdminSession|Session
+     */
     protected function getSession()
     {
         if (App::isAdmin()) {
@@ -179,14 +190,6 @@ class Module
         return App::getRequest();
     }
 
-    public function getModule($name)
-    {
-        if (isset(self::$_modules[$name])) {
-            return self::$_modules[$name];
-        }
-        throw new Exception("Module [$name] not found");
-    }
-
     public function canRoute()
     {
         return $this->_route != null;
@@ -202,6 +205,21 @@ class Module
         return $this->_route;
     }
 
+    public function getName()
+    {
+        return $this->_name;
+    }
+
+    public function getBodyClassName()
+    {
+        return $this->_bodyClassName;
+    }
+
+    public function setBodyClassName($name)
+    {
+        $this->_bodyClassName .= "$name ";
+        return $this;
+    }
 
     protected function _preDispatch()
     {
@@ -209,11 +227,6 @@ class Module
             $action = App::getRequest()->getModule() . ucfirst(App::getRequest()->getAction());
             App::getRequest()->setAction($action);
         }
-    }
-
-    protected function _postDispatch()
-    {
-
     }
 
     public function run()
@@ -237,61 +250,53 @@ class Module
         $this->_postDispatch();
     }
 
+    protected function _postDispatch()
+    {
+
+    }
+
     protected function _defaultNoRouteAction()
     {
         $this->getRequest()->setAction('404');
         $this->render();
     }
 
-
     protected function render($params = array())
     {
-        $this->_params->addData($params);
+        self::$_params->addData($params);
         App::runObserver('module_before_render', array('module' => $this));
         ob_start();
         $this->setBodyClassName(App::getRequest()->getFullActionName());
         $this->getPart('template');
         $content = ob_get_contents();
         ob_end_clean();
-        App::runObserver('module_after_render', array('module' => $this, 'content' => $content));
+        App::runObserver('module_after_render', array('module' => $this, 'content' => &$content));
         echo $content;
     }
 
     public function getParams()
     {
-        return $this->_params;
+        return self::$_params;
     }
 
     public function getParam($key, $default = null)
     {
-        return $this->_params->getData($key, $default);
+        return self::$_params->getData($key, $default);
     }
 
-    protected static $_parts = array();
-    protected static $_partsContent = array();
-
-    /**
-     * @return array
-     * part ni barcha modullar view papkasidan yuklash
-     */
-    public static function getParts()
-    {
-        return self::$_parts;
-    }
-
-    public function getRenderer($alias)
-    {
-        if ($template = $this->_renderers->getData($alias)) {
-            return $template;
-        }
-        return false;
-    }
 
     public function setRenderer($alias, $file)
     {
-        $this->_renderers->setData($alias, $file);
+        self::$_renderers->setData($alias, $file);
         return $this;
     }
+
+    public function setPart($part, $content)
+    {
+        if (is_object($content)) $content = $content->render();
+        self::$_partsContent->setData($part, $content);
+    }
+
 
     /**
      * @param $part
@@ -300,78 +305,78 @@ class Module
      * view papkada har bir modul va action uchun templatelarni boshqarsak bo'ladi
      * design/module/action ko'rinishida joylashtirlgan
      * har bir part (qism html) quyidagi ko'rinishda qidiriladi va yuklanadi
-     * 1. currentDesign/module/action/part
-     * 2. currentDesign/module/part
-     * 3. currentDesign/part
-     * 4. defaultDesign/module/action/part
-     * 5. defaultDesign/module/part
-     * 6. defaultDesign/part
+     * 1. currentDesign/module/action/renderer/part     if has some renderer
+     * 2. currentDesign/module/action/part
+     * 3. currentDesign/module/part
+     * 4. currentDesign/page/part
+     * 5. currentDesign/part
+     * 6. defaultDesign/module/action/renderer/part     if has some renderer
+     * 7. defaultDesign/module/action/part
+     * 8. defaultDesign/module/part
+     * 9. defaultDesign/page/part
+     * 10. defaultDesign/part
      * Kerakli part kamida shu papkalardan birida bo'lishi kerak, birinchi qaysi papkadan
      * topilsa o'sha yuklanadi. (Theme fallback like Magento, but not complicated like it)
-     * TODO part urovenda keshlash
+     * TODO part urovenda keshlash, balki ortiqcha ish kerakmasdir, chunki butun sahifani keshlash borku
      */
     public function getPart($part, $alias = false)
     {
-
-        if (!$alias) $alias = $part;
-        $part   = str_replace('/', DS, $part);
-        $module = $this->getName();
-        $action = App::getRequest()->getAction();
-        // App::log($module);
-        //       App::log($action);
-        if (isset(self::$_partsContent[$part])) {
-            $data = self::$_partsContent[$part];
-            App::runObserver('part_before_output', array('part' => $part, 'alias' => $alias, 'data' => &$data));
-            echo $data;
-            App::runObserver('part_after_output', array('part' => $part, 'alias' => $alias, 'data' => &$data));
-            return;
-        }
-        $default = $this->getRenderer($alias);
-        $files   = array(
-            ($default) ? $this->getCurrentTemplateDir() . $module . DS . $action . DS . $part . DS . $default : $this->getCurrentTemplateDir() . $module . DS . $action . DS . $part,
-            $this->getCurrentTemplateDir() . $module . DS . $action . DS . $part,
-            $this->getCurrentTemplateDir() . $module . DS . 'default' . DS . $part,
-            $this->getCurrentTemplateDir() . $module . DS . $part,
-            $this->getCurrentTemplateDir() . 'page' . DS . $part,
-            $this->getCurrentTemplateDir() . $part,
-        );
-
-        if (!App::isAdmin()) {
-            $files[] = App::getBaseTemplateDir() . $module . DS . $action . DS . $part;
-            $files[] = App::getBaseTemplateDir() . $module . DS . 'default' . DS . $part;
-            $files[] = App::getBaseTemplateDir() . $module . DS . $part;
-            $files[] = App::getBaseTemplateDir() . 'page' . DS . $part;
-            $files[] = App::getBaseTemplateDir() . $part;
-        }
-
-        $files = array_unique($files);
-        //App::log($files);
+        if ($alias == false) $alias = $part;
+        $part = str_replace('/', DS, $part);
+        if ($this->canIncludeAlreadyDefinedParts($part, $alias)) return true;
+        $files = $this->getTemplateFileList($part, $alias);
         foreach ($files as $file) {
             $file = $file . '.phtml';
             if (file_exists($file)) {
-                self::$_parts[] = $file;
                 App::runObserver('part_before_include', array('part' => $part, 'alias' => $alias, 'file' => &$file));
                 if ($file) include $file;
                 App::runObserver('part_after_include', array('part' => $part, 'alias' => $alias, 'file' => &$file));
                 return true;
             }
         }
-        $log = array(
-            'message' => "Template file [$part] not found",
-            'module'  => $module,
-            'action'  => $action,
-        );
-
-        App::log($log);
+        if (App::getIsDeveloperMode()) {
+            $module = $this->getName();
+            $action = App::getRequest()->getAction();
+            throw new Exception("Template file [$part] not found (module: [$module]\t action: [$action]).");
+        }
         return false;
     }
 
-    protected static $_partContents = array();
-
-    public function setPart($part, $content, $isFile = false)
+    protected function canIncludeAlreadyDefinedParts($part, $alias = false)
     {
-        if (is_object($content)) $content = $content->render();
-        self::$_partsContent[$part] = $content;
+        if ($content = self::$_partsContent->getData($part)) {
+            App::runObserver('part_before_output', array('part' => $part, 'alias' => $alias, 'data' => &$content));
+            echo $content;
+            App::runObserver('part_after_output', array('part' => $part, 'alias' => $alias, 'data' => &$content));
+            return true;
+        }
+        return false;
+    }
+
+    protected function getTemplateFileList($part, $alias = false)
+    {
+        $module          = $this->getName();
+        $action          = App::getRequest()->getAction();
+        $dynamicRenderer = self::$_renderers->getData($alias);
+        $currentTemplate = $this->getCurrentTemplateDir();
+
+        $files = array(
+            ($dynamicRenderer) ? $currentTemplate . $module . DS . $action . DS . $part . DS . $dynamicRenderer : $currentTemplate . $module . DS . $action . DS . $part,
+            $currentTemplate . $module . DS . $action . DS . $part,
+            $currentTemplate . $module . DS . $part,
+            $currentTemplate . 'page' . DS . $part,
+            $currentTemplate . $part,
+        );
+
+        if (!App::isAdmin()) {
+            $baseTemplate = App::getBaseTemplateDir();
+            if ($dynamicRenderer) $files[] = $baseTemplate . $module . DS . $action . DS . $part . DS . $dynamicRenderer;
+            $files[] = $baseTemplate . $module . DS . $action . DS . $part;
+            $files[] = $baseTemplate . $module . DS . $part;
+            $files[] = $baseTemplate . 'page' . DS . $part;
+            $files[] = $baseTemplate . $part;
+        }
+        return $files;
     }
 
     public function getWidget($widget)
@@ -457,24 +462,6 @@ class Module
         return App::getAdminUrl($link, $params);
     }
 
-    protected $_bodyClassName;
-
-    public function getBodyClassName()
-    {
-        return $this->_bodyClassName;
-    }
-
-    /**
-     * @param $name
-     * @return Module
-     * Page renderdan oldin bodyga klass berib ketsak yaxshiroq
-     */
-    public function setBodyClassName($name)
-    {
-        $this->_bodyClassName .= "$name ";
-        return $this;
-    }
-
     /**
      * @param $word
      * @return mixed
@@ -526,11 +513,9 @@ class Module
      */
     protected function getModel($modelName = false)
     {
-        if ($modelName && class_exists($modelName)) {
-            return new $modelName();
-        }
-        $modelName = ucfirst($this->getName()) . 'Model';
-        if ($modelName && class_exists($modelName)) {
+        if (!$modelName) $modelName = $this->getName() . 'Model';
+
+        if (class_exists($modelName)) {
             return new $modelName();
         }
         throw new Exception("Model class [$modelName] not found.");
