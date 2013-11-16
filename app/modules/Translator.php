@@ -19,11 +19,11 @@ class Translator extends Module
     /**
      * @param $word
      * @return string
-     * suppose we translate it
+     * suppose we translated it
      */
     public function translate($word)
     {
-        return $word . '*';
+        return "[$word]";
     }
 
 }

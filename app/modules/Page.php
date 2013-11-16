@@ -54,15 +54,13 @@ class Page extends Module
             $page = new PageModel();
             $page->loadByUrl($url);
             if ($page->getId() && $page->isActive()) {
-                return $this->renderPage($page);
+                $this->renderPage($page);
             } else {
-                return $this->forward('category');
+                $this->forward('category');
             }
         } else {
-            return $this->forward('home');
+            $this->forward('home');
         }
-
-        $this->_defaultNoRouteAction();
     }
 
     protected function categoryViewAction()
@@ -74,7 +72,6 @@ class Page extends Module
             } else {
                 $category->loadByUrl($this->getRequest()->getParam('id'));
             }
-
             if ($category->getId()) {
                 return $this->renderCategory($category);
             }
@@ -88,22 +85,23 @@ class Page extends Module
             $category = new CategoryModel();
             $category->loadByUrl($url);
             if ($category->getId()) {
-                if ($category->getRenderer()) $this->setPart('content', $category->render());
                 return $this->renderCategory($category);
             }
         }
         $this->_defaultNoRouteAction();
     }
 
-
+    /**
+     * @param $page PageModel
+     */
     protected function renderPage($page)
     {
         $this->_title       = $page->getData('title');
         $this->_keywords    = $page->getData('meta_keywords');
         $this->_description = $page->getData('meta_description');
-        $this->setBodyClassName($page->getData('type'));
+        $this->setBodyClassName('content_' . $page->getData('type'));
         $this->setRenderer('content', $page->getData('type'));
-        return $this->render(array('page' => $page));
+        $this->render(array('page' => $page));
     }
 
     /**
@@ -116,8 +114,8 @@ class Page extends Module
         $this->_keywords    = $category->getData('meta_keywords');
         $this->_description = $category->getData('meta_description');
         $this->setBodyClassName('category_' . $category->getData('url'));
-        if ($category->getData('renderer')) $this->setRenderer('content', $category->getData('renderer'));
-        return $this->render(array('category' => $category));
+        $this->setRenderer('content', $category->getData('renderer'));
+        $this->render(array('category' => $category));
     }
 
     protected function homeAction()
@@ -256,7 +254,7 @@ class PageModel extends Model
 
     public function loadStaticBlock($url)
     {
-        return $this->loadOneModel(false, array('url' => $url, 'type' => 'static'));
+        return $this->loadOneModel(false, array('url' => $url, 'type' => 'static', 'status' => 1));
     }
 
     public function getCreatedFormatted()

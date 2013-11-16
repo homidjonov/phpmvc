@@ -50,7 +50,7 @@ class Admin extends Module
                 if (count($action) == 1) $action[1] = 'default';
                 $module = $this->getModuleForRoute($action[0]);
                 if ($module) {
-                    $invoke = 'admin' . ucfirst($action[0]) . ucfirst($action[1]);
+                    $invoke = 'admin' . $action[0] . $action[1];
                     if (method_exists($module, $invoke)) {
                         $this->getRequest()->setAction($action[0] . $action[1]);
                         $module->$invoke();
@@ -100,7 +100,6 @@ class Admin extends Module
             }
         }
         $this->setPart('login_form', $form);
-
         $this->render();
     }
 

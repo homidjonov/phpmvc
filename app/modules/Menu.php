@@ -12,21 +12,6 @@ class Menu extends Module
         'getMenuData'
     );
 
-    protected function _init()
-    {
-        $translator = new MenuModel();
-    }
-
-    /**
-     * @param $word
-     * @return string
-     * suppose we translate it
-     */
-    public function translate($word)
-    {
-        return strtoupper($word);
-    }
-
     public function getMenuData($alias = false)
     {
         if ($alias) {
@@ -43,7 +28,6 @@ class MenuModel extends Model
 
     public function getMenuData($group)
     {
-        $data  = array();
         $query = "SELECT * FROM {$this->_table} WHERE group_id IN (SELECT id FROM menu_group WHERE code='$group') ORDER BY `order`";
         $data  = $this->fetchAll($query);
         return $data;

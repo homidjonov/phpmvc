@@ -22,17 +22,12 @@ class Cache extends Module
 
     public function module_before_run($params)
     {
-        $module = $params->getData('module');
-
         if ($this->canCacheThisRequest()) {
             $cache = $this->getFileNameForRequest();
             if (file_exists($cache)) {
                 try {
                     $params->setData('module', false);
                     include_once $cache;
-                    //which one is better? Include or echo file_get_contents()?
-                    //$content = file_get_contents($cache);
-                    //echo $content;
                 } catch (Exception $e) {
                     App::log($e);
                 }
@@ -50,9 +45,7 @@ class Cache extends Module
                 if ($e->getCode() == 2) {
                     $this->fixCacheDirs();
                 }
-                App::log($e);
             }
-
         }
     }
 
