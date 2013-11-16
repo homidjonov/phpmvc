@@ -28,7 +28,6 @@ class Admin extends Module
     protected function _preDispatch()
     {
         if (!$this->getSession()->isLoggedIn() && !in_array($this->getRequest()->getAction(), $this->_allowedActions)) {
-            $this->getRequest()->setBeforeAuthUrl($this->getRequest()->getRequestUrl());
             $this->getRequest()->setAction('login');
         }
 
@@ -93,7 +92,8 @@ class Admin extends Module
             try {
                 if ($this->getSession()->authenticate($email, $password)) {
                     $this->getSession()->addSuccess($this->__("Login Successful"));
-                    $this->getRequest()->redirect($this->getRequest()->getBeforeAuthUrl());
+                    $url = ($this->getRequest()->getOrigAction() != 'login') ? $this->getRequest()->getOrigRequestUrl() : $this->getAdminUrl('index');
+                    $this->getRequest()->redirect($url);
                 }
             } catch (Exception $e) {
                 $this->getSession()->addError($this->__($e->getMessage()));

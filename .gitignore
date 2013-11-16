@@ -1,3 +1,5 @@
 /.idea
-/app/log/exception.log
-/app/log/system.log
+/temp/*
+/temp/log
+/temp/log/exception.log
+/temp/log/system.log

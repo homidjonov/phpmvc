@@ -9,6 +9,7 @@
 class Object
 {
     protected $_data = array();
+    protected $_origData = array();
     protected $_idFieldName = 'id';
 
     public function __construct($data = array())
@@ -31,7 +32,18 @@ class Object
         return $this->_data;
     }
 
-    public function getData($key,$default = null)
+    public function getAllOrigData()
+    {
+        return $this->_origData;
+    }
+
+    public function getOrigData($key = false, $default = null)
+    {
+        if (isset($this->_origData[$key])) return $this->_origData[$key];
+        return $default;
+    }
+
+    public function getData($key, $default = null)
     {
         if (isset($this->_data[$key])) return $this->_data[$key];
         return $default;
@@ -46,7 +58,8 @@ class Object
     protected function assignData($data)
     {
         if (is_array($data)) {
-            $this->_data = $data;
+            $this->_data     = $data;
+            $this->_origData = $data;
         }
         return $this;
     }

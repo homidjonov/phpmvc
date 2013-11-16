@@ -492,6 +492,11 @@ class Module
         $this->$action();
     }
 
+    protected function redirect($url)
+    {
+        $this->getRequest()->redirect($url);
+    }
+
     /**
      * @param $method
      * @param $args

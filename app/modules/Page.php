@@ -8,7 +8,7 @@
 class Page extends Module
 {
     //multiple routing
-    protected $_route = 'page:category:tag:content';
+    protected $_route = 'page:category:tag:content:post';
     protected $_predefinedFunctions = array('getStaticBlock');
 
 
@@ -165,37 +165,33 @@ class Page extends Module
         $this->render();
     }
 
-    public function adminCategoryIndex()
-    {
-        $this->_title = 'Content Management';
-        $model        = new CategoryModel();
-        $table        = new Grid();
-        $table
-            ->setPanel('Category Management ')
-            ->setModel($model)
-            ->addColumn('id', array(
-                'title' => 'ID',
-                'width' => '40px'
-            ))
-            ->addColumn('title')
-            ->addColumn('url')
-            ->addColumn('status', array(
-                'type'    => Grid::TYPE_OPTION,
-                'options' => $model->getStatusOptions(),
-            ))
-            ->addColumn('edit', array(
-                'type'   => Grid::TYPE_ACTION,
-                'action' => 'getAdminEditLink'
-            ));
-        $this->setPart('content', $table);
-        $this->render();
-    }
-
     public function adminContentAdd()
     {
         $this->_title = 'Create New Page';
         $this->setPart('form', $this->getEditForm());
         $this->render();
+    }
+
+    protected function _loadPageModel()
+    {
+        $model = new PageModel();
+        if ($id = intval($this->getRequest()->getParam('id'))) {
+            $model->loadById($id);
+        }
+        return $model;
+    }
+
+    public function adminPostEdit()
+    {
+        $model = $this->_loadPageModel();
+        if ($model->getId()) {
+            $this->_title = 'Edit Post';
+            $this->setPart('form', $this->getEditForm()->loadModel($model));
+            $this->render();
+        } else {
+            $this->getSession()->addError('Content not found');
+            $this->redirect($this->getAdminUrl('content_index'));
+        }
     }
 
     protected function getEditForm()

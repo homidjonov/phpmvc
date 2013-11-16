@@ -8,6 +8,7 @@
 class Request
 {
     protected $_request;
+    protected $_origRequest;
     protected $_host;
     protected $_domain;
     protected $_baseUrl;
@@ -33,7 +34,8 @@ class Request
     {
         $this->sanitizeInput();
 
-        $this->_request = strtolower($_SERVER['REQUEST_URI']);
+        $this->_origRequest = $_SERVER['REQUEST_URI'];
+        $this->_request     = strtolower($_SERVER['REQUEST_URI']);
         if (isset($_SERVER['QUERY_STRING']) && $_SERVER['QUERY_STRING'])
             $this->_request = substr($this->_request, 0, strpos($this->_request, $_SERVER['QUERY_STRING']) - 1);
         $this->_domain   = $_SERVER['HTTP_HOST'];
@@ -136,6 +138,11 @@ class Request
     public function getRequestUrl()
     {
         return $this->_request;
+    }
+
+    public function getOrigRequestUrl()
+    {
+        return $this->_origRequest;
     }
 
     public function getDomain()

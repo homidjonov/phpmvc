@@ -15,12 +15,9 @@ class Form
         'editor',
         'editormini',
         'password',
+        'hidden',
         'select',
-        'radio',
-        'checkbox',
         'button',
-        'html',
-        'fieldset',
         'submit',
     );
 
@@ -29,7 +26,7 @@ class Form
     public function __construct()
     {
         $this->_id        = 'form_' . App::getRequest()->getFullActionName();
-        $this->_action    = App::getRequest()->getRequestUrl();
+        $this->_action    = '';
         $this->_tabId     = 'tab_' . App::getRequest()->getFullActionName();
         $this->_formClass = 'tab_' . App::getRequest()->getFullActionName();
     }
@@ -177,7 +174,7 @@ class Form
 
     protected $_tabId;
     protected $_tabHeadWrapper = 'ul';
-    protected $_tabHeadWrapperClass = 'nav nav-tabs';
+    protected $_tabHeadWrapperClass = 'nav nav-tabs ';
     protected $_tabHeadItemWrapper = 'li';
     protected $_tabHeadItemWrapperClass = '';
     protected $_tabContentWrapper = 'div';
@@ -229,7 +226,7 @@ class Form
         $unSets = array('label', 'options', 'before', 'after', 'label_class', 'wrapper');
         foreach ($unSets as $key) unset($params[$key]);
         foreach ($params as $param => $value) {
-            $value = addcslashes($value, '\',"');
+            $value = htmlentities($value);
             $html .= " $param='$value'";
         }
         return $html;
@@ -242,10 +239,18 @@ class Form
         return $html;
     }
 
-    protected function renderTextarea($id, $params)
+    protected function renderHidden($id, $params)
     {
         $params = $this->renderParams($params);
-        $value  = isset($params['value']) ? $params['value'] : '';
+        $html   = "<input type='hidden' $params />";
+        return $html;
+    }
+
+    protected function renderTextarea($id, $params)
+    {
+        $value = isset($params['value']) ? $params['value'] : '';
+        unset($params['value']);
+        $params = $this->renderParams($params);
         $html   = "<textarea type='text' $params >$value</textarea>";
         return $html;
     }
@@ -279,11 +284,15 @@ class Form
                     height: $height,
                     focus: true,
                     toolbar: [
+                        ['style', ['style']],
                         ['style', ['bold', 'italic', 'underline', 'clear']],
                         ['fontsize', ['fontsize']],
                         ['color', ['color']],
-                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['para', ['paragraph']],
                         ['insert', ['link']]
+                        //['insert', ['picture', 'link']],
+                        //['table', ['table']],
+                        //['help', ['help']]
                       ]
                 });
             });
@@ -327,6 +336,17 @@ class Form
     public function expand()
     {
         App::runObserver('module_form_expand', array('form' => $this));
+        return $this;
+    }
+
+    public function loadModel(Model $model)
+    {
+        foreach ($this->_elements as $id => $element) {
+            if (in_array($element['type'], $this->_elementTypes)) {
+                $name                                    = $element['params']['name'];
+                $this->_elements[$id]['params']['value'] = $model->getOrigData($name);
+            }
+        }
         return $this;
     }
 }
