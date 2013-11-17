@@ -11,7 +11,20 @@ class Cache extends Module
         'module_before_run',
         'page_before_cache',
         'module_after_render',
+        'pagemodel_after_save',
     );
+
+    public function pagemodel_after_save($params)
+    {
+        if ($model = $params->getData('model')) {
+            if ($url = $model->getUrl()) {
+                $fileName = APP_CACHE_PAGE_DIR . md5($this->getUrl($url)) . '.cache';
+                if (file_exists($fileName)) {
+                    unlink($fileName);
+                }
+            }
+        }
+    }
 
     public function page_before_cache($params)
     {
@@ -49,7 +62,6 @@ class Cache extends Module
         }
     }
 
-
     protected function canCacheThisRequest()
     {
         $canCacheThisPage = true;
@@ -59,7 +71,7 @@ class Cache extends Module
 
     protected function getFileNameForRequest()
     {
-        $fileName = md5(trim($this->getRequest()->getRequestUrl(), '/?') . $this->getRequest()->getQueryString()) . '.cache';
+        $fileName = md5($this->getUrl(trim($this->getRequest()->getOrigRequestUrl(), '/?'))) . '.cache';
         return APP_CACHE_PAGE_DIR . $fileName;
     }
 

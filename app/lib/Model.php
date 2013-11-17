@@ -236,7 +236,7 @@ class Model extends Object
 
     protected function _beforeSave()
     {
-
+        App::runObserver(strtolower($this->getName()) . '_before_save', array('model', $this));
     }
 
     public function save()
@@ -281,7 +281,7 @@ class Model extends Object
 
     protected function _afterSave()
     {
-
+        App::runObserver(strtolower($this->getName()) . '_after_save', array('model'=>$this));
     }
 
 
