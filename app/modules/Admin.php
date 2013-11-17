@@ -90,7 +90,7 @@ class Admin extends Module
             $email    = $this->getRequest()->getPost('email');
             $password = $this->getRequest()->getPost('password');
             try {
-                if ($this->getSession()->authenticate($email, $password)) {
+                if ($email && $password && $this->getSession()->authenticate($email, $password)) {
                     $this->getSession()->addSuccess($this->__("Login Successful"));
                     $url = ($this->getRequest()->getOrigAction() != 'login') ? $this->getRequest()->getOrigRequestUrl() : $this->getAdminUrl('index');
                     $this->getRequest()->redirect($url);

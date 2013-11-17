@@ -134,10 +134,103 @@ class Page extends Module
     public function adminContentIndex()
     {
         $this->_title = 'Category Management';
-        $page         = new PageModel();
-        $table        = new Grid();
+        $this->setPart('content', $this->getContentGrid());
+        $this->render();
+    }
+
+    public function adminContentAdd()
+    {
+        $this->_title = 'Create New Page';
+        $this->setPart('form', $this->getPostEditForm());
+        $this->render();
+    }
+
+    protected function _loadPageModel()
+    {
+        $model = new PageModel();
+        if ($id = intval($this->getRequest()->getParam('id'))) {
+            $model->loadById($id);
+        }
+        return $model;
+    }
+
+    public function adminPostEdit()
+    {
+        $model = $this->_loadPageModel();
+        if ($model->getId()) {
+            $this->_title = 'Edit Post';
+            $form         = $this->getPostEditForm()->loadModel($model);
+            $this->setPart('form', $form);
+            $this->render();
+        } else {
+            $this->getSession()->addError('Content not found');
+            $this->redirect($this->getAdminUrl('content_index'));
+        }
+    }
+
+    public function adminPageEditorUpload()
+    {
+        $result = array('success' => 1, 'url' => '');
+        try {
+            $ext         = explode('.', $_FILES['file']['name']);
+            $filename    = time() . '.' . $ext[1];
+            $destination = App::getMediaDir('content') . $filename;
+            $location    = $_FILES["file"]["tmp_name"];
+            move_uploaded_file($location, $destination);
+            $result['url']   = App::getMediaUrl('content/' . $filename);
+            $result['image'] = $filename;
+        } catch (Exception $e) {
+            App::log($e);
+            $result['message'] = $e->getMessage();
+            $result['success'] = 0;
+        }
+        $this->returnJson($result);
+    }
+
+    public function adminPageEdit()
+    {
+        $model = $this->_loadPageModel();
+        if ($this->getRequest()->hasPost()) {
+            try {
+                $data = new Object($_POST);
+                $model
+                    ->setData('title', $data->getTitle())
+                    ->setData('content', $data->getContent())
+                    ->setData('intro', $data->getIntro())
+                    ->setData('meta_keywords', $data->getMetaKeywords())
+                    ->setData('meta_description', $data->getMetaDescription())
+                    ->setData('author', $data->getAuthor())
+                    ->setData('url', $data->getUrl())
+                    ->setData('image', $data->getImage())
+                    ->setData('status', $data->getStatus())
+                    ->save();
+
+                $this->getSession()->addSuccess("Page updated successfully");
+                if ($model->getId() && $this->getRequest()->getParam('save_back')) {
+                    $this->redirect($model->getAdminEditLink());
+                }
+                $this->redirect($this->getAdminUrl('content_index'));
+            } catch (Exception $e) {
+                $this->getSession()->addError($e->getMessage());
+            }
+        }
+        if ($model->getId() || $this->getRequest()->hasPost()) {
+            $form         = $this->getPostEditForm()->loadModel($model);
+            $this->_title = sprintf('Edit Page "%s"', $model->getTitle());
+            $this->setPart('form', $form);
+            $this->render();
+        } else {
+            $this->getSession()->addError('Content not found');
+            $this->redirect($this->getAdminUrl('content_index'));
+        }
+    }
+
+    protected function getContentGrid()
+    {
+        $page  = new PageModel();
+        $table = new Grid();
         $table
-            ->setPanel('Content Management ')
+            ->setPanel('Content Management')
             ->setModel($page)
             ->addColumn('id', array(
                 'title' => 'ID',
@@ -161,44 +254,15 @@ class Page extends Module
                 'type'   => Grid::TYPE_ACTION,
                 'action' => 'getAdminEditLink'
             ));
-        $this->setPart('content', $table);
-        $this->render();
+        return $table;
     }
 
-    public function adminContentAdd()
-    {
-        $this->_title = 'Create New Page';
-        $this->setPart('form', $this->getEditForm());
-        $this->render();
-    }
-
-    protected function _loadPageModel()
-    {
-        $model = new PageModel();
-        if ($id = intval($this->getRequest()->getParam('id'))) {
-            $model->loadById($id);
-        }
-        return $model;
-    }
-
-    public function adminPostEdit()
-    {
-        $model = $this->_loadPageModel();
-        if ($model->getId()) {
-            $this->_title = 'Edit Post';
-            $this->setPart('form', $this->getEditForm()->loadModel($model));
-            $this->render();
-        } else {
-            $this->getSession()->addError('Content not found');
-            $this->redirect($this->getAdminUrl('content_index'));
-        }
-    }
-
-    protected function getEditForm()
+    protected function getPostEditForm()
     {
         $form = new Form();
         $form
             ->setClass('form-horizontal')
+
             ->setElementWrapper('div', 'form-group')
             ->addTab('tab_2', 'Content')
             ->addElement('text', 'title', array(
@@ -225,7 +289,32 @@ class Page extends Module
                 'rows'        => '6',
                 'wrapper'     => '<div class="col-sm-10">%s</div>',
             ))
-            ->addTab('tab_4', 'Configuration');
+            ->addTab('tab_4', 'Configuration')
+            ->addElement('text', 'url', array(
+                'label'       => $this->__('Content Link'),
+                'placeholder' => $this->__('type-some-unique-url-identifier-of-the-page-here'),
+                'label_class' => 'col-sm-2',
+                'wrapper'     => '<div class="col-sm-10">%s</div>',
+            ))
+            ->addElement('image', 'image', array(
+                'label'       => $this->__('Thumbnail'),
+                'label_class' => 'col-sm-2',
+                'ajax_upload' => App::getAdminUrl('page_editorUpload'),
+                'placeholder' => $this->__('Select image or paste image url here'),
+                'wrapper'     => '<div class="col-sm-10">%s</div>',
+            ))
+            ->addElement('text', 'author', array(
+                'label'       => $this->__('Author or Source'),
+                'label_class' => 'col-sm-2',
+                'wrapper'     => '<div class="col-sm-5">%s</div>',
+            ))
+            ->addElement('select', 'status', array(
+                'label'       => $this->__('Status'),
+                'label_class' => 'col-sm-2',
+                'wrapper'     => '<div class="col-sm-5">%s</div>',
+                'options'     => PageModel::getStatusOptions()
+            ));
+
         return $form->expand();
     }
 
@@ -301,8 +390,75 @@ class PageModel extends Model
         if (strpos($url, 'http') === 0) {
             return $url;
         } else {
-            return App::getRequest()->getBaseUrl() . "media/images/$url";
+            return App::getMediaUrl("content/$url");
         }
+    }
+
+    protected $_mediaC = 0;
+
+    public function dataToImage($match)
+    {
+        list(, $img, $type, $base64, $end) = $match;
+        $bin  = base64_decode($base64);
+        $name = time() . "{$this->_mediaC}." . $type;
+        $file = App::getMediaDir('content') . $name;
+        file_exists($file) or file_put_contents($file, $bin);
+        $url = App::getMediaUrl("content/$name");
+        $this->_mediaC++;
+        return "$img$url$end";
+    }
+
+
+    protected function _beforeSave()
+    {
+        //load from url
+        if (strpos($this->getData('image'), 'http') === 0) {
+            try {
+                $content = file_get_contents($this->getData('image'));
+                $ext     = 'jpg';
+                $exts    = explode('.', $this->getData('image'));
+                $exts    = strtolower($exts[count($exts) - 1]);
+                if (in_array($exts, array('jpg', 'jpeg', 'bmp', 'png', 'gif', 'tiff'))) {
+                    $ext = $exts;
+                }
+                $name        = time() . '.' . $ext;
+                $destination = App::getMediaDir('content') . $name;
+                file_put_contents($destination, $content);
+                $this->setData('image', $name);
+                AdminSession::getInstance()->addSuccess('Image successfully loaded from url.');
+            } catch (Exception $e) {
+                AdminSession::getInstance()->addError('Failed load image from url');
+            }
+        }
+
+        //delete old thumbnail
+        $oldImage = App::getMediaDir('content') . $this->getOrigData('image');
+        if ($this->getOrigData('image') && $this->getOrigData('image') != $this->getData('image') && file_exists($oldImage)) {
+            unlink($oldImage);
+        }
+
+        //upload editor images
+        if ($content = $this->getContent()) {
+            $content = preg_replace_callback('#(<img\s(?>(?!src=)[^>])*?src=")data:image/(gif|png|jpeg);base64,([\w=+/]++)("[^>]*>)#', array('PageModel', 'dataToImage'), $content);
+            $this->setData('content', $content);
+        }
+
+        //fix created and updated date
+        $this->setData('updated', date('Y-m-d H:i:s'));
+        if (!$this->getId()) {
+            $this->setData('created', date('Y-m-d H:i:s'));
+        }
+
+        //fix content url
+        if (strlen(trim($this->getData('url'))) == 0 && $this->getData('title')) {
+            $this->setData('url', $this->convertToUrl($this->getData('title')));
+        }
+        parent::_beforeSave();
+    }
+
+    protected function _afterSave()
+    {
+        parent::_afterSave();
     }
 
     public function getIntro()
@@ -330,7 +486,7 @@ class PageModel extends Model
 
     public function getAdminEditLink()
     {
-        return sprintf("<a href='%s'>%s</a>", App::getAdminUrl($this->getData('type') . '_edit', array($this->getIdFieldName() => $this->getId())), 'Edit');
+        return App::getAdminUrl($this->getData('type') . '_edit', array($this->getIdFieldName() => $this->getId()));
     }
 
 }

@@ -100,4 +100,15 @@ class Object
         $result = strtolower(preg_replace('/(.)([A-Z])/', "$1_$2", $name));
         return $result;
     }
+
+    protected function getChangedFields()
+    {
+        $fields = array();
+        foreach ($this->_origData as $field => $value) {
+            if ($this->getOrigData($field) != $this->getData($field)) {
+                $fields[$field] = $this->getData($field);
+            }
+        }
+        return $fields;
+    }
 }

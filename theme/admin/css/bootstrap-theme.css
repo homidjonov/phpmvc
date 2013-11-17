@@ -5,6 +5,23 @@
  *
  * Designed and built with all the love in the world by @mdo and @fat.
  */
+.image_selector_img{
+    height: 34px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+.image_selector_img:hover{
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 150px;
+    width: auto;
+    z-index: 10001;
+}
+.image_selector_img_w{
+    position: relative;
+    width: 60px;
+}
 .container {
     max-width: 1768px;
     margin-top: 70px;

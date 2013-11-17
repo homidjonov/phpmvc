@@ -78,16 +78,29 @@ class Request
     protected function sanitizeInput()
     {
         foreach ($_POST as $key => $value) {
-            $_POST[$key] = mysql_real_escape_string($value);
+            //$_POST[$key] = $this->escapeValue($value);
         }
         foreach ($_GET as $key => $value) {
-            $_GET[$key] = mysql_real_escape_string($value);
+            $_GET[$key] = $this->escapeValue($value);
         }
+    }
+
+    protected function escapeValue($value)
+    {
+        if (is_array($value)) {
+            foreach ($value as &$v) {
+                $this->escapeValue($v);
+            }
+        } else {
+            $value = mysql_real_escape_string($value);
+        }
+        return $value;
     }
 
     public function getParam($key, $default = null)
     {
         if (isset($this->_getParams[$key])) return $this->_getParams[$key];
+        if (isset($_POST[$key])) return $_POST[$key];
         return $default;
     }
 

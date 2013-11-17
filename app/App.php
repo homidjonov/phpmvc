@@ -47,8 +47,8 @@ class App
             ini_set('display_errors', 'off');
             ini_set('error_reporting', E_ERROR);
         }
-
-
+        date_default_timezone_set(APP_DEFAULT_TIMEZONE);
+        setlocale(LC_ALL, APP_DEFAULT_LOCALE);
     }
 
     /**
@@ -232,6 +232,14 @@ class App
         return APP_VIEW_DIR;
     }
 
+    static public function getMediaDir($dir = false)
+    {
+        if ($dir) {
+            return APP_MEDIA_DIR . $dir . DS;
+        }
+        return APP_MEDIA_DIR;
+    }
+
     public static function getAdminRoute()
     {
         return APP_ADMIN_ROUTE;
@@ -289,6 +297,11 @@ class App
     public static function getAdminUrl($link, $params = array())
     {
         return self::getUrl(self::getAdminRoute() . "/" . $link, $params);
+    }
+
+    public static function getMediaUrl($link)
+    {
+        return self::getUrl("media/" . $link);
     }
 
     public static function formatDate($date)

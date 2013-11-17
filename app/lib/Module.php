@@ -13,6 +13,7 @@ class Module
     protected $_name;
     protected $_observers;
     protected $_adminMenu;
+    protected $_form;
 
     protected static $_renderers;
     protected static $_params;
@@ -221,6 +222,20 @@ class Module
         return $this;
     }
 
+    public function setForm(Form $form)
+    {
+        $this->_form = $form;
+        return $this;
+    }
+
+    /**
+     * @return Form
+     */
+    public function getForm()
+    {
+        return $this->_form;
+    }
+
     protected function _preDispatch()
     {
         if ($this->isMultipleRoute() && App::getRequest()->getModule() != $this->getName()) {
@@ -293,7 +308,10 @@ class Module
 
     public function setPart($part, $content)
     {
-        if (is_object($content)) $content = $content->render();
+        if (is_object($content)) {
+            if (get_class($content) == 'Form') $this->setForm($content);
+            $content = $content->render();
+        }
         self::$_partsContent->setData($part, $content);
     }
 
@@ -526,4 +544,10 @@ class Module
         throw new Exception("Model class [$modelName] not found.");
     }
 
+
+    protected function returnJson($data)
+    {
+        header('Content-Type: application/json');
+        echo json_encode($data);
+    }
 }

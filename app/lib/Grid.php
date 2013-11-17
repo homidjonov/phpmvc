@@ -172,7 +172,7 @@ class Grid
         switch ($type) {
             case self::TYPE_ACTION:
                 $action = $column['action'];
-                $value  = $item->$action();
+                $value  = sprintf("<a href='%s'>%s</a>", $item->$action(), $column['field']);
                 break;
             case self::TYPE_DATE:
                 $value = App::formatDate($value);

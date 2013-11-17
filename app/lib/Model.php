@@ -233,4 +233,68 @@ class Model extends Object
     {
         return sprintf("<a href='%s'>%s</a>", App::getAdminUrl('page_edit', array($this->getIdFieldName() => $this->getId())), 'Edit');
     }
+
+    protected function _beforeSave()
+    {
+
+    }
+
+    public function save()
+    {
+        $this->_beforeSave();
+        if ($this->getId()) {
+            $fields = $this->getChangedFields();
+            if (count($fields)) {
+                $cols = array();
+                foreach ($fields as $field => $value) {
+                    $cols[] = "`$field`=:$field";
+                }
+                $fields[$this->_idFieldName] = $this->_id;
+                $cols                        = implode(', ', $cols);
+                $query                       = "Update `{$this->_table}` SET $cols WHERE `{$this->_idFieldName}`=:{$this->_idFieldName}";
+                $stm                         = $this->getConnection()->prepare($query);
+                if (!$stm->execute($fields)) {
+                    $error = $stm->errorInfo();
+                    throw new Exception($error[2]);
+                }
+            }
+        } else {
+            $col  = array();
+            $bind = array();
+            foreach ($this->_data as $field => $value) {
+                $bind[$field] = $value;
+                $col[$field]  = ":field";
+            }
+            $val   = implode(', ', array_values($col));
+            $col   = implode(', ', array_keys($col));
+            $query = "INSERT INTO `{$this->_table}` ($col) VALUES ($val)";
+            $stm   = $this->getConnection()->prepare($query);
+            if (!$stm->execute($bind)) {
+                $error = $stm->errorInfo();
+                throw new Exception($error[2]);
+            }
+        }
+        $this->reload();
+        $this->_afterSave();
+        return $this;
+    }
+
+    protected function _afterSave()
+    {
+
+    }
+
+
+    protected function reload()
+    {
+        if ($this->getId()) {
+            $this->loadById($this->getId());
+        }
+        return $this;
+    }
+
+    protected function convertToUrl($string)
+    {
+        return strtolower(preg_replace('/[^A-Za-z0-9_-]+/', '-', $string));
+    }
 }

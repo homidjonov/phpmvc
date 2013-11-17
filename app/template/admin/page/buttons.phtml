@@ -1,0 +1,29 @@
+<?php
+/**
+ * @var $this Module
+ */
+?>
+<?php if ($this->getForm()): ?>
+    <div class="btn-group">
+        <button type="button" class="btn btn-default " onclick="formBack()"><i class="fa fa-angle-left"></i></button>
+        <button type="button" class="btn btn-default " onclick="formSave()">Save</button>
+        <button type="button" class="btn btn-default " onclick="formSaveContinue()">Save&Continue</button>
+    </div>
+    <script type="text/javascript">
+        var activeForm = '<?=$this->getForm()->getId()?>';
+        function formBack() {
+            window.history.back();
+        }
+        function formSave() {
+            $('#' + activeForm).submit();
+        }
+        function formSaveContinue() {
+            $('<input>').attr({
+                type: 'hidden',
+                name: 'save_back',
+                value: 1
+            }).appendTo('#' + activeForm);
+            formSave();
+        }
+    </script>
+<?php endif; ?>

@@ -19,6 +19,7 @@ class Form
         'select',
         'button',
         'submit',
+        'image',
     );
 
     protected $_validation = array();
@@ -41,6 +42,11 @@ class Form
     {
         $this->_enctype = "enctype='multipart/form-data'";
         return $this;
+    }
+
+    public function getId()
+    {
+        return $this->_id;
     }
 
     public function setMethod($method)
@@ -93,7 +99,9 @@ class Form
                 'params'   => $params,
                 'validate' => ($validation != false)
             );
-
+            if ($type == 'image') {
+                $this->setMultiPartFormData();
+            }
             if ($validation) {
                 $this->_validation[$id] = $validation;
             }
@@ -239,6 +247,56 @@ class Form
         return $html;
     }
 
+    protected function renderImage($id, $params)
+    {
+        $name = $params['name'];
+        $url  = '#';
+        if ($this->_model) {
+            $url = $this->_model->getImageUrl();
+        }
+        $uploadUrl = (isset($params['ajax_upload'])) ? $params['ajax_upload'] : '';
+        $params    = $this->renderParams($params);
+        $html      = "<div class='input-group' id='image_selector'>
+                    <span class='input-group-btn image_selector_img_w'><img src='{$url}' class='image_selector_img' id='image_selector_img'/></span>
+                    <input type='text' class='form-control' id='$id' $params>
+                    <span class='input-group-btn'><button class='btn btn-primary' type='button' onclick='$(\"#input_{$name}_upload\").click()'>Select Image</button></span>
+                   </div>
+                   <input type='file' id='input_{$name}_upload' name='{$name}[upload]' onchange='$(\"#{$id}\").val(this.value);uploadImageData(this.files)' style='display: none'/>
+                   <script type='text/javascript'>
+                   var fileUploaded=false;
+                   $('#{$this->_id}').on('submit',function(){
+                       if(fileUploaded)$('#input_{$name}_upload').attr('disabled','disabled');
+                   });
+                   function uploadImageData(files){
+                       var uploadUrl='$uploadUrl';
+                       if(uploadUrl.length){
+                           var data = new FormData();
+                           data.append('file', files[0]);
+                           $.ajax({
+                               data: data,
+                               type: 'POST',
+                               url: uploadUrl,
+                               cache: false,
+                               dataType : 'json',
+                               contentType: false,
+                               processData: false,
+                               success: function(data) {
+                                   if(data.success){
+                                       fileUploaded=true;
+                                       $('#$id').val(data.image);
+                                       $('#image_selector_img').attr('src',data.url);
+                                   }else{
+                                       console.log(data.message);
+                                   }
+                               }
+                           });
+                       }
+                   }
+                   </script>
+                   ";
+        return $html;
+    }
+
     protected function renderHidden($id, $params)
     {
         $params = $this->renderParams($params);
@@ -259,13 +317,49 @@ class Form
     {
         $value  = isset($params['value']) ? $params['value'] : '';
         $height = isset($params['height']) ? $params['height'] : 300;
-        $html   = "
-        <div id='$id'>$value</div>
+
+        unset($params['value']);
+        $params    = $this->renderParams($params);
+        $uploadUrl = App::getAdminUrl('page_editorUpload');
+        $html      = "
+        <textarea id='{$id}' $params style='display: none'></textarea>
+        <div id='summernote_{$id}'>$value</div>
         <script type='text/javascript'>
             $(document).ready(function () {
-                $('#$id').summernote({
+                $('#summernote_{$id}').summernote({
                     height: $height,
-                    focus: true
+                    focus: true,
+                    onImageUpload: function(files, editor, welEditable) {
+                        sendFile(files[0],editor,welEditable);
+                    }
+                });
+                function sendFile(file,editor,welEditable) {
+                    data = new FormData();
+                    data.append('file', file);
+                    $.ajax({
+                        data: data,
+                        type: 'POST',
+                        url: '$uploadUrl',
+                        cache: false,
+                        dataType : 'json',
+                        contentType: false,
+                        processData: false,
+                        success: function(data) {
+                            if(data.success){
+                                editor.insertImage(welEditable, data.url);
+                            }else{
+                                console.log(data.message);
+                                var fileReader = new FileReader;
+                                fileReader.onload = function(event) {
+                                   editor.insertImage(welEditable, event.target.result);
+                                };
+                                fileReader.readAsDataURL(file);
+                            }
+                        }
+                    });
+                }
+                $('#{$this->_id}').on('submit',function(){
+                    $('#{$id}').val($('#summernote_{$id}').code());
                 });
             });
         </script>";
@@ -276,11 +370,14 @@ class Form
     {
         $value  = isset($params['value']) ? $params['value'] : '';
         $height = isset($params['height']) ? $params['height'] : 100;
+        unset($params['value']);
+        $params = $this->renderParams($params);
         $html   = "
-        <div id='$id'>$value</div>
+        <textarea id='{$id}' $params style='display: none'></textarea>
+        <div id='summernote_{$id}'>$value</div>
         <script type='text/javascript'>
             $(document).ready(function () {
-                $('#$id').summernote({
+                $('#summernote_{$id}').summernote({
                     height: $height,
                     focus: true,
                     toolbar: [
@@ -294,6 +391,9 @@ class Form
                         //['table', ['table']],
                         //['help', ['help']]
                       ]
+                });
+                $('#{$this->_id}').on('submit',function(){
+                    $('#{$id}').val($('#summernote_{$id}').code());
                 });
             });
         </script>";
@@ -311,6 +411,7 @@ class Form
     protected function renderSelect($id, $params)
     {
         $options = '';
+
         if (isset($params['options'])) {
             foreach ($params['options'] as $value => $label) {
                 $selected = (isset($params['value']) && $params['value'] == $value) ? "selected='selected'" : '';
@@ -328,8 +429,7 @@ class Form
         foreach ($this->_elements as $id => &$element) {
             if (in_array($element['type'], array('password', 'submit'))) continue;
             $name                       = $element['params']['name'];
-            $value                      = App::getRequest()->getPost($name);
-            $element['params']['value'] = $value;
+            $element['params']['value'] = App::getRequest()->getPost($name);;
         }
     }
 
@@ -339,8 +439,11 @@ class Form
         return $this;
     }
 
+    protected $_model;
+
     public function loadModel(Model $model)
     {
+        $this->_model = $model;
         foreach ($this->_elements as $id => $element) {
             if (in_array($element['type'], $this->_elementTypes)) {
                 $name                                    = $element['params']['name'];

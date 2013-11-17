@@ -22,11 +22,17 @@ define('APP_MODULES_DIR', __DIR__ . DS . 'modules' . DS);
 define('APP_VIEW_DIR', __DIR__ . DS . 'template' . DS);
 define('APP_THEME_DIR', APP_WWW_FOLDER . DS . 'theme' . DS);
 define('APP_TEMP_DIR', APP_WWW_FOLDER . DS . 'temp' . DS);
+define('APP_MEDIA_DIR', APP_WWW_FOLDER . DS . 'media' . DS);
 define('APP_LOG_DIR', APP_TEMP_DIR . 'log' . DS);
 define('APP_SESSION_DIR', APP_TEMP_DIR . 'session' . DS);
 define('APP_CACHE_DIR', APP_TEMP_DIR . 'cache' . DS);
 define('APP_CACHE_PAGE_DIR', APP_CACHE_DIR . 'page' . DS);
 define('APP_CACHE_PART_DIR', APP_CACHE_DIR . 'part' . DS);
+
+
+define('APP_DEFAULT_TIMEZONE', 'Asia/Tashkent');
+define('APP_DEFAULT_LOCALE', 'en_US');
+//App::log(DateTimeZone::listIdentifiers());
 
 //defaults
 define('APP_DEFAULT_ROUTE', 'page');
