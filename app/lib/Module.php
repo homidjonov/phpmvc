@@ -550,4 +550,16 @@ class Module
         header('Content-Type: application/json');
         echo json_encode($data);
     }
+
+    protected $_cacheKey;
+
+    public function setCacheKey($key)
+    {
+        $this->_cacheKey = $key;
+        return $this;
+    }
+    public function getCacheKey()
+    {
+        return $this->_cacheKey;
+    }
 }

@@ -15,6 +15,13 @@ class Model extends Object
     const STATUS_ENABLED  = 1;
     const STATUS_DISABLED = 0;
 
+    const CACHE_KEY = 'model';
+
+    public function  getCacheKey()
+    {
+        return self::CACHE_KEY . '_' . $this->getId();
+    }
+
     static public function getStatusOptions()
     {
         return array(
@@ -281,7 +288,7 @@ class Model extends Object
 
     protected function _afterSave()
     {
-        App::runObserver(strtolower($this->getName()) . '_after_save', array('model'=>$this));
+        App::runObserver(strtolower($this->getName()) . '_after_save', array('model' => $this));
     }
 
 

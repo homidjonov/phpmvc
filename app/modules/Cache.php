@@ -35,7 +35,8 @@ class Cache extends Module
 
     public function module_before_run($params)
     {
-        if ($this->canCacheThisRequest()) {
+        $module = $params->getData('module');
+        if ($this->canCacheThisRequest($module)) {
             $cache = $this->getFileNameForRequest();
             if (file_exists($cache)) {
                 try {
@@ -50,10 +51,18 @@ class Cache extends Module
 
     public function module_after_render($params)
     {
-        if ($this->canCacheThisRequest()) {
+        /**
+         * @var $module Module
+         */
+        $module = $params->getData('module');
+        if ($this->canCacheThisRequest($module) && $module->getCacheKey()) {
             try {
-                $content = $params->getData('content');
-                file_put_contents($this->getFileNameForRequest(), $content);
+                $content  = $params->getData('content');
+                $fileName = APP_CACHE_PAGE_DIR . 'keys' . DS . $module->getCacheKey() . '.ck';
+                if (!file_exists($fileName)) {
+                    file_put_contents($fileName, $this->getFileNameForRequest());
+                    file_put_contents($this->getFileNameForRequest(), $content);
+                }
             } catch (Exception $e) {
                 if ($e->getCode() == 2) {
                     $this->fixCacheDirs();
@@ -62,10 +71,10 @@ class Cache extends Module
         }
     }
 
-    protected function canCacheThisRequest()
+    protected function canCacheThisRequest($module)
     {
         $canCacheThisPage = true;
-        App::runObserver('page_before_cache', array('can_cache' => &$canCacheThisPage));
+        App::runObserver('page_before_cache', array('can_cache' => &$canCacheThisPage, 'module' => $module));
         return $canCacheThisPage;
     }
 
@@ -82,6 +91,9 @@ class Cache extends Module
         }
         if (!file_exists(APP_CACHE_PAGE_DIR)) {
             mkdir(APP_CACHE_PAGE_DIR);
+        }
+        if (!file_exists(APP_CACHE_PAGE_DIR . 'keys')) {
+            mkdir(APP_CACHE_PAGE_DIR . 'keys');
         }
         if (!file_exists(APP_CACHE_PART_DIR)) {
             mkdir(APP_CACHE_PART_DIR);

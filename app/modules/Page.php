@@ -96,6 +96,7 @@ class Page extends Module
      */
     protected function renderPage($page)
     {
+        $this->setCacheKey($page->getCacheKey());
         $this->_title       = $page->getData('title');
         $this->_keywords    = $page->getData('meta_keywords');
         $this->_description = $page->getData('meta_description');
@@ -346,6 +347,13 @@ class PageModel extends Model
     const TYPE_POST   = 'post';
     const TYPE_PAGE   = 'page';
     const TYPE_STATIC = 'static';
+
+    const CACHE_KEY = 'page';
+
+    public function  getCacheKey()
+    {
+        return self::CACHE_KEY . '_' . $this->getId();
+    }
 
     static public function getStatusOptions()
     {

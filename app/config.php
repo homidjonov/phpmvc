@@ -46,7 +46,7 @@ define('APP_DB_DATABASE', 'blog');
 
 //administrator configs
 define('APP_ADMIN_ROUTE', 'adminbox');
-define('APP_CACHE_ENABLED', 0);
+define('APP_CACHE_ENABLED', 1);
 
 //modules configs
 define('MD_PAGE_POST_LIMIT', 5);
