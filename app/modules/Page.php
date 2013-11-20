@@ -156,16 +156,7 @@ class Page extends Module
 
     public function adminPostEdit()
     {
-        $model = $this->_loadPageModel();
-        if ($model->getId()) {
-            $this->_title = 'Edit Post';
-            $form         = $this->getPostEditForm()->loadModel($model);
-            $this->setPart('form', $form);
-            $this->render();
-        } else {
-            $this->getSession()->addError('Content not found');
-            $this->redirect($this->getAdminUrl('content_index'));
-        }
+        $this->adminPageEdit();
     }
 
     public function adminPageEditorUpload()
@@ -545,7 +536,8 @@ class PageInstaller extends Model
         `url`  varchar(255) NOT NULL ,
         `title`  varchar(255) NULL ,
         `author`  varchar(255) NULL ,
-        `content`  text NULL ,
+        `intro`  mediumtext DEFAULT NULL ,
+        `content`  text DEFAULT NULL ,
         `lang_id`  int(11) UNSIGNED NOT NULL ,
         `image`  varchar(255) NULL ,
         `meta_keywords`  varchar(255) NULL ,
